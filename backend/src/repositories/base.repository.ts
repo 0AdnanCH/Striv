@@ -1,6 +1,7 @@
 import { Document, FilterQuery, Model, Types, UpdateQuery } from "mongoose";
+import { IBaseRepository } from "./interface/baseRepository.interface";
 
-export abstract class BaseRepository<T extends Document> {
+export abstract class BaseRepository<T extends Document> implements IBaseRepository<T> {
   constructor(protected model: Model<T>) {}
 
   async create(data: Partial<T>): Promise<T> {

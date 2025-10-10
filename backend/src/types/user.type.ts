@@ -9,4 +9,5 @@ export interface IUser {
   gender: GENDER;
   age: number;
   role: ROLE;
+  isVerified?: boolean;
 }

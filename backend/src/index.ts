@@ -1,10 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
 
 import authRouter from './routers/auth.router';
 import { errorHandler } from './middlewares/errors.middleware';
-
-dotenv.config();
 
 const app = express();
 import { env } from './configs/env.config';
@@ -20,4 +19,4 @@ app.use(errorHandler);
 
 app.listen(env.PORT, () => {
   console.log(`Server is running at http://localhost:${env.PORT}`);
-})
+});
