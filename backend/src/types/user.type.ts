@@ -8,6 +8,6 @@ export interface IUser {
   password: string;
   gender: GENDER;
   age: number;
-  role: ROLE;
+  role?: ROLE;
   isVerified?: boolean;
 }
