@@ -1,5 +1,6 @@
 import { Schema, model, Document } from "mongoose";
 import { IUser } from "../types/user.type";
+import { UserRole } from "../constants/roles.constants";
 
 export interface UserDocument extends IUser, Document {}
 
@@ -10,7 +11,7 @@ const userSchema = new Schema<UserDocument>({
   password: { type: String, required: true },
   gender: { type: String, enum: ['male', 'female'], required: true },
   age: { type: Number, required: true },
-  role: { type: String, enum: ['client', 'trainer', 'admin'], required: true },
+  role: { type: String, enum: Object.values(UserRole), default: UserRole.CLIENT },
   isVerified: { type: Boolean, default: false },
 }, { timestamps: true });
 

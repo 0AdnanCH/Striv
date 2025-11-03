@@ -14,6 +14,7 @@ export interface SignInData {
 }
 
 export interface AuthResponse {
+  message: string;
   user: {
     id: string;
     first_name: string;
@@ -22,4 +23,9 @@ export interface AuthResponse {
     role: 'admin' | 'trainer' | 'client';
   };
   token: string;
+}
+
+export interface OtpVerifyData {
+  email: string;
+  otp: string;
 }

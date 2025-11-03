@@ -15,7 +15,7 @@ const authController = new AuthController(authService);
 
 authRouter.post('/signup', validate(signupSchema), authController.signup.bind(authController));
 authRouter.post('/signin', authController.signin.bind(authController));
-authRouter.post('/verify-otp', validate(otpSchema), authController.verifySignUpOtp.bind(authController));
-authRouter.post('/resent-otp', validate(emailSchema), authController.resendOtp.bind(authController));
+authRouter.post('/verify-signup-otp', validate(otpSchema), authController.verifySignUpOtp.bind(authController));
+authRouter.post('/resend-otp', validate(emailSchema), authController.resendOtp.bind(authController));
 
 export default authRouter;

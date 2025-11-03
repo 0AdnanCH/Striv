@@ -16,7 +16,7 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('[API Error]', error.response || error.message);
+    console.error('[API Error]', error.response);
     throw error;
   }
 );

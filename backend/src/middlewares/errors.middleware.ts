@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { CustomError } from "../errors/custom.error";
 import { HTTP_STATUS } from "../constants/httpStatus.constants";
 import { RESPONSE_MESSAGES } from "../constants/responseMessages.constants";
-import { ApiResponse } from "../utils/apiResponse";
+import { ApiResponse } from "../utils/apiResponse.util";
 
 export const errorHandler = (err: Error, req: Request, res: Response<ApiResponse>, next: NextFunction) => {
   // Handled errors

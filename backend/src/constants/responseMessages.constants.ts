@@ -13,5 +13,8 @@ export const RESPONSE_MESSAGES = {
   OTP_RESENT: 'A new OTP has been sent to your email address.',
   OTP_VERIFIED: 'Email verified successfully.',
   INVALID_OTP: 'Invalid OTP. Please try again.',
-  EMAIL_NOT_VERIFIED: 'Please verify your email before logging in.'
+  EMAIL_NOT_VERIFIED: 'Please verify your email before logging in.',
+  TOKEN_MISSING: 'Authorization token is missing.',
+  INVALID_OR_EXPIRED_TOKEN: 'Invalid or expired token.',
+  FORBIDDEN: 'You do not have permission to perform this action.'
 } as const;

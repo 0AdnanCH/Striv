@@ -1,6 +1,6 @@
 import OTPModel, { IOTP, OtpDocument } from "../../models/otp.model";
 import { BaseRepository } from "../base.repository";
-import { IOtpRepository } from "../interface/otpRepository.interface";
+import { IOtpRepository } from "../interface/IOtp.repository";
 
 export class OtpRepository extends BaseRepository<OtpDocument> implements IOtpRepository {
   constructor() {

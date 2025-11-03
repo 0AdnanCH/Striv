@@ -1,5 +1,5 @@
 import { IOTP, OtpDocument } from "../../models/otp.model";
-import { IBaseRepository } from "./baseRepository.interface";
+import { IBaseRepository } from "./IBase.repository";
 
 export interface IOtpRepository extends IBaseRepository<OtpDocument> {
   findByEmail(email: string): Promise<OtpDocument | null>;

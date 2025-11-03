@@ -3,23 +3,28 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import SignUpPage from '../pages/auth/SignUpPage';
 import SignInPage from '../pages/auth/SignInPage';
+import VerifySignUpOtpPage from '../pages/auth/VerifySignUpOtpPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: <HomePage />
   },
   {
     path: '/signup',
-    element: <SignUpPage />,
+    element: <SignUpPage />
   },
   {
     path: '/signin',
-    element: <SignInPage />,
+    element: <SignInPage />
+  },
+  {
+    path: '/verify-signup-otp',
+    element: <VerifySignUpOtpPage />
   },
   {
     path: '*',
-    element: <div className='text-center p-10'>404 | Page Not Found</div>,
+    element: <div className="text-center p-10">404 | Page Not Found</div>
   }
 ]);
 

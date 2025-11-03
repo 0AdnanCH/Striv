@@ -1,9 +1,11 @@
 import React from 'react';
 import SignUpForm from '../../components/forms/SignUpForm';
-import { cn } from '../../utils/cn';
+import { cn } from '../../utils/cn.util';
 import { useAuth } from '../../hooks/useAuth';
 import type { SignUpData } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { handleApiError } from '../../utils/handleApiError.util';
 
 const SignUpPage: React.FC = () => {
   const { signUp, loading } = useAuth();
@@ -14,9 +16,13 @@ const SignUpPage: React.FC = () => {
       const response = await signUp(data);
       console.log('Signup successful:', response);
 
-      navigate('/');
+      toast.success(response.message);
+      
+      sessionStorage.setItem('signup_email', data.email);
+
+      navigate('/verify-signup-otp', { state: { email: data.email } });
     } catch (error: any) {
-      console.error('Signup failed:', error);
+      handleApiError('Signup', error);
     }
   };
 

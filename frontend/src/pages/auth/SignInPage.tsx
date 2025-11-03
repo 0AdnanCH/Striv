@@ -3,6 +3,8 @@ import SignInForm from '../../components/forms/SignInForm';
 import { useAuth } from '../../hooks/useAuth';
 import type { SignInData } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { handleApiError } from '../../utils/handleApiError.util';
 
 const SignInPage: React.FC = () => {
   const {signIn, loading} = useAuth();
@@ -12,10 +14,11 @@ const SignInPage: React.FC = () => {
     try {
       const response = await signIn(data);
       console.log('Signin successful:', response);
+      toast.success(response.message);
 
       navigate('/');
     } catch (error: any) {
-      console.error('Signin failed:', error);
+      handleApiError('Signin', error);
     }
   }
   return (

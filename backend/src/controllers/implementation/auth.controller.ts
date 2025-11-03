@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { IAuthController } from "../interface/IAuthController";
-import { IAuthService } from "../../services/interface/IAuthService";
+import { IAuthController } from "../interface/IAuth.controller";
+import { IAuthService } from "../../services/interface/IAuth.service";
 import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { successResponse } from "../../utils/apiResponse";
+import { successResponse } from "../../utils/apiResponse.util";
 
 export class AuthController implements IAuthController {
   constructor(private authService: IAuthService) {}
@@ -19,8 +19,8 @@ export class AuthController implements IAuthController {
   async verifySignUpOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email, otp } = req.body;
-      const message = await this.authService.verifySignUpOtp(email, otp);
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      const { message, token, user } = await this.authService.verifySignUpOtp(email, otp);
+      successResponse(res, message, { token, user }, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
@@ -29,8 +29,8 @@ export class AuthController implements IAuthController {
   async signin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email, password } = req.body;
-      const message = await this.authService.signin(email, password);
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      const { message, token, user } = await this.authService.signin(email, password);
+      successResponse(res, message, { token, user }, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }

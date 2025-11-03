@@ -1,13 +1,15 @@
-export type ROLE = 'client' | 'trainer' | 'admin';
+import { UserRole } from "../constants/roles.constants";
+import { ObjectId } from "mongoose";
 export type GENDER = 'male' | 'female';
 
 export interface IUser {
+  _id: ObjectId;
   first_name: string;
   last_name: string;
   email: string;
   password: string;
   gender: GENDER;
   age: number;
-  role?: ROLE;
+  role: UserRole;
   isVerified?: boolean;
 }

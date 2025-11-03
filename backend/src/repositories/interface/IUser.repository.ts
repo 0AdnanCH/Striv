@@ -1,6 +1,6 @@
 import { UserDocument } from "../../models/user.model";
 import { IUser } from "../../types/user.type";
-import { IBaseRepository } from "./baseRepository.interface";
+import { IBaseRepository } from "./IBase.repository";
 
 export interface IUserRepository extends IBaseRepository<UserDocument> {
   findByEmail(email: string): Promise<UserDocument | null>;
