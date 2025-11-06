@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { tokenUtils } from '../utils/token.utils';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
@@ -7,8 +8,14 @@ const axiosClient = axios.create({
   },
 });
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    role?: 'admin' | 'client' | 'trainer';
+  }
+}
+
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = tokenUtils.getToken(config.role);
   if(token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });

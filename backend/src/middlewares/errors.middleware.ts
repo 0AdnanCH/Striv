@@ -27,7 +27,7 @@ export const errorHandler = (err: Error, req: Request, res: Response<ApiResponse
   }
 
   // Unhandled errors
-  console.error(JSON.stringify(err, null, 2));
+  console.error(err)
   res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     success: false,
     message: RESPONSE_MESSAGES.SERVER_ERROR,

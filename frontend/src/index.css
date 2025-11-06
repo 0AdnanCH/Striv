@@ -5,4 +5,10 @@
   --color-striv-secondary: #8697C4;
   --color-striv-muted: #ADBBDA;
   --color-striv-bg: #EDE8F5;
+
+  --color-admin-primary: #1E293B; /* Slate-800: Sidebar & Header */
+  --color-admin-accent: #3B82F6;  /* Blue-500: Buttons, Highlights */
+  --color-admin-secondary: #64748B; /* Slate-500: Text and borders */
+  --color-admin-bg: #E2E8F0;
+  --color-admin-text: #334155;
 }

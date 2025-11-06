@@ -3,7 +3,6 @@ import { ObjectId } from "mongoose";
 export type GENDER = 'male' | 'female';
 
 export interface IUser {
-  _id: ObjectId;
   first_name: string;
   last_name: string;
   email: string;
@@ -12,4 +11,5 @@ export interface IUser {
   age: number;
   role: UserRole;
   isVerified?: boolean;
+  isBlocked?: boolean;
 }

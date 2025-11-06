@@ -1,35 +1,11 @@
-import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import HomePage from '../pages/HomePage';
-import SignUpPage from '../pages/auth/SignUpPage';
-import SignInPage from '../pages/auth/SignInPage';
-import VerifySignUpOtpPage from '../pages/auth/VerifySignUpOtpPage';
+import { Suspense } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router.config';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <HomePage />
-  },
-  {
-    path: '/signup',
-    element: <SignUpPage />
-  },
-  {
-    path: '/signin',
-    element: <SignInPage />
-  },
-  {
-    path: '/verify-signup-otp',
-    element: <VerifySignUpOtpPage />
-  },
-  {
-    path: '*',
-    element: <div className="text-center p-10">404 | Page Not Found</div>
-  }
-]);
-
-const AppRoutes = () => {
-  return <RouterProvider router={router} />
-}
+const AppRoutes = () => (
+  <Suspense fallback={<div className="text-center p-6">Loading...</div>}>
+    <RouterProvider router={router} />
+  </Suspense>
+);
 
 export default AppRoutes;

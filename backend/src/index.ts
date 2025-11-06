@@ -4,6 +4,7 @@ dotenv.config();
 import cors from 'cors';
 
 import authRouter from './routers/auth.routes';
+import adminRouter from './routers/admin.routes';
 import { errorHandler } from './middlewares/errors.middleware';
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 
 app.use(errorHandler);
 

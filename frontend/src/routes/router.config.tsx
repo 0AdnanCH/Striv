@@ -1,0 +1,43 @@
+import { createBrowserRouter, type RouteObject } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
+import { authRoutes } from '../modules/auth/routes/authRoutes';
+import { publicAdminRoutes, protectedAdminRoutes } from '../modules/admin/routes/adminRoutes';
+
+const baseRoutes: RouteObject[] = [
+  {
+    path: '/',
+    element: <HomePage />
+  },
+  {
+    path: '*',
+    element: <div className="text-center p-10">404 | Page Not Found</div>,
+  },
+];
+
+const publicAuthRoutes: RouteObject[] = [
+  {
+    element: <PublicRoute />,
+    children: authRoutes,
+  },
+];
+
+const adminRoutes: RouteObject[] = [
+  {
+    element: <PublicRoute />,
+    children: publicAdminRoutes,
+  },
+  {
+    element: <ProtectedRoute redirectTo='/admin/signin' allowedRoles={['admin']} />,
+    children: protectedAdminRoutes,
+  }
+];
+
+const allRoutes: RouteObject[] = [
+  ...baseRoutes,
+  ...publicAuthRoutes,
+  ...adminRoutes,
+];
+
+export const router = createBrowserRouter(allRoutes);
