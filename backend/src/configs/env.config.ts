@@ -7,5 +7,8 @@ export const env = {
   },
   get MONGO_URI() {
     return process.env.MONGO_URI;
+  },
+  get JWT_SECRET() {
+    return process.env.JWT_SECRET;
   }
 }
