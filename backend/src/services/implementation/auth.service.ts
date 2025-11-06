@@ -13,7 +13,7 @@ import { generateToken } from "../../utils/jwt.util";
 import { ObjectId } from "mongoose";
 
 export class AuthService implements IAuthService {
-  constructor(private userRepository: IUserRepository, private otpRepository: IOtpRepository) {}
+  constructor(private readonly userRepository: IUserRepository, private readonly otpRepository: IOtpRepository) {}
 
   async signup(user: IUser): Promise<string> {
     const existingUser = await this.userRepository.findByEmail(user.email);
@@ -116,6 +116,14 @@ export class AuthService implements IAuthService {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.UNAUTHORIZED,
         message: RESPONSE_MESSAGES.EMAIL_NOT_VERIFIED,
+        logging: false
+      });
+    }
+
+    if (user.isBlocked) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.FORBIDDEN,
+        message: RESPONSE_MESSAGES.USER_BLOCKED,
         logging: false
       });
     }

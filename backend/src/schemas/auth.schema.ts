@@ -40,3 +40,10 @@ export const otpSchema = z.object({
 export const emailSchema = z.object({
   email: z.email(RESPONSE_MESSAGES.INVALID_CREDENTIALS)
 });
+
+export const adminSigninSchema = z.object({
+  email: z.email({ message: 'Enter a valid email address' }),
+  password: z.string().min(1, { message: 'Password is required' })
+});
+
+export type AdminSigninDto = z.infer<typeof adminSigninSchema>;

@@ -22,19 +22,28 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
     }
 
     const token = authHeader.split(' ')[1];
+    
+    if (!token || token === 'undefined' || token === 'null') {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: RESPONSE_MESSAGES.INVALID_OR_EXPIRED_TOKEN,
+        logging: false
+      });
+    }
+
     const decoded = verifyToken(token);
 
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch (err: any) {
     if (err instanceof BadRequestError) {
       return next(err);
     }
-
+    console.error(err)
     next(
       new BadRequestError({
         statusCode: HTTP_STATUS.UNAUTHORIZED,
-        message: RESPONSE_MESSAGES.INVALID_OR_EXPIRED_TOKEN,
+        message: err.message || RESPONSE_MESSAGES.INVALID_OR_EXPIRED_TOKEN,
         logging: false
       })
     );
