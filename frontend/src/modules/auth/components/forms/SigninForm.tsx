@@ -20,6 +20,10 @@ const AuthSignInForm: React.FC<AuthSigninFormProps> = ({onSubmit, loading }) => 
         href: '/signup',
         linkText: 'Sign up'
       }}
+      forgotPassword={{
+        text: 'Forgot Password?',
+        href: '/forgot-password'
+      }}
       theme={{
         primary: 'text-striv-primary',
         accent: 'from-striv-primary to-striv-accent',

@@ -1,5 +1,5 @@
 import axiosClient from '../../../api/axiosClient';
-import type { SigninData, SignupData, AuthResponse, OtpVerifyData } from '../types/auth.types';
+import type { SigninData, SignupData, AuthResponse, OtpVerifyData, ResetPasswordData } from '../types/auth.types';
 
 export const authApi = {
   signUp: async (data: SignupData): Promise<{ message: string }> => {
@@ -20,5 +20,15 @@ export const authApi = {
   resendOtp: async (email: string): Promise<{ message: string }> => {
     const response = await axiosClient.post('/auth/resend-otp', { email });
     return response.data;
-  }
+  },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await axiosClient.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  resetPassword: async (data: ResetPasswordData): Promise<{ message: string }> => {
+    const response = await axiosClient.post('/auth/reset-password', data);
+    return response.data;
+  },
 };

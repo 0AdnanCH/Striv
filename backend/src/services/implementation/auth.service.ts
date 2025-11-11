@@ -10,13 +10,21 @@ import { IOtpRepository } from "../../repositories/interface/IOtp.repository";
 import { sendEmail } from "../../utils/mailer.util";
 import { UserRole } from "../../constants/roles.constants";
 import { generateToken } from "../../utils/jwt.util";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
+import { IPasswordResetTokenRepository } from "../../repositories/interface/IPasswordResetToken.repository";
+import { env } from "../../configs/env.config";
+import { CryptoUtil } from "../../utils/crypto.util";
+import type { ForgotPasswordDto, ResetPasswordDto } from "../../dtos/auth.dto";
 
 export class AuthService implements IAuthService {
-  constructor(private readonly userRepository: IUserRepository, private readonly otpRepository: IOtpRepository) {}
+  constructor(
+    private readonly _userRepository: IUserRepository, 
+    private readonly _otpRepository: IOtpRepository,
+    private readonly _resetTokenRepository: IPasswordResetTokenRepository,
+  ) {}
 
   async signup(user: IUser): Promise<string> {
-    const existingUser = await this.userRepository.findByEmail(user.email);
+    const existingUser = await this._userRepository.findByEmail(user.email);
 
     if (existingUser && existingUser.isVerified) throw new BadRequestError({ statusCode: HTTP_STATUS.BAD_REQUEST, message: RESPONSE_MESSAGES.USER_ALREADY_EXISTS, logging: false });
 
@@ -25,13 +33,13 @@ export class AuthService implements IAuthService {
     const role = UserRole.CLIENT;
 
     if (existingUser && !existingUser.isVerified) {
-      await this.userRepository.updateByEmail(user.email, {
+      await this._userRepository.updateByEmail(user.email, {
         ...user,
         role,
         password: hashedPassword
       });
     } else {
-      await this.userRepository.create({
+      await this._userRepository.create({
         ...user,
         role,
         password: hashedPassword,
@@ -43,8 +51,8 @@ export class AuthService implements IAuthService {
     console.log('Otp Generated:', otp);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    await this.otpRepository.deleteByEmail(user.email);
-    await this.otpRepository.create({ email: user.email, otp, expiresAt });
+    await this._otpRepository.deleteByEmail(user.email);
+    await this._otpRepository.create({ email: user.email, otp, expiresAt });
 
     await sendEmail(user.email, 'Striv Email Verification', `Your OTP for Striv signup is ${otp}. It expires in 5 minutes.`);
 
@@ -52,7 +60,7 @@ export class AuthService implements IAuthService {
   }
 
   async verifySignUpOtp(email: string, otp: string): Promise<{ message: string; token: string; user: { id: ObjectId; role: UserRole; email: string; first_name: string; last_name: string } }> {
-    const otpRecord = await this.otpRepository.findByEmail(email);
+    const otpRecord = await this._otpRepository.findByEmail(email);
     if (!otpRecord) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
@@ -62,7 +70,7 @@ export class AuthService implements IAuthService {
     }
 
     if (otpRecord.expiresAt < new Date()) {
-      await this.otpRepository.deleteByEmail(email);
+      await this._otpRepository.deleteByEmail(email);
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         message: RESPONSE_MESSAGES.OTP_EXPIRED,
@@ -78,9 +86,9 @@ export class AuthService implements IAuthService {
       });
     }
 
-    await this.userRepository.updateByEmail(email, { isVerified: true });
+    await this._userRepository.updateByEmail(email, { isVerified: true });
 
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this._userRepository.findByEmail(email);
     if (!user) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
@@ -89,7 +97,7 @@ export class AuthService implements IAuthService {
       });
     }
 
-    await this.otpRepository.deleteByEmail(email);
+    await this._otpRepository.deleteByEmail(email);
 
     const token = generateToken({id: user._id.toString(), role: user.role});
 
@@ -107,7 +115,7 @@ export class AuthService implements IAuthService {
   }
 
   async signin(email: string, password: string): Promise<{ message: string; token: string; user: { id: ObjectId; email: string; role: UserRole; first_name: string; last_name: string } }> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this._userRepository.findByEmail(email);
     if (!user) {
       throw new BadRequestError({ statusCode: HTTP_STATUS.UNAUTHORIZED, message: RESPONSE_MESSAGES.USER_NOT_FOUND, logging: false });
     }
@@ -145,7 +153,7 @@ export class AuthService implements IAuthService {
   }
 
   async resendOtp(email: string): Promise<string> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this._userRepository.findByEmail(email);
     if(!user) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.NOT_FOUND,
@@ -166,8 +174,8 @@ export class AuthService implements IAuthService {
     console.log('ResendOtp Generated:', otp);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    await this.otpRepository.deleteByEmail(email);
-    await this.otpRepository.create({ email, otp, expiresAt });
+    await this._otpRepository.deleteByEmail(email);
+    await this._otpRepository.create({ email, otp, expiresAt });
 
     await sendEmail(
       email,
@@ -176,5 +184,69 @@ export class AuthService implements IAuthService {
     );
 
     return RESPONSE_MESSAGES.OTP_RESENT;
+  }
+
+  async requestPasswordReset(data: ForgotPasswordDto, meta?: { ip?: string; ua?: string; }): Promise<{ message: string; }> {
+    const user = await this._userRepository.findByEmail(data.email);
+    if (!user) {
+      return { message: RESPONSE_MESSAGES.PASSWORD_RESET_EMAIL_SENT };
+    }
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const attempts = await this._resetTokenRepository.countRecentRequests(user._id, oneHourAgo);
+    if (attempts >= 3) {
+      return { message: RESPONSE_MESSAGES.PASSWORD_RESET_ALREADY_SENT };
+    }
+
+    const rawToken = CryptoUtil.randomToken();
+    const tokenHash = CryptoUtil.sha256(rawToken);
+
+    const expiresAt = new Date(Date.now() + env.RESET_TOKEN_TTL_MINUTES * 60 * 1000);
+
+    await this._resetTokenRepository.create({
+      userId: user._id,
+      tokenHash,
+      expiresAt,
+      createdIp: meta?.ip,
+      createdUserAgent: meta?.ua
+    });
+
+    const resetUrl = `${env.APP_URL}/reset-password?token=${rawToken}`;
+
+    await sendEmail(
+      user.email,
+      "Reset your Striv password",
+      `Click the following link to reset your password: ${resetUrl}`
+    );
+
+    return { message: RESPONSE_MESSAGES.PASSWORD_RESET_EMAIL_SENT };
+  }
+
+  async resetPassword(data: ResetPasswordDto): Promise<{ message: string; }> {
+    const tokenHash = CryptoUtil.sha256(data.token);
+    const tokenRecord = await this._resetTokenRepository.findValidByHash(tokenHash);
+    if (!tokenRecord) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.INVALID_OR_EXPIRED_TOKEN,
+        logging: false
+      });
+    }
+
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+      const hashedPassword = await hashPassword(data.password);
+
+      await this._userRepository.updatePassword(tokenRecord.userId, hashedPassword, session);
+      
+      await this._resetTokenRepository.invalidateAllForUser(tokenRecord.userId, session);
+
+      await this._resetTokenRepository.markUsed(tokenRecord._id, session);
+      });
+    } finally {
+      await session.endSession();
+    }
+
+    return { message: RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS };
   }
 }

@@ -4,6 +4,7 @@ import { IUser } from "../../types/user.type";
 import { User, UserDocument } from "../../models/user.model";
 import { FetchUsersQuery } from "../../dtos/adminUser.dto";
 import { PaginatedResult } from "../../types/pagination.types";
+import { ObjectId } from "mongoose";
 
 export class UserRepository extends BaseRepository<UserDocument> implements IUserRepository {
   constructor() {
@@ -37,5 +38,13 @@ export class UserRepository extends BaseRepository<UserDocument> implements IUse
     const total = await this.model.countDocuments(filter);
 
     return { users, total, page, limit };
+  }
+
+  async updatePassword(userId: string | ObjectId, hashedPassword: string, session?: any): Promise<void> {
+    await this.model.updateOne(
+      { _id: userId },
+      { $set: { password: hashedPassword } },
+      { session }
+    ).exec();
   }
 }

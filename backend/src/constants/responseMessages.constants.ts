@@ -24,6 +24,9 @@ export const RESPONSE_MESSAGES = {
   TOKEN_MISSING: 'Authorization token is missing.',
   INVALID_OR_EXPIRED_TOKEN: 'Invalid or expired token.',
   ADMIN_SIGNIN_SUCCESS: 'Admin signed in successfully.',
-  CANNOT_BLOCK_ADMIN: "Admins cannot be blocked.",
-  CANNOT_UNBLOCK_ADMIN: "Admins cannot be unblocked.",
+  CANNOT_BLOCK_ADMIN: 'Admins cannot be blocked.',
+  CANNOT_UNBLOCK_ADMIN: 'Admins cannot be unblocked.',
+  PASSWORD_RESET_EMAIL_SENT: "If that email exists, you'll receive a reset link.",
+  PASSWORD_RESET_ALREADY_SENT: 'A reset link was already sent recently.',
+  PASSWORD_RESET_SUCCESS: 'Password reset successful.'
 } as const;

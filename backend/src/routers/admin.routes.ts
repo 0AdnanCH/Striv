@@ -4,6 +4,7 @@ import { AdminService } from '../services/implementation/admin.service';
 import { AuthService } from '../services/implementation/auth.service';
 import { UserRepository } from '../repositories/implementation/user.repository';
 import { OtpRepository } from '../repositories/implementation/otp.repository';
+import { PasswordResetTokenRepository } from '../repositories/implementation/passwordResetToken.repository';
 import validate from '../middlewares/validation.middleware';
 import { adminSigninSchema } from '../schemas/auth.schema';
 import { AdminUserService } from '../services/implementation/adminUser.service';
@@ -14,7 +15,8 @@ const adminRouter = express.Router();
 
 const userRepository = new UserRepository();
 const otpRepository = new OtpRepository
-const authService = new AuthService(userRepository, otpRepository);
+const tokenRepository = new PasswordResetTokenRepository()
+const authService = new AuthService(userRepository, otpRepository, tokenRepository);
 const adminService = new AdminService(authService, userRepository);
 const adminController = new AdminController(adminService);
 

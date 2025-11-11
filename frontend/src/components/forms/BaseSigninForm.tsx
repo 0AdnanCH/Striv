@@ -27,6 +27,10 @@ interface BaseSigninFormProps {
     background: string; // For form background
     border: string; // For border or input outlines
   };
+  forgotPassword?: {
+    text: string;
+    href: string;
+  };
 }
 
 const BaseSigninForm: React.FC<BaseSigninFormProps> = ({
@@ -43,7 +47,8 @@ const BaseSigninForm: React.FC<BaseSigninFormProps> = ({
     accent: 'from-striv-primary to-striv-accent',
     background: 'bg-white/80',
     border: 'border-striv-muted/40'
-  }
+  },
+  forgotPassword,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -91,6 +96,13 @@ const BaseSigninForm: React.FC<BaseSigninFormProps> = ({
             </button>
           </div>
           {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>}
+          {forgotPassword && (
+            <div className="flex justify-end mt-1">
+              <a href={forgotPassword.href} className={cn('text-sm font-medium hover:underline', theme.primary, 'opacity-80 hover:opacity-100')}>
+                {forgotPassword.text}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 

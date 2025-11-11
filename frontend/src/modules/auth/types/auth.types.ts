@@ -47,3 +47,8 @@ export interface AuthContextType {
   logout: (role?: 'admin' | 'trainer' | 'client') => void;
   loading: boolean;
 }
+
+export interface ResetPasswordData {
+  token: string;
+  password: string;
+}
