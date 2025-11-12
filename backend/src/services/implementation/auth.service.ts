@@ -15,6 +15,7 @@ import { IPasswordResetTokenRepository } from "../../repositories/interface/IPas
 import { env } from "../../configs/env.config";
 import { CryptoUtil } from "../../utils/crypto.util";
 import type { ForgotPasswordDto, ResetPasswordDto } from "../../dtos/auth.dto";
+import { verifyGoogleAccessToken } from "../../utils/google.util";
 
 export class AuthService implements IAuthService {
   constructor(
@@ -27,6 +28,10 @@ export class AuthService implements IAuthService {
     const existingUser = await this._userRepository.findByEmail(user.email);
 
     if (existingUser && existingUser.isVerified) throw new BadRequestError({ statusCode: HTTP_STATUS.BAD_REQUEST, message: RESPONSE_MESSAGES.USER_ALREADY_EXISTS, logging: false });
+
+    if (!user.password) {
+      throw new Error('Password is required for local sign-up');
+    }
 
     const hashedPassword = await hashPassword(user.password);
 
@@ -108,8 +113,8 @@ export class AuthService implements IAuthService {
         id: user._id,
         email: user.email,
         role: user.role,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        first_name: user.first_name ?? '',
+        last_name: user.last_name ?? '',
       }
     };
   }
@@ -136,6 +141,10 @@ export class AuthService implements IAuthService {
       });
     }
 
+    if (!user.password) {
+      throw new Error('Password is required for local sign-up');
+    }
+
     const validPassword = await comparePassword(password, user.password);
     if (!validPassword) {
       throw new BadRequestError({ statusCode: HTTP_STATUS.UNAUTHORIZED, message: RESPONSE_MESSAGES.INCORRECT_PASSWORD, logging: false });
@@ -146,8 +155,8 @@ export class AuthService implements IAuthService {
       id: user._id,
       email: user.email,
       role: user.role,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      first_name: user.first_name ?? '',
+      last_name: user.last_name ?? '',
     }
     return { token, user: userData, message: RESPONSE_MESSAGES.LOGIN_SUCCESS };
   }
@@ -184,6 +193,37 @@ export class AuthService implements IAuthService {
     );
 
     return RESPONSE_MESSAGES.OTP_RESENT;
+  }
+
+  async signInWithGoogle(accessToken: string): Promise<{ message: string; token: string; user: { id: string; email: string; role: string; first_name: string; last_name: string; picture?: string; }; }> {
+    const googleUser = await verifyGoogleAccessToken(accessToken);
+    let user = await this._userRepository.findByEmail(googleUser.email);
+
+    if(!user) {
+      user = await this._userRepository.create({
+        email: googleUser.email,
+        first_name: googleUser.given_name,
+        last_name: googleUser.family_name,
+        isVerified: true,
+        role: UserRole.CLIENT,
+        authProvider: 'google',
+        googleId: googleUser.sub,
+      });
+    }
+
+    const appToken = generateToken({ id: user._id.toString(), role: user.role });
+
+    return {
+      message: RESPONSE_MESSAGES.LOGIN_SUCCESS,
+      token: appToken,
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name as string,
+        last_name: user.last_name as string,
+      }
+    };
   }
 
   async requestPasswordReset(data: ForgotPasswordDto, meta?: { ip?: string; ua?: string; }): Promise<{ message: string; }> {

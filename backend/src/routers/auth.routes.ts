@@ -22,5 +22,6 @@ authRouter.post('/verify-signup-otp', validate(otpSchema), authController.verify
 authRouter.post('/resend-otp', validate(emailSchema), authController.resendOtp.bind(authController));
 authRouter.post('/forgot-password', validate(ForgotPasswordDto), authController.forgotPassword.bind(authController));
 authRouter.post('/reset-password', validate(ResetPasswordDto), authController.resetPassword.bind(authController));
+authRouter.post('/google-signin', authController.signInWithGoogle.bind(authController));
 
 export default authRouter;

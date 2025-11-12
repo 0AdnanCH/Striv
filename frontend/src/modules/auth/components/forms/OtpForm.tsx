@@ -1,7 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { Button } from '../../../../components/ui/Button';
 import {
   InputOTP,
@@ -12,6 +11,7 @@ import {
 import { cn } from '../../../../utils/cn.util'; 
 import { otpSchema, type OtpSchema } from '../../schemas';
 import { useOtpCooldown } from '../../hooks/useOtpCooldown';
+import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from '../../../../constants/otp.constants';
 
 interface OtpFormProps {
   onSubmit: (otp: string) => void | Promise<void>;
@@ -35,8 +35,8 @@ const OtpForm: React.FC<OtpFormProps> = ({
   });
 
   const { cooldown, isCooldownActive, startCooldown } = useOtpCooldown({
-    duration: 60,
-    storageKey: 'otp_cooldown_expiry',
+    duration: OTP_COOLDOWN_SECONDS,
+    storageKey: OTP_COOLDOWN_STORAGE_KEY,
   });
   
   const otpValue = watch('otp', '');

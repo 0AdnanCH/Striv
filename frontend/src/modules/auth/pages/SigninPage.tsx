@@ -5,7 +5,7 @@ import type { SigninData } from '../types/auth.types';
 import { handleApiError } from '../../../utils/handleApiError.util';
 
 const SigninPage: React.FC = () => {
-  const {signIn, loading} = useAuth();
+  const {signIn, googleLogin, loading } = useAuth();
 
   const handleSignIn = async (data: SigninData) => {
     try {
@@ -17,7 +17,7 @@ const SigninPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-striv-bg px-4">
       <div className="flex flex-col items-center w-full max-w-md">
-        <AuthSignInForm onSubmit={handleSignIn} loading={loading} />
+        <AuthSignInForm onSubmit={handleSignIn} onGoogleSignin={googleLogin} loading={loading} />
       </div>
     </div>
   );

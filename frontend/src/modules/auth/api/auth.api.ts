@@ -1,5 +1,5 @@
 import axiosClient from '../../../api/axiosClient';
-import type { SigninData, SignupData, AuthResponse, OtpVerifyData, ResetPasswordData } from '../types/auth.types';
+import type { SigninData, SignupData, AuthResponse, OtpVerifyData, ResetPasswordData, ForgotPasswordData } from '../types/auth.types';
 
 export const authApi = {
   signUp: async (data: SignupData): Promise<{ message: string }> => {
@@ -22,8 +22,8 @@ export const authApi = {
     return response.data;
   },
 
-  forgotPassword: async (email: string): Promise<{ message: string }> => {
-    const response = await axiosClient.post('/auth/forgot-password', { email });
+  forgotPassword: async (data: ForgotPasswordData): Promise<{ message: string }> => {
+    const response = await axiosClient.post('/auth/forgot-password', data);
     return response.data;
   },
 
@@ -31,4 +31,9 @@ export const authApi = {
     const response = await axiosClient.post('/auth/reset-password', data);
     return response.data;
   },
+
+  googleSignIn: async (token: string): Promise<AuthResponse> => {
+    const response = await axiosClient.post('/auth/google-signin', { token });
+    return response.data;
+  }
 };

@@ -19,5 +19,8 @@ export const env = {
   },
   get APP_URL() {
     return process.env.APP_URL ?? 'http://localhost:5173';
-  } 
+  },
+  get GOOGLE_USERINFO_URL() {
+    return process.env.GOOGLE_USERINFO_URL ?? 'https://www.googleapis.com/oauth2/v3/userinfo';
+  }
 };

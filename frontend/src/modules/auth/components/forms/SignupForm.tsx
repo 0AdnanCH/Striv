@@ -138,14 +138,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, loading }) => {
       </Button>
 
       {/* Google Signup Button */}
-      {/* <button
+      <button
         type="button"
         onClick={() => console.log('Google Login Clicked!')}
         className="w-full h-11 mt-2 flex items-center justify-center gap-2 border border-gray-300 bg-white rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200"
       >
         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5" />
         Sign up with Google
-      </button> */}
+      </button>
 
       <p className="text-sm text-center text-gray-600">
         Already have an account?{' '}

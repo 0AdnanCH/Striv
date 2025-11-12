@@ -119,11 +119,12 @@ const BaseSigninForm: React.FC<BaseSigninFormProps> = ({
       {showGoogleButton && (
         <button
           type="button"
+          disabled={loading}
           onClick={onGoogleSignin}
           className="w-full h-11 flex items-center justify-center gap-2 border border-gray-300 bg-white rounded-lg font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5" />
-          Sign in with Google
+          {loading ? 'Signing in...' : 'Sign in with Google'}
         </button>
       )}
 

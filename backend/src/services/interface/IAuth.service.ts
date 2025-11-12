@@ -10,4 +10,16 @@ export interface IAuthService {
   resendOtp(email: string): Promise<string>;
   requestPasswordReset(data: ForgotPasswordDto, meta?: { ip?: string; ua?: string }): Promise<{ message: string }>;
   resetPassword(data: ResetPasswordDto): Promise<{ message: string }>;
+  signInWithGoogle(accessToken: string): Promise<{
+    message: string;
+    token: string;
+    user: {
+      id: string;
+      email: string;
+      role: string;
+      first_name: string;
+      last_name: string;
+      picture?: string;
+    };
+  }>;
 }

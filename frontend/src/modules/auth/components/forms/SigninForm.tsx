@@ -4,13 +4,16 @@ import { type SigninSchema } from '../../schemas';
 
 interface AuthSigninFormProps {
   onSubmit: (data: SigninSchema) => void;
+  onGoogleSignin: () => void;
   loading?: boolean;
 }
 
-const AuthSignInForm: React.FC<AuthSigninFormProps> = ({onSubmit, loading }) => {
+const AuthSignInForm: React.FC<AuthSigninFormProps> = ({onSubmit, onGoogleSignin, loading }) => {
   return (
     <BaseSigninForm
       onSubmit={onSubmit}
+      showGoogleButton={true}
+      onGoogleSignin={onGoogleSignin}
       loading={loading}
       title="Welcome back 👋"
       subtitle="Sign in to continue your Striv journey"

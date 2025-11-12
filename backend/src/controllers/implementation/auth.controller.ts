@@ -64,4 +64,14 @@ export class AuthController implements IAuthController {
       next(error);
     }
   }
+
+  async signInWithGoogle(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token: googleAccessToken } = req.body;
+      const { message, token: appJwtToken, user } = await this._authService.signInWithGoogle(googleAccessToken);
+      successResponse(res, message, { token: appJwtToken, user }, HTTP_STATUS.OK);
+    } catch (error: any) {
+      next(error);
+    }
+  }
 }

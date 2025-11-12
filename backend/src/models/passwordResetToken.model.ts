@@ -23,7 +23,6 @@ const PasswordResetTokenSchema = new Schema<PasswordResetTokenDocument>(
     expiresAt: {
       type: Date,
       required: true,
-      index: true // ✅ Required for TTL
     },
 
     usedAt: {

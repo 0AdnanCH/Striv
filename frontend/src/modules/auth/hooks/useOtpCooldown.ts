@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from "../../../constants/otp.constants";
 
 interface UseOtpCooldownOptions {
   duration?: number;
@@ -6,8 +7,8 @@ interface UseOtpCooldownOptions {
 }
 
 export const useOtpCooldown = ({ 
-  duration = 60, 
-  storageKey = 'otp_cooldown_expiry'
+  duration = OTP_COOLDOWN_SECONDS, 
+  storageKey = OTP_COOLDOWN_STORAGE_KEY,
 }: UseOtpCooldownOptions = {} ) => {
   const [cooldown, setCooldown] = useState(0);
 
