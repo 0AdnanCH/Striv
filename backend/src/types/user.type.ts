@@ -8,6 +8,8 @@ export interface IUser {
   password?: string;
   gender?: GENDER;
   age?: number;
+  height?: number;
+  weight?: number;
   role: UserRole;
   isVerified?: boolean;
   isBlocked?: boolean;

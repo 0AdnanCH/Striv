@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import authRouter from './routers/auth.routes';
 import adminRouter from './routers/admin.routes';
+import userRouter from './routers/user.routes';
 import { errorHandler } from './middlewares/errors.middleware';
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
+app.use('/user', userRouter);
 
 app.use(errorHandler);
 

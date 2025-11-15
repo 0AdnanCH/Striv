@@ -14,11 +14,13 @@ const userSchema = new Schema<UserDocument>(
     password: { type: String, required: false },
     gender: { type: String, enum: ['male', 'female'], required: false },
     age: { type: Number, required: false },
+    height: { type: Number, required: false },
+    weight: { type: Number, required: false },
     role: { type: String, enum: Object.values(UserRole), default: UserRole.CLIENT },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
     authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
-    googleId: { type: String, unique: true, sparse: true },
+    googleId: { type: String, unique: true, sparse: true }
   },
   { timestamps: true }
 );

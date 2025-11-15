@@ -39,8 +39,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
   }, []);
 
+  const updateUser = useCallback((updatedFields: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      const updatedUser = { ...prev, ...updatedFields };
+
+      const role = updatedUser.role || 'client';
+      localStorage.setItem(`${role}_user`, JSON.stringify(updatedUser));
+
+      return updatedUser;
+    });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, loading, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

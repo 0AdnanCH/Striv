@@ -46,6 +46,7 @@ export interface AuthContextType {
   login: (token: string, user: User, role?: 'admin' | 'trainer' | 'client') => void;
   logout: (role?: 'admin' | 'trainer' | 'client') => void;
   loading: boolean;
+  updateUser: (updated: Partial<User>) => void;
 }
 
 export interface ResetPasswordData {

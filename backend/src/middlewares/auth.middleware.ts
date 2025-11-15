@@ -9,6 +9,10 @@ export interface AuthenticatedRequest extends Request {
   user?: { id: string; role: JwtUserPayload['role'] };
 }
 
+export interface ValidatedAuthenticatedRequest extends Request {
+  user: { id: string; role: JwtUserPayload['role'] };
+}
+
 export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;

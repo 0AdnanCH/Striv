@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import { authRoutes } from '../modules/auth/routes/authRoutes';
 import { publicAdminRoutes, protectedAdminRoutes } from '../modules/admin/routes/adminRoutes';
+import { protectedClientRoutes } from '../modules/client/routes/clientRoutes';
 
 const baseRoutes: RouteObject[] = [
   {
@@ -38,6 +39,7 @@ const allRoutes: RouteObject[] = [
   ...baseRoutes,
   ...publicAuthRoutes,
   ...adminRoutes,
+  ...protectedClientRoutes,
 ];
 
 export const router = createBrowserRouter(allRoutes);
