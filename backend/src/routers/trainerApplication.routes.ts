@@ -10,6 +10,9 @@ import { authenticate, authorizeRoles } from '../middlewares/auth.middleware';
 import validate from '../middlewares/validation.middleware';
 import { TrainerRegistrationStep1Schema } from '../schemas/trainerApplication.schema';
 import { trainerProfessionalInfoSchema } from '../schemas/trainerProfessionalInfo.schema';
+import { trainerWorkInfoSchema } from '../schemas/trainerWorkInfo.schema';
+import { TrainerKycRepository } from '../repositories/implementation/trainerKyc.repository';
+import { trainerKycSchema } from '../schemas/trainerKyc.schema';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -18,7 +21,8 @@ const router = Router();
 const userRepository = new UserRepository();
 const fileRepository = new FileService();
 const trainerRepository = new TrainerRepository();
-const trainerApplicationService = new TrainerApplicationService(userRepository, trainerRepository, fileRepository);
+const trainerKycRepository = new TrainerKycRepository();
+const trainerApplicationService = new TrainerApplicationService(userRepository, trainerRepository, trainerKycRepository, fileRepository);
 const trainerApplicationController = new TrainerApplicationController(trainerApplicationService);
 
 router.patch(
@@ -36,7 +40,27 @@ router.patch(
   authorizeRoles('client'),
   upload.array('certificates'),
   validate(trainerProfessionalInfoSchema),
-  trainerApplicationController.submitProfessionalInfo
+  trainerApplicationController.submitProfessionalInfo.bind(trainerApplicationController)
+);
+
+router.patch(
+  '/work-info',
+  authenticate,
+  authorizeRoles('client'),
+  validate(trainerWorkInfoSchema),
+  trainerApplicationController.submitWorkInfo.bind(trainerApplicationController)
+);
+
+router.post(
+  '/identity',
+  authenticate,
+  authorizeRoles('client'),
+  upload.fields([
+    { name: 'frontImage', maxCount: 1 },
+    { name: 'backImage', maxCount: 1 }
+  ]),
+  validate(trainerKycSchema),
+  trainerApplicationController.submitIdentityInfo.bind(trainerApplicationController)
 );
 
 export default router;

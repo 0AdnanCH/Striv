@@ -24,6 +24,21 @@ const trainerSchema = new Schema<TrainerDocument>(
       groupSession: { type: Number, required: true, min: 0 }
     },
 
+    availability: {
+      type: [
+        {
+          day: {
+            type: String,
+            enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+            required: true
+          },
+          startTime: { type: String, required: true },
+          endTime: { type: String, required: true }
+        }
+      ],
+      default: []
+    },
+
     portfolio: {
       bio: { type: String, required: true },
       achievements: { type: [String], default: [] },

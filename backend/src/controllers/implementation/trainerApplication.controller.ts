@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { ITrainerApplicationController } from '../interface/ITrainerApplication.controller';
 import { ITrainerApplicationService } from '../../services/interface/ITrainerApplication.service';
-import { TrainerRegistrationStep1Dto } from '../../dtos/trainerApplication.dto'; 
+import { TrainerKycDto, TrainerRegistrationStep1Dto, TrainerWorkInfoDto } from '../../dtos/trainerApplication.dto'; 
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 import { successResponse } from '../../utils/apiResponse.util';
 import { HTTP_STATUS } from '../../constants/httpStatus.constants';
@@ -42,6 +42,44 @@ export class TrainerApplicationController implements ITrainerApplicationControll
 
       successResponse(res, message, null, HTTP_STATUS.OK);
     } catch (error: any) {
+      next(error);
+    }
+  }
+
+  async submitWorkInfo(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return;
+
+      const payload: TrainerWorkInfoDto = req.body;
+
+      const { message } = await this._trainerApplicationService.submitWorkInfo(userId, payload);
+
+      successResponse(res, message, null, HTTP_STATUS.OK);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
+  async submitIdentityInfo(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return;
+
+      const files = req.files as {
+        [fieldname: string]: Express.Multer.File[];
+      };
+
+      const payload: TrainerKycDto = {
+        ...req.body,
+        frontImage: files?.frontImage?.[0],
+        backImage: files?.backImage?.[0]
+      }
+
+      const { message } = await this._trainerApplicationService.submitIdentityInfo(userId, payload);
+
+      successResponse(res, message, null, HTTP_STATUS.OK);
+    } catch (error) {
       next(error);
     }
   }

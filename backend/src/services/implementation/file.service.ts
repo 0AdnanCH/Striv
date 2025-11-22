@@ -7,7 +7,9 @@ export class FileService {
 
     const key = `trainer/${trainerId}/documents/${fileName}`;
 
-    return await fileRepository.upload(key, file.buffer, file.mimetype);
+    const url = await fileRepository.upload(key, file.buffer, file.mimetype);
+
+    return url;
   }
 
   async uploadUserProfilePhoto(userId: string, file: Express.Multer.File) {

@@ -12,6 +12,12 @@ export interface PricingInfo {
   groupSession: number;
 }
 
+export interface TrainerAvailability {
+  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  startTime: string;
+  endTime: string;
+}
+
 export interface SocialLinks {
   website?: string | null;
   instagram?: string | null;
@@ -40,6 +46,8 @@ export interface ITrainer {
 
   certificates: CertificateInfo[];
 
+  availability: TrainerAvailability[];
+
   pricing: PricingInfo;
 
   portfolio: PortfolioInfo;
@@ -55,12 +63,12 @@ export enum KycDocumentType {
   PAN_CARD = 'pan_card'
 }
 
-export interface ITrainerKYC {
+export interface ITrainerKyc {
   userId: ObjectId;
   documentType: KycDocumentType;
 
   frontImageUrl: string;
-  backImageUrl?: string;
+  backImageUrl?: string | null;
 
   status: KycStatus;
   rejectionReason?: string;

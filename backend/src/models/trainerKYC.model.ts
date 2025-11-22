@@ -1,7 +1,7 @@
 import { Document, model, ObjectId, Schema } from "mongoose";
-import { ITrainerKYC, KycDocumentType, KycStatus } from "../types/trainer.type";
+import { ITrainerKyc, KycDocumentType, KycStatus } from "../types/trainer.type";
 
-export interface TrainerKycDocument extends ITrainerKYC, Document<ObjectId> {
+export interface TrainerKycDocument extends ITrainerKyc, Document<ObjectId> {
   _id: ObjectId;
 }
 
@@ -32,4 +32,4 @@ const trainerKycSchema = new Schema<TrainerKycDocument>(
   { timestamps: true }
 );
 
-export const TrainerKYC = model<TrainerKycDocument>('TrainerKYC', trainerKycSchema);
+export const TrainerKyc = model<TrainerKycDocument>('TrainerKYC', trainerKycSchema);
