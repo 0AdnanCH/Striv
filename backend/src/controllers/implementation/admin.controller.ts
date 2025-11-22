@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { IAdminController } from "../interface/IAdmin.controller";
-import { IAdminService } from "../../services/interface/iAdmin.service";
+import { IAdminService } from "../../services/interface/IAdmin.service";
 import { successResponse } from "../../utils/apiResponse.util";
 import { HTTP_STATUS } from "../../constants/httpStatus.constants";
 import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";

@@ -10,6 +10,8 @@ export interface IUser {
   age?: number;
   height?: number;
   weight?: number;
+  phone?: string;
+  profile_photo?: string;
   role: UserRole;
   isVerified?: boolean;
   isBlocked?: boolean;

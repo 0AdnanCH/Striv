@@ -1,4 +1,4 @@
-import { IOTP, OtpDocument } from "../../models/otp.model";
+import { OtpDocument } from "../../models/otp.model";
 import { IBaseRepository } from "./IBase.repository";
 
 export interface IOtpRepository extends IBaseRepository<OtpDocument> {

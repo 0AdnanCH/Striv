@@ -1,4 +1,4 @@
-import { IAdminService } from "../interface/iAdmin.service"; 
+import { IAdminService } from "../interface/IAdmin.service"; 
 import { IAuthService } from "../interface/IAuth.service";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { AdminSigninDto } from "../../schemas/auth.schema";

@@ -1,4 +1,4 @@
-import OTPModel, { IOTP, OtpDocument } from "../../models/otp.model";
+import { OTPModel, OtpDocument } from "../../models/otp.model";
 import { BaseRepository } from "../base.repository";
 import { IOtpRepository } from "../interface/IOtp.repository";
 

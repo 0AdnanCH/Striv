@@ -22,5 +22,17 @@ export const env = {
   },
   get GOOGLE_USERINFO_URL() {
     return process.env.GOOGLE_USERINFO_URL ?? 'https://www.googleapis.com/oauth2/v3/userinfo';
-  }
+  },
+  get AWS_REGION() {
+    return process.env.AWS_REGION;
+  },
+  get AWS_ACCESS_KEY() {
+    return process.env.AWS_ACCESS_KEY;
+  },
+  get AWS_SECRET_KEY() {
+    return process.env.AWS_SECRET_KEY;
+  },
+  get AWS_S3_BUCKET() {
+    return process.env.AWS_S3_BUCKET;
+  },
 };
