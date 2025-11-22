@@ -1,5 +1,5 @@
 import { UpdateQuery } from "mongoose";
-import { TrainerKycDocument } from "../../models/trainerKYC.model";
+import { TrainerKycDocument } from "../../models/trainerKyc.model";
 import { IBaseRepository } from "./IBase.repository";
 
 export interface ITrainerKycRepository extends IBaseRepository<TrainerKycDocument> {
