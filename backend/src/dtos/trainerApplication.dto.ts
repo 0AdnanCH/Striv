@@ -10,14 +10,12 @@ export interface TrainerRegistrationStep1Dto {
 }
 
 export interface TrainerWorkInfoDto {
-  pricing: {
-    oneToOne: number;
-    groupSession: number;
-  };
+  oneToOnePrice: number;
+  groupSessionPrice: number;
   availability: {
     day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
     startTime: string;
-    endTime: string; 
+    endTime: string;
   }[];
 }
 

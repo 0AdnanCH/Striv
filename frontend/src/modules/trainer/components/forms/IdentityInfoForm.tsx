@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 const ACCEPTED_EXT = '.jpg, .jpeg, .png, .webp';
 
 const defaultValues: IdentityInfoType = {
-  documentType: 'aadhar',
+  documentType: 'aadhaar',
   frontImage: undefined as any,
   backImage: undefined as any
 };
@@ -111,7 +111,7 @@ const IdentityInfoForm: React.FC<{ onNext?: (data: IdentityInfoType) => void }> 
                 </SelectTrigger>
 
                 <SelectContent>
-                  <SelectItem value="aadhar">Aadhar Card</SelectItem>
+                  <SelectItem value="aadhaar">Aadhaar Card</SelectItem>
                   <SelectItem value="driving_license">Driving License</SelectItem>
                   <SelectItem value="pan_card">PAN Card</SelectItem>
                 </SelectContent>

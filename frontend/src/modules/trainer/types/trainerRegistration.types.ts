@@ -50,7 +50,7 @@ export interface TrainerWorkInfoPayload {
 }
 
 export interface TrainerIdentityInfoPayload {
-  documentType: 'aadhar' | 'driving_license' | 'pan_card';
+  documentType: 'aadhaar' | 'driving_license' | 'pan_card';
   frontImage: File;
   backImage?: File;
 }

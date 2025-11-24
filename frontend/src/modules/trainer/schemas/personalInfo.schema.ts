@@ -44,7 +44,7 @@ export const personalInfoSchema = z.object({
       const f = file instanceof File ? file : file instanceof FileList && file.length ? file[0] : null;
       if (!f) return false;
       return ACCEPTED_IMAGE_TYPES.includes(f.type);
-    }, 'Only JPEG, PNG, and WebP images are allowed')
+    }, 'Only JPEG, JPG, PNG, and WebP images are allowed')
 });
 
 export type PersonalInfoType = z.infer<typeof personalInfoSchema>;

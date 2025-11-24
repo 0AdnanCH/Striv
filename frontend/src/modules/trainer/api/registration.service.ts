@@ -1,5 +1,6 @@
 import { trainerRegistrationAPI } from './registration.api';
 import type { TrainerPersonalInfoPayload, ApiMessageResponse, TrainerProfessionalInfoPayload, TrainerWorkInfoPayload, TrainerIdentityInfoPayload } from '../types/trainerRegistration.types';
+import { normalizeFile } from '../utils/normalizeFile.util';
 
 export const trainerRegistrationService = {
   async submitPersonalInfo(payload: TrainerPersonalInfoPayload): Promise<ApiMessageResponse> {
@@ -10,7 +11,7 @@ export const trainerRegistrationService = {
     formData.append('gender', payload.gender);
     formData.append('age', String(payload.age));
     formData.append('phone', payload.phone);
-    formData.append('profile_photo', payload.profile_photo);
+    formData.append('profile_photo', payload.profile_photo, payload.profile_photo.name);
 
     const res = await trainerRegistrationAPI.submitPersonalInfo(formData);
     return res;
@@ -58,7 +59,12 @@ export const trainerRegistrationService = {
         }
 
         if (cert.certificateImage) {
-          formData.append(`certificates[${index}][certificateImage]`, cert.certificateImage, cert.certificateImage.name);
+          const file = cert.certificateImage instanceof FileList ? cert.certificateImage[0] : cert.certificateImage;
+
+          if (file) {
+            console.log('Certificate file:', file);
+            formData.append(`certificates`, file, file.name);
+          }
         }
       });
     }
@@ -76,12 +82,16 @@ export const trainerRegistrationService = {
 
     formData.append('documentType', payload.documentType);
 
-    if (payload.frontImage) {
-      formData.append('frontImage', payload.frontImage, payload.frontImage.name);
+    const front = normalizeFile(payload.frontImage);
+    const back = normalizeFile(payload.backImage);
+
+
+    if (front) {
+      formData.append('frontImage', front, front.name);
     }
 
-    if (payload.backImage) {
-      formData.append('backImage', payload.backImage, payload.backImage.name);
+    if (back) {
+      formData.append('backImage', back, back.name);
     }
 
     return await trainerRegistrationAPI.submitIdentityInfo(formData);

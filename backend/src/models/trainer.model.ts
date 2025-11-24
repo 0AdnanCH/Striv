@@ -8,20 +8,23 @@ export interface TrainerDocument extends ITrainer, Document<ObjectId> {
 const trainerSchema = new Schema<TrainerDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-    specialization: { type: [String], required: true },
+    specialization: { type: [String], default: [] },
     additionalSkills: { type: [String], default: [] },
-    yearsOfExperience: { type: Number, required: true, min: 0 },
-    certificates: [
-      {
-        title: { type: String, required: true },
-        issuer: { type: String, required: true },
-        issuedDate: { type: Date, required: false },
-        fileUrl: { type: String, required: true }
-      }
-    ],
+    yearsOfExperience: { type: Number, min: 0, default: 0 },
+    certificates: {
+      type: [
+        {
+          title: { type: String },
+          issuer: { type: String },
+          issuedDate: { type: Date },
+          fileUrl: { type: String }
+        }
+      ],
+      default: []
+    },
     pricing: {
-      oneToOne: { type: Number, required: true, min: 0 },
-      groupSession: { type: Number, required: true, min: 0 }
+      oneToOne: { type: Number, min: 0, default: 0 },
+      groupSession: { type: Number, min: 0, default: 0 }
     },
 
     availability: {
@@ -30,17 +33,16 @@ const trainerSchema = new Schema<TrainerDocument>(
           day: {
             type: String,
             enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-            required: true
           },
-          startTime: { type: String, required: true },
-          endTime: { type: String, required: true }
+          startTime: { type: String },
+          endTime: { type: String }
         }
       ],
       default: []
     },
 
     portfolio: {
-      bio: { type: String, required: true },
+      bio: { type: String, default: '' },
       achievements: { type: [String], default: [] },
       socialLinks: {
         website: { type: String, default: null },

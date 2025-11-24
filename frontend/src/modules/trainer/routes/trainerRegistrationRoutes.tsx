@@ -9,5 +9,5 @@ export const trainerRegistrationRoutes: RouteObject[] = [
   { path: 'trainer/personal-info', element: <PersonalInfoPage /> },
   { path: 'trainer/professional-info', element: <ProfessionalInfoPage /> },
   { path: 'trainer/work-info', element: <WorkInfoPage /> },
-  { path: 'trainer/identity-info', element: <IdentityInfoPage /> },
+  { path: 'trainer/identity', element: <IdentityInfoPage /> },
 ];

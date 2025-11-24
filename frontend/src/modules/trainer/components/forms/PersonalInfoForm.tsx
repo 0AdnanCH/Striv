@@ -62,7 +62,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
 
 
   const onSubmit = async (data: PersonalInfoType) => {
-    const payload = { ...data };
+    const payload: PersonalInfoType = { ...data };
     if ((payload.profile_photo as FileList)?.length) payload.profile_photo = (data.profile_photo as FileList)[0];
     console.log('Step 1 submit:', payload);
     // if (onNext) onNext(payload);
@@ -82,30 +82,36 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
         {/* First + Last */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor='first_name' className="mb-2 block">First name</Label>
-            <Input id='first_name' type='text' placeholder="First name" {...register('first_name')} />
+            <Label htmlFor="first_name" className="mb-2 block">
+              First name
+            </Label>
+            <Input id="first_name" type="text" placeholder="First name" {...register('first_name')} />
             {errors.first_name && <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>}
           </div>
 
           <div>
-            <Label htmlFor='last_name' className="mb-2 block">Last name</Label>
-            <Input id='last_name' type='text' placeholder="Last name" {...register('last_name')} />
+            <Label htmlFor="last_name" className="mb-2 block">
+              Last name
+            </Label>
+            <Input id="last_name" type="text" placeholder="Last name" {...register('last_name')} />
             {errors.last_name && <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor='gender' className="mb-2 block">Gender</Label>
+            <Label htmlFor="gender" className="mb-2 block">
+              Gender
+            </Label>
             <Controller
               control={control}
               name="gender"
               render={({ field }) => (
                 <Select onValueChange={(val) => field.onChange(val)} value={field.value}>
-                  <SelectTrigger id='gender'>
+                  <SelectTrigger id="gender">
                     <SelectValue>{field.value}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent position='popper' sideOffset={6}>
+                  <SelectContent position="popper" sideOffset={6}>
                     <SelectGroup>
                       <SelectLabel>Gender</SelectLabel>
                       <SelectItem value="male">Male</SelectItem>
@@ -119,19 +125,30 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
             {errors.gender && <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>}
           </div>
           <div>
-            <Label htmlFor='age' className="mb-2 block">Age</Label>
-            <Input id='age' placeholder="Age" type="number" {...register('age' as any)} />
+            <Label htmlFor="age" className="mb-2 block">
+              Age
+            </Label>
+            <Input
+              id="age"
+              placeholder="Age"
+              type="number"
+              {...register('age', {
+                valueAsNumber: true
+              })}
+            />
             {errors.age && <p className="mt-1 text-sm text-red-600">{errors.age.message}</p>}
           </div>
         </div>
 
         {/* Phone */}
         <div>
-          <Label htmlFor='phone_no' className='mb-2 block'>Phone</Label>
-          <Input 
-            id='phone_no' 
-            placeholder="Phone number" 
-            maxLength={10} 
+          <Label htmlFor="phone_no" className="mb-2 block">
+            Phone
+          </Label>
+          <Input
+            id="phone_no"
+            placeholder="Phone number"
+            maxLength={10}
             {...register('phone')}
             onInput={(e: React.FormEvent<HTMLInputElement>) => {
               const input = e.currentTarget;
@@ -140,16 +157,18 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
                 input.value = input.value.slice(0, 10);
               }
               input.dispatchEvent(new Event('change', { bubbles: true }));
-            }} 
+            }}
           />
           {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
         </div>
 
         {/* Profile photo */}
         <div>
-          <Label htmlFor='profile_photo' className="mb-2 block">Profile photo</Label>
+          <Label htmlFor="profile_photo" className="mb-2 block">
+            Profile photo
+          </Label>
           <input
-            id='profile_photo'
+            id="profile_photo"
             type="file"
             accept=".jpg, .jpeg, .png, .webp"
             onChange={(e) => {

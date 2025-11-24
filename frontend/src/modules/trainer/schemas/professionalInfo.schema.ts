@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MAX_CERTIFICATE_IMAGE_SIZE = 3 * 1024 * 1024; 
+const MAX_CERTIFICATE_IMAGE_SIZE = 2 * 1024 * 1024; 
 const ACCEPTED_CERTIFICATE_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 const optionalURL = z
@@ -50,7 +50,7 @@ export const certificateSchema = z.object({
       if (!f) return true;
 
       return f.size <= MAX_CERTIFICATE_IMAGE_SIZE;
-    }, "Certificate image must be less than 3MB")
+    }, "Certificate image must be less than 2 MB")
     .refine((file) => {
       if (!file) return true;
       const f =

@@ -5,7 +5,7 @@ export const trainerRegistrationAPI = {
   async submitPersonalInfo(formData: FormData): Promise<ApiMessageResponse> {
 
     const response = await axiosClient.post(
-      '/trainer/registration/personal-info', 
+      '/trainer/application/personal-info', 
       formData, 
       {
         role: 'client',
@@ -20,7 +20,7 @@ export const trainerRegistrationAPI = {
 
   async submitProfessionalInfo(formData: FormData): Promise<ApiMessageResponse> {
     const response = await axiosClient.post(
-      '/trainer/registration/professional-info',
+      '/trainer/application/professional-info',
       formData,
       {
         role: 'client',
@@ -35,7 +35,7 @@ export const trainerRegistrationAPI = {
 
   async submitWorkInfo(data: TrainerWorkInfoPayload): Promise<ApiMessageResponse> {
     const response = await axiosClient.post(
-      '/trainer/registration/work-info',
+      '/trainer/application/work-info',
       data,
       {
         role: 'client'
@@ -46,7 +46,7 @@ export const trainerRegistrationAPI = {
 
   async submitIdentityInfo(formData: FormData): Promise<ApiMessageResponse> {
     const response = await axiosClient.post(
-      '/trainer/registration/identity',
+      '/trainer/application/identity',
       formData,
       {
         role: 'client',

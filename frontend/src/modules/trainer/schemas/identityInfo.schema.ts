@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MAX_ID_IMAGE_SIZE = 3 * 1024 * 1024; 
+const MAX_ID_IMAGE_SIZE = 2 * 1024 * 1024; 
 const ACCEPTED_ID_IMAGE_TYPES: readonly string[] = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 function getFileFromValue(val: any): File | null {
@@ -15,7 +15,7 @@ function getFileFromValue(val: any): File | null {
 
 export const identityInfoSchema = z
   .object({
-    documentType: z.enum(['aadhar', 'driving_license', 'pan_card'], 'Please select a valid document type'),
+    documentType: z.enum(['aadhaar', 'driving_license', 'pan_card'], 'Please select a valid document type'),
 
     frontImage: z
       .any()

@@ -24,7 +24,9 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     userId: string, 
     payload: TrainerRegistrationStep1Dto
   ): Promise<{ message: string }> {
-    const { first_name, last_name, gender, age, phone, profile_photo } = payload;
+    const { first_name, last_name, gender, phone, profile_photo } = payload;
+    const age = Number(payload.age);
+    
 
     const user = await this._userRepository.findById(userId);
     if (!user) throw new BadRequestError({
@@ -101,11 +103,11 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
     const {
       specialization,
-      yearsOfExperience,
       portfolio,
       additionalSkills,
       certificates
     } = payload;
+    const yearsOfExperience = Number(payload.yearsOfExperience);
 
     const updatePayload: Partial<ITrainer> = {};
 
@@ -184,14 +186,17 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       } as unknown as ITrainer);
     }
 
-    const { pricing, availability } = payload;
+    const { oneToOnePrice, groupSessionPrice , availability } = payload;
 
     const updatePayload: Partial<ITrainer> = {};
 
-    const pricingChanged = pricing.oneToOne !== trainer.pricing.oneToOne || pricing.groupSession !== trainer.pricing.groupSession;
+    const pricingChanged = oneToOnePrice !== trainer.pricing.oneToOne || groupSessionPrice !== trainer.pricing.groupSession;
 
     if (pricingChanged) {
-      updatePayload.pricing = pricing;
+      updatePayload.pricing = {
+        oneToOne: oneToOnePrice,
+        groupSession: groupSessionPrice,
+      };
     }
 
     const availabilityChanged = JSON.stringify(availability) !== JSON.stringify(trainer.availability);
