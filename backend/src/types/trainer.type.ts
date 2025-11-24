@@ -58,7 +58,6 @@ export interface ITrainer {
 
 export enum KycDocumentType {
   AADHAAR = 'aadhaar',
-  PASSPORT = 'passport',
   DRIVING_LICENSE = 'driving_license',
   PAN_CARD = 'pan_card'
 }
@@ -87,4 +86,3 @@ export interface TrainerProfessionalInfo {
   certificates?: CertificateInfo[];
   portfolio: PortfolioInfo;
 }
-

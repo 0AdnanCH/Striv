@@ -30,7 +30,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        'border border-striv-muted/60 bg-white/60 backdrop-blur-sm text-gray-800 rounded-md shadow-sm hover:bg-white/80 focus:border-striv-accent focus:ring-2 focus:ring-striv-accent/40 flex items-center justify-between',
+        'border border-striv-muted/60 bg-white/60 backdrop-blur-sm text-gray-800 rounded-md shadow-sm hover:bg-white/80 focus:border-striv-accent focus:ring-2 focus:ring-striv-accent/40 flex items-center justify-between w-full h-11 text-base px-3',
         className
       )}
       {...props}
@@ -51,6 +51,7 @@ function SelectContent({ className, children, position = 'popper', align = 'cent
         className={cn(
           'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md',
           position === 'popper' && 'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+          'z-[100] bg-white/95 border border-striv-muted/60 shadow-lg rounded-md',
           className
         )}
         position={position}

@@ -108,10 +108,10 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, loading }) => {
         <div className="flex flex-col gap-2">
           <Label htmlFor="gender">Gender</Label>
           <Select onValueChange={handleGenderChange}>
-            <SelectTrigger className="w-full h-11 text-base border-striv-muted/60 focus:border-striv-accent focus:ring-2 focus:ring-striv-accent/40 bg-white/60 backdrop-blur-sm rounded-md px-3">
+            <SelectTrigger id='gender'>
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
-            <SelectContent className="z-[100] bg-white/95 border border-striv-muted/60 shadow-lg rounded-md" position="popper" sideOffset={6}>
+            <SelectContent position="popper" sideOffset={6}>
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>
               {/* <SelectItem value="other">Other</SelectItem> */}
