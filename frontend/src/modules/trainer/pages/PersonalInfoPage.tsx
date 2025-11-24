@@ -1,5 +1,5 @@
 import React from 'react';
-import TrainerPersonalInfoForm from '../components/forms/PersonalInfoForm';
+import PersonalInfoForm from '../components/forms/PersonalInfoForm';
 
 const TrainerPersonalInfoPage: React.FC = () => {
   return (
@@ -12,7 +12,7 @@ const TrainerPersonalInfoPage: React.FC = () => {
 
             <div className="flex justify-center">
               <div className="w-full">
-                <TrainerPersonalInfoForm
+                <PersonalInfoForm
                   onNext={() => {
                     console.log('Received step1 data on page:');
                   }}

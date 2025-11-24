@@ -8,6 +8,9 @@ import { Input } from '../../../../components/ui/Input';
 import { Button } from '../../../../components/ui/Button';
 import { Label } from '@radix-ui/react-label';
 import { cn } from '../../../../utils/cn.util';
+import { trainerRegistrationService } from '../../api/registration.service';
+import { handleApiError } from '../../../../utils/handleApiError.util';
+import { toast } from 'sonner';
 
 const ACCEPTED_CERT_IMAGE_EXT = '.jpg, .jpeg, .png, .webp';
 
@@ -36,8 +39,6 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
     control,
     handleSubmit,
     setValue,
-    getValues,
-    watch,
     formState: { errors, isSubmitting }
   } = useForm<FormValues>({
     resolver: zodResolver(professionalInfoSchema),
@@ -50,13 +51,13 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
   const certArray = useFieldArray({ control, name: 'certificates' as any });
   const achievementsArray = useFieldArray({ control, name: 'portfolio.achievements' as any });
 
-  const watchedCertificates = watch('certificates');
+  // const watchedCertificates = watch('certificates');
 
-  const handleAddSpecialization = (val: string) => {
-    const v = val?.trim();
-    if (!v) return;
-    specArray.append(v);
-  };
+  // const handleAddSpecialization = (val: string) => {
+  //   const v = val?.trim();
+  //   if (!v) return;
+  //   specArray.append(v);
+  // };
 
   // helper for file change -> set in RHF
   const handleCertificateFileChange = (index: number, files: FileList | null) => {
@@ -83,7 +84,7 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
     return out;
   };
 
-  const onSubmit = (raw: FormValues) => {
+  const onSubmit = async (raw: FormValues) => {
     const payload = {
       ...raw,
       certificates: raw.certificates?.map((c: any) => {
@@ -101,7 +102,15 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
     };
 
     console.log('Step2 submit:', payload);
-    if (onNext) onNext(payload as FormValues);
+    // if (onNext) onNext(payload as FormValues);
+    if(onNext) {
+      try {
+        const res = await trainerRegistrationService.submitProfessionalInfo(payload);
+        toast.success(res.message);
+      } catch (err: any) {
+        handleApiError('Trainer Professional Info POST', err);
+      }
+    }
   };
 
   return (

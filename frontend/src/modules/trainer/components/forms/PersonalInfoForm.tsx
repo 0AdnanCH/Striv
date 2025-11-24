@@ -7,14 +7,15 @@ import { Button } from '../../../../components/ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
-
+import { trainerRegistrationService } from '../../api/registration.service';
+import { handleApiError } from '../../../../utils/handleApiError.util';
+import { toast } from 'sonner';
 
 interface Props {
   onNext?: (data: PersonalInfoType) => void;
 }
 
-
-export const Step1PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
+const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
   const {
     register,
     handleSubmit,
@@ -60,11 +61,19 @@ export const Step1PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
   }, [watchedPhoto]);
 
 
-  const onSubmit = (data: PersonalInfoType) => {
-    const out = { ...data } as any;
-    if ((data.profile_photo as FileList)?.length) out.profile_photo = (data.profile_photo as FileList)[0];
-    console.log('Step 1 submit:', out);
-    if (onNext) onNext(out);
+  const onSubmit = async (data: PersonalInfoType) => {
+    const payload = { ...data };
+    if ((payload.profile_photo as FileList)?.length) payload.profile_photo = (data.profile_photo as FileList)[0];
+    console.log('Step 1 submit:', payload);
+    // if (onNext) onNext(payload);
+    if(onNext) {
+      try {
+        const res = await trainerRegistrationService.submitPersonalInfo(payload);
+        toast.success(res.message);
+      } catch (err: any) {
+        handleApiError('Trainer Personal Info POST', err);
+      }
+    }
   };
 
   return (
@@ -173,4 +182,4 @@ export const Step1PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
 
 }
 
-export default Step1PersonalInfoForm;
+export default PersonalInfoForm;

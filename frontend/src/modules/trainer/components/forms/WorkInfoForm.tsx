@@ -9,6 +9,9 @@ import { Button } from '../../../../components/ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
+import { trainerRegistrationService } from '../../api/registration.service';
+import { handleApiError } from '../../../../utils/handleApiError.util';
+import { toast } from 'sonner';
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
@@ -47,14 +50,22 @@ const WorkInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = ({ onNex
     availabilityArray.remove(index);
   };
 
-  const onSubmit = (raw: FormValues) => {
+  const onSubmit = async (raw: FormValues) => {
     const payload: FormValues = {
       ...raw,
       availability: raw.availability
     };
 
     console.log('WorkInfo submit payload:', payload);
-    if (onNext) onNext(payload);
+    // if (onNext) onNext(payload);
+    if (onNext) {
+      try {
+        const res = await trainerRegistrationService.submitWorkInfo(payload);
+        toast.success(res.message);
+      } catch (err: any) {
+        handleApiError('Trainer Work Info POST', err);
+      }
+    }
   };
 
   return (

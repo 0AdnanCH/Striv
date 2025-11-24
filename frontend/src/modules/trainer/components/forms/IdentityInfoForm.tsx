@@ -10,6 +10,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '.
 import { Input } from '../../../../components/ui/Input';
 import { Button } from '../../../../components/ui/Button';
 import { Label } from '@radix-ui/react-label';
+import { trainerRegistrationService } from '../../api/registration.service';
+import { handleApiError } from '../../../../utils/handleApiError.util';
+import { toast } from 'sonner';
 
 const ACCEPTED_EXT = '.jpg, .jpeg, .png, .webp';
 
@@ -80,8 +83,16 @@ const IdentityInfoForm: React.FC<{ onNext?: (data: IdentityInfoType) => void }> 
     setValue(field, files, { shouldValidate: true });
   };
 
-  const onSubmit = (data: IdentityInfoType) => {
-    onNext?.(data);
+  const onSubmit = async (payload: IdentityInfoType) => {
+    // onNext?.(data);
+    if (onNext) {
+      try {
+        const res = await trainerRegistrationService.submitIdentityInfo(payload);
+        toast.success(res.message);
+      } catch (err: any) {
+        handleApiError('Trainer Identity Info POST', err);
+      }
+    }
   };
 
   return (
