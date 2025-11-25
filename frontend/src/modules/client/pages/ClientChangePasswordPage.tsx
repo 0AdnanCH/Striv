@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import ClientProfile from '../components/profile/ClientProfile';
 import { LogOut, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuthContext } from '../../auth/context/AuthContext';
 import { cn } from '../../../utils/cn.util';
 import BaseConfirmModal from '../../../components/ui/BaseConfirmModal';
 import { Link, useNavigate } from 'react-router-dom';
+import ClientChangePassword from '../components/forms/ClientChangePassword';
 
-const ClientProfilePage: React.FC = () => {
+const ClientChangePasswordPage: React.FC = () => {
   const { logout, user } = useAuthContext();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const openLogoutModal = () => setShowLogoutModal(true);
   const handleLogoutCancel = () => setShowLogoutModal(false);
@@ -20,18 +20,18 @@ const ClientProfilePage: React.FC = () => {
   };
 
   const navItems = [
-    { label: 'Profile', icon: <User size={18} />, action: () => {}, active: true  },
-    { label: 'Reset Password', icon: <KeyRound size={18} />, action: () => { navigate('/client/change-password') } }
+    { label: 'Profile', icon: <User size={18} />, action: () => navigate('/client/profile') },
+    { label: 'Reset Password', icon: <KeyRound size={18} />, action: () => {}, active: true }
   ];
 
   return (
     <div className="min-h-screen bg-striv-bg flex relative">
-      {/* BACK TO HOME BUTTON (top-left of page) */}
+      {/* BACK HOME BUTTON */}
       <Link
         to="/"
         className="absolute top-6 left-6 z-50 flex items-center gap-2 
-                 bg-white px-3 py-2 rounded-full shadow-md 
-                 hover:bg-gray-100 transition-all"
+                   bg-white px-3 py-2 rounded-full shadow-md 
+                   hover:bg-gray-100 transition-all"
       >
         <ArrowLeft className="h-5 w-5 text-striv-primary" />
         <span className="text-sm font-medium text-gray-700">Back to Home</span>
@@ -67,21 +67,18 @@ const ClientProfilePage: React.FC = () => {
           <button
             onClick={openLogoutModal}
             className="flex items-center gap-3 w-full px-4 py-3 
-          rounded-lg font-medium text-red-600
-          hover:bg-red-100 active:bg-red-200 transition"
+                      rounded-lg font-medium text-red-600
+                      hover:bg-red-100 active:bg-red-200 transition"
           >
             <LogOut size={18} /> Logout
           </button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto p-6 sm:p-10">
-        <div
-          className="w-full bg-white/70 backdrop-blur-md 
-        border border-striv-muted/30 rounded-2xl p-8 sm:p-10 shadow-md"
-        >
-          <ClientProfile />
+      {/* MAIN CONTENT — CENTERED */}
+      <main className="flex-1 flex justify-center items-center p-6 sm:p-10">
+        <div className="w-full max-w-lg">
+          <ClientChangePassword />
         </div>
       </main>
 
@@ -106,4 +103,4 @@ const ClientProfilePage: React.FC = () => {
   );
 };
 
-export default ClientProfilePage;
+export default ClientChangePasswordPage;

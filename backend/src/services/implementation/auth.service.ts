@@ -16,6 +16,7 @@ import { env } from "../../configs/env.config";
 import { CryptoUtil } from "../../utils/crypto.util";
 import type { ForgotPasswordDto, ResetPasswordDto } from "../../dtos/auth.dto";
 import { verifyGoogleAccessToken } from "../../utils/google.util";
+import { ChangePasswordDto } from "../../dtos/changePassword.dto";
 
 export class AuthService implements IAuthService {
   constructor(
@@ -288,5 +289,40 @@ export class AuthService implements IAuthService {
     }
 
     return { message: RESPONSE_MESSAGES.PASSWORD_RESET_SUCCESS };
+  }
+
+  async changePassword(userId: string, data: ChangePasswordDto): Promise<{ message: string; }> {
+    const { currentPassword, newPassword } = data;
+    const user = await this._userRepository.findById(userId);
+    if (!user) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: RESPONSE_MESSAGES.USER_NOT_FOUND,
+        logging: false
+      });
+    }
+
+    if (user.authProvider === 'google' || !user.password) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: 'Password change is not allowed for Google accounts',
+        logging: false
+      });
+    }
+
+    const isValidCurrentPassword = await comparePassword(currentPassword, user.password);
+    if (!isValidCurrentPassword) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: RESPONSE_MESSAGES.INCORRECT_PASSWORD,
+        logging: false
+      });
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await this._userRepository.updatePassword(user._id, hashedPassword);
+
+    return { message: 'Password updated successfully' };
   }
 }

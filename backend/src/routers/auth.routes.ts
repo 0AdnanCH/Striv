@@ -7,6 +7,8 @@ import { emailSchema, otpSchema, signupSchema } from '../schemas/auth.schema';
 import validate from '../middlewares/validation.middleware';
 import { OtpRepository } from '../repositories/implementation/otp.repository';
 import { ForgotPasswordDto, ResetPasswordDto } from '../dtos/auth.dto';
+import { authenticate } from '../middlewares/auth.middleware';
+import { changePasswordSchema } from '../dtos/changePassword.dto';
 
 const authRouter = express.Router();
 
@@ -23,5 +25,6 @@ authRouter.post('/resend-otp', validate(emailSchema), authController.resendOtp.b
 authRouter.post('/forgot-password', validate(ForgotPasswordDto), authController.forgotPassword.bind(authController));
 authRouter.post('/reset-password', validate(ResetPasswordDto), authController.resetPassword.bind(authController));
 authRouter.post('/google-signin', authController.signInWithGoogle.bind(authController));
+authRouter.patch('/change-password', authenticate, validate(changePasswordSchema), authController.changePassword.bind(authController));
 
 export default authRouter;

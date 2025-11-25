@@ -3,6 +3,9 @@ import { IAuthController } from "../interface/IAuth.controller";
 import { IAuthService } from "../../services/interface/IAuth.service";
 import { HTTP_STATUS } from "../../constants/httpStatus.constants";
 import { successResponse } from "../../utils/apiResponse.util";
+import { AuthenticatedRequest } from "../../middlewares/auth.middleware";
+import BadRequestError from "../../errors/badRequest.error";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
 
 export class AuthController implements IAuthController {
   constructor(private readonly _authService: IAuthService) {}
@@ -72,6 +75,25 @@ export class AuthController implements IAuthController {
       successResponse(res, message, { token: appJwtToken, user }, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
+    }
+  }
+
+  async changePassword(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if(!userId) {
+        return next(new BadRequestError({
+          statusCode: HTTP_STATUS.UNAUTHORIZED,
+          message: RESPONSE_MESSAGES.TOKEN_MISSING,
+          logging: false
+        }));
+      } 
+
+      const { message } = await this._authService.changePassword(userId, req.body);
+      successResponse(res, message, null, HTTP_STATUS.OK);
+    } catch (error: any) {
+      next(error)
     }
   }
 }

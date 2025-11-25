@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           ) : (
             <div className="flex items-center gap-4">
               {/* User Name */}
-              <span onClick={() => navigate('/profile')} className="font-semibold text-white cursor-pointer">
+              <span onClick={() => navigate('client/profile')} className="font-semibold text-white cursor-pointer">
                 {user.first_name} {user.last_name}
               </span>
 

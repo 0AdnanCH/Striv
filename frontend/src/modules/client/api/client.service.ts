@@ -1,5 +1,5 @@
 import { clientApi } from './client.api';
-import type { ClientProfile, UpdateClientProfileRequest } from '../types/client.types'; 
+import type { ChangePasswordRequest, ChangePasswordResponse, ClientProfile, UpdateClientProfileRequest } from '../types/client.types'; 
 
 export const clientService = {
   async getProfile(): Promise<ClientProfile> {
@@ -24,5 +24,13 @@ export const clientService = {
       height: response.data.height ?? undefined,
       weight: response.data.weight ?? undefined
     };
+  },
+
+    async changePassword(
+    payload: ChangePasswordRequest
+  ): Promise<ChangePasswordResponse> {
+    const response = await clientApi.changePassword(payload);
+    return response; // { message }
   }
+
 };

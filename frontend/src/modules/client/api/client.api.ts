@@ -1,5 +1,5 @@
 import axiosClient from "../../../api/axiosClient";
-import type { ClientProfileResponse, UpdateClientProfileRequest, UpdateClientProfileResponse } from '../types/client.types';
+import type { ChangePasswordRequest, ChangePasswordResponse, ClientProfileResponse, UpdateClientProfileRequest, UpdateClientProfileResponse } from '../types/client.types';
 
 export const clientApi = {
   getProfile: async (): Promise<ClientProfileResponse> => {
@@ -11,6 +11,13 @@ export const clientApi = {
     payload: UpdateClientProfileRequest
   ): Promise<UpdateClientProfileResponse> => {
     const response = await axiosClient.patch('/user/me', payload);
+    return response.data;
+  },
+
+    changePassword: async (
+    payload: ChangePasswordRequest
+  ): Promise<ChangePasswordResponse> => {
+    const response = await axiosClient.patch('/auth/change-password', payload);
     return response.data;
   }
 };

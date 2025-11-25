@@ -2,6 +2,7 @@ import { ObjectId } from "mongoose";
 import { UserRole } from "../../constants/roles.constants";
 import { IUser } from "../../types/user.type";
 import type { ForgotPasswordDto, ResetPasswordDto } from "../../dtos/auth.dto";
+import { ChangePasswordDto } from "../../dtos/changePassword.dto";
 
 export interface IAuthService {
   signup(user: IUser): Promise<string>;
@@ -22,4 +23,5 @@ export interface IAuthService {
       picture?: string;
     };
   }>;
+  changePassword(userId: string, data: ChangePasswordDto): Promise<{ message: string }>;
 }
