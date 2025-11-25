@@ -28,5 +28,6 @@ export const RESPONSE_MESSAGES = {
   CANNOT_UNBLOCK_ADMIN: 'Admins cannot be unblocked.',
   PASSWORD_RESET_EMAIL_SENT: "You'll receive a password reset link shortly at your email address.",
   PASSWORD_RESET_ALREADY_SENT: 'A password reset link was already sent recently. Please check your inbox or spam folder.',
-  PASSWORD_RESET_SUCCESS: 'Password reset successfuly.'
+  PASSWORD_RESET_SUCCESS: 'Password reset successfuly.',
+  TRAINER_NOT_FOUND: 'Trainer not found'
 } as const;

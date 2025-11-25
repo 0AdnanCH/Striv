@@ -25,6 +25,13 @@ const trainerKycRepository = new TrainerKycRepository();
 const trainerApplicationService = new TrainerApplicationService(userRepository, trainerRepository, trainerKycRepository, fileRepository);
 const trainerApplicationController = new TrainerApplicationController(trainerApplicationService);
 
+trainerApplicationRouter.get(
+  '/me',
+  authenticate,
+  authorizeRoles('client'),
+  trainerApplicationController.getFullTrainerInfo.bind(trainerApplicationController)
+);
+
 trainerApplicationRouter.post(
   '/personal-info',
   authenticate,

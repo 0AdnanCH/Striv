@@ -7,45 +7,63 @@ import { Button } from '../../../../components/ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
-import { trainerRegistrationService } from '../../api/registration.service';
-import { handleApiError } from '../../../../utils/handleApiError.util';
-import { toast } from 'sonner';
+import { useTrainer } from '../../hooks/useTrainer';
 
 interface Props {
+  loading: boolean;
   onNext?: (data: PersonalInfoType) => void;
 }
 
-const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
+const defaultValues: PersonalInfoType = {
+  first_name: '',
+  last_name: '',
+  gender: 'male',
+  age: undefined as any,
+  phone: '',
+  profile_photo: undefined as any,
+  existingProfilePhotoUrl: null,
+};
+
+const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
+  const { trainer } = useTrainer();
+
   const {
     register,
     handleSubmit,
     control,
     setValue,
     watch,
-    formState: { errors, isSubmitting }
+    reset,
+    formState: { errors }
   } = useForm<PersonalInfoType>({
     resolver: zodResolver(personalInfoSchema),
     mode: 'onTouched',
-    defaultValues: {
-      first_name: '',
-      last_name: '',
-      gender: 'male',
-      age: undefined as any,
-      phone: '',
-      profile_photo: undefined as any
-    }
+    defaultValues
   });
+
+  useEffect(() => {
+    if (!trainer) return;
+
+    reset({
+      first_name: trainer.first_name || '',
+      last_name: trainer.last_name || '',
+      gender: trainer.gender || 'male',
+      age: trainer.age || undefined,
+      phone: trainer.phone || '',
+      profile_photo: undefined,
+      existingProfilePhotoUrl: trainer.profile_photo || null,
+    });
+
+    setPreviewUrl(trainer.profile_photo || null);
+  }, [trainer, reset]);
 
 
   const watchedPhoto = watch('profile_photo');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(trainer?.profile_photo || null);
 
 
   useEffect(() => {
-    if (!watchedPhoto) {
-      setPreviewUrl(null);
-      return;
-    }
+    if (!watchedPhoto) return;
     let file: File | null = null;
     if (watchedPhoto instanceof File) file = watchedPhoto;
     else if ((watchedPhoto as FileList)?.length) file = (watchedPhoto as FileList)[0];
@@ -63,21 +81,14 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
 
   const onSubmit = async (data: PersonalInfoType) => {
     const payload: PersonalInfoType = { ...data };
-    if ((payload.profile_photo as FileList)?.length) payload.profile_photo = (data.profile_photo as FileList)[0];
-    console.log('Step 1 submit:', payload);
-    // if (onNext) onNext(payload);
-    if(onNext) {
-      try {
-        const res = await trainerRegistrationService.submitPersonalInfo(payload);
-        toast.success(res.message);
-      } catch (err: any) {
-        handleApiError('Trainer Personal Info POST', err);
-      }
-    }
+    if ((payload.profile_photo as FileList)?.length) 
+      payload.profile_photo = (data.profile_photo as FileList)[0];
+   
+    onNext?.(payload);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-2xl">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl mx-auto">
       <div className="grid grid-cols-1 gap-4">
         {/* First + Last */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -107,7 +118,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
               control={control}
               name="gender"
               render={({ field }) => (
-                <Select onValueChange={(val) => field.onChange(val)} value={field.value}>
+                <Select key={field.value} onValueChange={(val) => field.onChange(val)} value={field.value}>
                   <SelectTrigger id="gender">
                     <SelectValue>{field.value}</SelectValue>
                   </SelectTrigger>
@@ -191,7 +202,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext }) => {
           <Button variant="outline" type="button" onClick={() => console.log('Previous (none)')}>
             Previous
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={loading}>
             Next
           </Button>
         </div>

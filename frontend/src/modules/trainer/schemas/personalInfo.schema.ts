@@ -22,29 +22,48 @@ export const personalInfoSchema = z.object({
     .gte(13, 'You must be at least 18 years old')
     .lte(120, 'Age must be 90 or below'),
   phone: z.string().regex(/^[0-9]{10}$/, { message: 'Phone number must be exactly 10 digits' }),
-  profile_photo: z
-    .any()
-    .refine((file) => {
-      if (!file) return false;
+  existingProfilePhotoUrl: z.string().nullable().optional(),
+  profile_photo: z.any().optional(),
+})
+.superRefine((data, ctx) => {
+  const file = data.profile_photo instanceof FileList && data.profile_photo.length
+    ? data.profile_photo[0]
+    : data.profile_photo instanceof File
+    ? data.profile_photo
+    : null;
 
-      if (file instanceof FileList) {
-        return file.length === 1; // must select EXACTLY 1 file
-      }
+  const hasExisting = !!data.existingProfilePhotoUrl;
 
-      if (file instanceof File) return true;
+  if (!file && !hasExisting) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Profile photo is required",
+      path: ["profile_photo"],
+    });
+    return;
+  }
 
-      return false;
-    }, 'Profile photo is required')
-    .refine((file) => {
-      const f = file instanceof File ? file : file instanceof FileList && file.length ? file[0] : null;
-      if (!f) return false;
-      return f.size <= MAX_IMAGE_SIZE;
-    }, 'Image must be less than 2MB')
-    .refine((file) => {
-      const f = file instanceof File ? file : file instanceof FileList && file.length ? file[0] : null;
-      if (!f) return false;
-      return ACCEPTED_IMAGE_TYPES.includes(f.type);
-    }, 'Only JPEG, JPG, PNG, and WebP images are allowed')
+  // If no new file, existing image is enough
+  if (!file) return;
+
+  // 2️⃣ Validate Size
+  if (file.size > MAX_IMAGE_SIZE) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Image must be less than 2MB",
+      path: ["profile_photo"],
+    });
+  }
+
+  // 3️⃣ Validate Types
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Only JPEG, JPG, PNG, and WebP images are allowed",
+      path: ["profile_photo"],
+    });
+  }
 });
+
 
 export type PersonalInfoType = z.infer<typeof personalInfoSchema>;

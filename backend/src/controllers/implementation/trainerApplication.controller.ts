@@ -10,6 +10,19 @@ import { TrainerProfessionalInfoDto } from '../../schemas/trainerProfessionalInf
 export class TrainerApplicationController implements ITrainerApplicationController {
   constructor(private readonly _trainerApplicationService: ITrainerApplicationService) {}
 
+  async getFullTrainerInfo(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return;
+
+      const fullInfo = await this._trainerApplicationService.getFullTrainerInfo(userId);
+
+      successResponse(res, 'Trainer information fetched successfully', fullInfo, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async submitPersonalInfo(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.id;
@@ -21,13 +34,13 @@ export class TrainerApplicationController implements ITrainerApplicationControll
         payload.profile_photo = req.file;
       }
 
-      const { message } = await this._trainerApplicationService.submitPersonalInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitPersonalInfo(userId, payload);
 
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
-  };
+  }
 
   async submitProfessionalInfo(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -38,9 +51,9 @@ export class TrainerApplicationController implements ITrainerApplicationControll
 
       const certificateFiles = req.files as Express.Multer.File[] | undefined;
 
-      const { message } = await this._trainerApplicationService.submitProfessionalInfo(userId, payload, certificateFiles);
+      const { message, data } = await this._trainerApplicationService.submitProfessionalInfo(userId, payload, certificateFiles);
 
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
@@ -53,9 +66,9 @@ export class TrainerApplicationController implements ITrainerApplicationControll
 
       const payload: TrainerWorkInfoDto = req.body;
 
-      const { message } = await this._trainerApplicationService.submitWorkInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitWorkInfo(userId, payload);
 
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
@@ -74,11 +87,11 @@ export class TrainerApplicationController implements ITrainerApplicationControll
         ...req.body,
         frontImage: files?.frontImage?.[0],
         backImage: files?.backImage?.[0]
-      }
+      };
 
-      const { message } = await this._trainerApplicationService.submitIdentityInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitIdentityInfo(userId, payload);
 
-      successResponse(res, message, null, HTTP_STATUS.OK);
+      successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }

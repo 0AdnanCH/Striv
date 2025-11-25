@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import ClientProfile from '../components/profile/ClientProfile';
-import { LogOut, KeyRound, User } from 'lucide-react';
+import { LogOut, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuthContext } from '../../auth/context/AuthContext';
 import { cn } from '../../../utils/cn.util';
 import BaseConfirmModal from '../../../components/ui/BaseConfirmModal';
+import { Link } from 'react-router-dom';
 
 const ClientProfilePage: React.FC = () => {
   const { logout, user } = useAuthContext();
@@ -23,10 +24,22 @@ const ClientProfilePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-striv-bg flex">
+    <div className="min-h-screen bg-striv-bg flex relative">
+      {/* BACK TO HOME BUTTON (top-left of page) */}
+      <Link
+        to="/"
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 
+                 bg-white px-3 py-2 rounded-full shadow-md 
+                 hover:bg-gray-100 transition-all"
+      >
+        <ArrowLeft className="h-5 w-5 text-striv-primary" />
+        <span className="text-sm font-medium text-gray-700">Back to Home</span>
+      </Link>
+
+      {/* SIDEBAR */}
       <aside className={cn('hidden md:flex flex-col w-64 px-6 py-10', 'bg-white/40 backdrop-blur-xl border-r border-striv-muted/40 shadow-md')}>
         {/* HEADER */}
-        <div className="mb-12">
+        <div className="mb-12 mt-10">
           <h2 className="text-2xl font-bold text-striv-primary tracking-tight">Account</h2>
           <p className="text-sm text-gray-700 mt-1">{user?.email}</p>
         </div>
@@ -38,8 +51,8 @@ const ClientProfilePage: React.FC = () => {
               key={item.label}
               onClick={item.action}
               className="flex items-center gap-3 px-4 py-3 rounded-lg
-              text-gray-800 font-medium hover:bg-striv-muted/30 
-              hover:text-striv-primary transition"
+            text-gray-800 font-medium hover:bg-striv-muted/30 
+            hover:text-striv-primary transition"
             >
               <span className="text-striv-secondary">{item.icon}</span>
               {item.label}
@@ -52,22 +65,25 @@ const ClientProfilePage: React.FC = () => {
           <button
             onClick={openLogoutModal}
             className="flex items-center gap-3 w-full px-4 py-3 
-            rounded-lg font-medium text-red-600
-            hover:bg-red-100 active:bg-red-200 transition"
+          rounded-lg font-medium text-red-600
+          hover:bg-red-100 active:bg-red-200 transition"
           >
             <LogOut size={18} /> Logout
           </button>
         </div>
       </aside>
 
+      {/* MAIN CONTENT */}
       <main className="flex-1 overflow-y-auto p-6 sm:p-10">
         <div
           className="w-full bg-white/70 backdrop-blur-md 
-          border border-striv-muted/30 rounded-2xl p-8 sm:p-10 shadow-md"
+        border border-striv-muted/30 rounded-2xl p-8 sm:p-10 shadow-md"
         >
           <ClientProfile />
         </div>
       </main>
+
+      {/* LOGOUT MODAL */}
       <BaseConfirmModal
         isOpen={showLogoutModal}
         title="Logout Confirmation"

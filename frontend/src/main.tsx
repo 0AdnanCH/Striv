@@ -4,12 +4,15 @@ import './index.css';
 import App from './App.tsx';
 import { AuthProvider } from './modules/auth/context/AuthContext.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { TrainerProvider } from './modules/trainer/context/TrainerContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
-        <App />
+        <TrainerProvider>
+          <App />
+        </TrainerProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   </StrictMode>

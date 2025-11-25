@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { getUploadedFile } from '../utils/getUploadedFile.util';
+import { AuthenticatedRequest } from './auth.middleware';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
-export function validateProfilePhoto(req: Request, res: Response, next: NextFunction) {
+export function validateProfilePhoto(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const file = req.file;
 
   if (!file) {
-    res.status(400).json({ message: 'Profile photo is required' });
-    return
+    return next();
   }
 
   if (!ACCEPTED_IMAGE_TYPES.includes(file.mimetype)) {
@@ -57,21 +57,18 @@ export function validateIdentityImages(req: Request, res: Response, next: NextFu
   const frontImage = getUploadedFile(files?.['frontImage']);
   const backImage = getUploadedFile(files?.['backImage']);
 
-  if (!frontImage) {
-    res.status(400).json({ message: 'Front image is required' });
-    return;
-  }
+  if(frontImage) {
+    if (!ACCEPTED_IMAGE_TYPES.includes(frontImage.mimetype)) {
+      res.status(400).json({ message: 'Front image must be jpeg, jpg, png or webp' });
+      return;
+    }
 
-  if (!ACCEPTED_IMAGE_TYPES.includes(frontImage.mimetype)) {
-    res.status(400).json({ message: 'Front image must be jpeg, jpg, png or webp' });
-    return;
-  }
-
-  if (frontImage.size > MAX_IMAGE_SIZE) {
-    res.status(400).json({
-      message: `Front image must be less than ${MAX_IMAGE_SIZE / (1024 * 1024)} MB`
-    });
-    return;
+    if (frontImage.size > MAX_IMAGE_SIZE) {
+      res.status(400).json({
+        message: `Front image must be less than ${MAX_IMAGE_SIZE / (1024 * 1024)} MB`
+      });
+      return;
+    }
   }
 
   if (backImage) {

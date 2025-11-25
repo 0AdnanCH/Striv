@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { professionalInfoSchema, type ProfessionalInfoType } from '../../schemas/professionalInfo.schema';
@@ -8,13 +8,15 @@ import { Input } from '../../../../components/ui/Input';
 import { Button } from '../../../../components/ui/Button';
 import { Label } from '@radix-ui/react-label';
 import { cn } from '../../../../utils/cn.util';
-import { trainerRegistrationService } from '../../api/registration.service';
-import { handleApiError } from '../../../../utils/handleApiError.util';
-import { toast } from 'sonner';
+import { useTrainer } from '../../hooks/useTrainer';
 
 const ACCEPTED_CERT_IMAGE_EXT = '.jpg, .jpeg, .png, .webp';
 
-type FormValues = ProfessionalInfoType;
+interface Props {
+  loading: boolean;
+  onNext?: (data: ProfessionalInfoType) => void;
+  onPrev?: () => void;
+}
 
 const defaultValues: ProfessionalInfoType = {
   specialization: [],
@@ -33,33 +35,58 @@ const defaultValues: ProfessionalInfoType = {
   }
 };
 
-const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = ({ onNext }) => {
+const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
+  const { trainer } = useTrainer();
+  
   const {
     register,
     control,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting }
-  } = useForm<FormValues>({
+    reset,
+    formState: { errors }
+  } = useForm<ProfessionalInfoType>({
     resolver: zodResolver(professionalInfoSchema),
     mode: 'onBlur',
-    defaultValues: defaultValues
+    defaultValues
   });
+
+  useEffect(() => {
+    if (!trainer) return;
+
+    const mappedValues: ProfessionalInfoType = {
+      specialization: trainer.specialization || [],
+      additionalSkills: trainer.additionalSkills || [],
+      yearsOfExperience: trainer.yearsOfExperience ?? 0,
+
+      certificates:
+        trainer.certificates?.map((c) => ({
+          title: c.title,
+          issuer: c.issuer,
+          issuedDate: c.issuedDate ? new Date(c.issuedDate).toISOString().slice(0, 10) : null,
+          certificateImage: undefined,
+        })) || [],
+
+      portfolio: {
+        bio: trainer.portfolio?.bio || '',
+        achievements: trainer.portfolio?.achievements || [],
+        socialLinks: {
+          website: trainer.portfolio?.socialLinks?.website || null,
+          instagram: trainer.portfolio?.socialLinks?.instagram || null,
+          youtube: trainer.portfolio?.socialLinks?.youtube || null,
+          linkedin: trainer.portfolio?.socialLinks?.linkedin || null
+        }
+      }
+    };
+
+    reset(mappedValues);
+  }, [trainer, reset]);
 
   const specArray = useFieldArray({ control, name: 'specialization' as any });
   const skillsArray = useFieldArray({ control, name: 'additionalSkills' as any });
   const certArray = useFieldArray({ control, name: 'certificates' as any });
   const achievementsArray = useFieldArray({ control, name: 'portfolio.achievements' as any });
 
-  // const watchedCertificates = watch('certificates');
-
-  // const handleAddSpecialization = (val: string) => {
-  //   const v = val?.trim();
-  //   if (!v) return;
-  //   specArray.append(v);
-  // };
-
-  // helper for file change -> set in RHF
   const handleCertificateFileChange = (index: number, files: FileList | null) => {
     if (!files || files.length === 0) {
       setValue(`certificates.${index}.certificateImage` as any, undefined, { shouldValidate: true });
@@ -84,8 +111,8 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
     return out;
   };
 
-  const onSubmit = async (raw: FormValues) => {
-    const payload = {
+  const onSubmit = async (raw: ProfessionalInfoType) => {
+    const payload: ProfessionalInfoType = {
       ...raw,
       certificates: raw.certificates?.map((c: any) => {
         const issuedDate = typeof c.issuedDate === 'string' && c.issuedDate ? new Date(c.issuedDate).toISOString() : null;
@@ -101,16 +128,7 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
       }
     };
 
-    console.log('Step2 submit:', payload);
-    // if (onNext) onNext(payload as FormValues);
-    if(onNext) {
-      try {
-        const res = await trainerRegistrationService.submitProfessionalInfo(payload);
-        toast.success(res.message);
-      } catch (err: any) {
-        handleApiError('Trainer Professional Info POST', err);
-      }
-    }
+    onNext?.(payload);
   };
 
   return (
@@ -370,10 +388,10 @@ const ProfessionalInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = 
 
         {/* Buttons */}
         <div className="flex items-center justify-end gap-3 pt-4">
-          <Button variant="outline" type="button" onClick={() => console.log('Previous')}>
+          <Button variant="outline" type="button" onClick={onPrev}>
             Previous
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={loading}>
             Next
           </Button>
         </div>

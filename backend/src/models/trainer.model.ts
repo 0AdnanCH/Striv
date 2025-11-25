@@ -51,6 +51,11 @@ const trainerSchema = new Schema<TrainerDocument>(
         linkedin: { type: String, default: null }
       }
     },
+    registrationStep: {
+      type: Number,
+      enum: [1, 2, 3, 4],
+      default: 1
+    },
     verificationStatus: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],

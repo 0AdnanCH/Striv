@@ -35,6 +35,14 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
 
         {/* Auth Section */}
         <div className="flex items-center gap-4">
+          {/* Trainer Registration Button */}
+          <button
+            onClick={() => navigate('/trainer/register')}
+            className="px-4 py-2 rounded-lg font-medium border border-white text-white hover:bg-white hover:text-striv-primary transition-all duration-200"
+          >
+            Become a Trainer
+          </button>
+
           {!user ? (
             <>
               <button
@@ -49,9 +57,12 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             </>
           ) : (
             <div className="flex items-center gap-4">
-              <span className="font-semibold text-white">
+              {/* User Name */}
+              <span onClick={() => navigate('/profile')} className="font-semibold text-white cursor-pointer">
                 {user.first_name} {user.last_name}
               </span>
+
+              {/* Logout Button */}
               <button
                 onClick={() => setShowLogoutModal(true)}
                 className="px-4 py-2 rounded-lg font-medium border border-white text-white hover:bg-white hover:text-striv-primary transition-all duration-200"

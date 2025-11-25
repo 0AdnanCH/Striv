@@ -1,8 +1,8 @@
 import axiosClient from '../../../api/axiosClient'; 
-import type { ApiMessageResponse, TrainerWorkInfoPayload } from '../types/trainerRegistration.types';  
+import type { FetchTrainerFullInfoApiResponse, PersonalInfoApiResponse, ProfessionalInfoResponse, TrainerKycResponse, WorkInfoPayload, WorkInfoResponse } from '../types/trainerRegistration.types';  
 
 export const trainerRegistrationAPI = {
-  async submitPersonalInfo(formData: FormData): Promise<ApiMessageResponse> {
+  async submitPersonalInfo(formData: FormData): Promise<PersonalInfoApiResponse> {
 
     const response = await axiosClient.post(
       '/trainer/application/personal-info', 
@@ -18,7 +18,7 @@ export const trainerRegistrationAPI = {
     return response.data;
   },
 
-  async submitProfessionalInfo(formData: FormData): Promise<ApiMessageResponse> {
+  async submitProfessionalInfo(formData: FormData): Promise<ProfessionalInfoResponse> {
     const response = await axiosClient.post(
       '/trainer/application/professional-info',
       formData,
@@ -33,7 +33,7 @@ export const trainerRegistrationAPI = {
     return response.data;
   },
 
-  async submitWorkInfo(data: TrainerWorkInfoPayload): Promise<ApiMessageResponse> {
+  async submitWorkInfo(data: WorkInfoPayload): Promise<WorkInfoResponse> {
     const response = await axiosClient.post(
       '/trainer/application/work-info',
       data,
@@ -44,7 +44,7 @@ export const trainerRegistrationAPI = {
     return response.data;
   },
 
-  async submitIdentityInfo(formData: FormData): Promise<ApiMessageResponse> {
+  async submitIdentityInfo(formData: FormData): Promise<TrainerKycResponse> {
     const response = await axiosClient.post(
       '/trainer/application/identity',
       formData,
@@ -53,6 +53,14 @@ export const trainerRegistrationAPI = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
     );
+    return response.data;
+  },
+
+  async fetchTrainerFullInfo(): Promise<FetchTrainerFullInfoApiResponse> {
+    const response = await axiosClient.get('/trainer/application/me', {
+      role: 'client' 
+    });
+
     return response.data;
   }
 };

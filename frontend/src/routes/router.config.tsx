@@ -5,7 +5,7 @@ import PublicRoute from './PublicRoute';
 import { authRoutes } from '../modules/auth/routes/authRoutes';
 import { publicAdminRoutes, protectedAdminRoutes } from '../modules/admin/routes/adminRoutes';
 import { protectedClientRoutes } from '../modules/client/routes/clientRoutes';
-import { trainerRegistrationRoutes } from '../modules/trainer/routes/trainerRegistrationRoutes';
+import { protectedTrainerRoutes } from '../modules/trainer/routes/trainerRoutes';
 
 const baseRoutes: RouteObject[] = [
   {
@@ -41,7 +41,7 @@ const allRoutes: RouteObject[] = [
   ...publicAuthRoutes,
   ...adminRoutes,
   ...protectedClientRoutes,
-  ...trainerRegistrationRoutes,
+  ...protectedTrainerRoutes,
 ];
 
 export const router = createBrowserRouter(allRoutes);

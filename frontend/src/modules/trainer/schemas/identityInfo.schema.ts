@@ -13,45 +13,26 @@ function getFileFromValue(val: any): File | null {
   return null;
 }
 
+const fileOrUrl = z.union([
+  z.instanceof(File).optional(),
+  z.url().optional(),
+  z.any().optional() 
+]);
+
+
 export const identityInfoSchema = z
   .object({
     documentType: z.enum(['aadhaar', 'driving_license', 'pan_card'], 'Please select a valid document type'),
 
-    frontImage: z
-      .any()
-      .refine((v) => {
-        const f = getFileFromValue(v);
-        return f instanceof File;
-      }, 'Front image is required')
-      .refine((v) => {
-        const f = getFileFromValue(v);
-        if (!f) return true;
-        return ACCEPTED_ID_IMAGE_TYPES.includes(f.type);
-      }, 'Front image must be jpeg, jpg, png or webp')
-      .refine((v) => {
-        const f = getFileFromValue(v);
-        if (!f) return true;
-        return f.size <= MAX_ID_IMAGE_SIZE;
-      }, `Front image must be less than ${MAX_ID_IMAGE_SIZE / (1024 * 1024)} MB`),
+    frontImage: fileOrUrl,
 
-    backImage: z
-      .any()
-      .optional()
-      .refine((v) => {
-        const f = getFileFromValue(v);
-        if (!f) return true;
-        return ACCEPTED_ID_IMAGE_TYPES.includes(f.type);
-      }, 'Back image must be jpeg, jpg, png or webp')
-      .refine((v) => {
-        const f = getFileFromValue(v);
-        if (!f) return true;
-        return f.size <= MAX_ID_IMAGE_SIZE;
-      }, `Back image must be less than ${MAX_ID_IMAGE_SIZE / (1024 * 1024)} MB`)
+    backImage: fileOrUrl,
   })
   .superRefine((obj, ctx) => {
     // ensure frontImage exists and is a real file
-    const front = getFileFromValue(obj.frontImage);
-    if (!front) {
+    const hasFrontUrl = typeof obj.frontImage === 'string';
+    const frontFile = getFileFromValue(obj.frontImage);
+    if (!hasFrontUrl && !frontFile) {
       ctx.addIssue({
         code: 'custom',
         message: 'Front image is required',
@@ -60,25 +41,28 @@ export const identityInfoSchema = z
     }
 
     // conditional: backImage required unless documentType is pan_card
-    const back = getFileFromValue(obj.backImage);
-    if (obj.documentType !== 'pan_card' && !back) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Back image is required for the selected document type',
-        path: ['backImage']
-      });
+      const hasBackUrl = typeof obj.backImage === 'string';
+    const backFile = getFileFromValue(obj.backImage);
+    if (obj.documentType !== 'pan_card') {
+      if(!hasBackUrl && !backFile) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Back image is required for the selected document type',
+          path: ['backImage']
+        });
+      }
     }
 
     // If both files exist, also re-validate type/size (defensive)
-    if (front) {
-      if (!ACCEPTED_ID_IMAGE_TYPES.includes(front.type)) {
+    if (frontFile) {
+      if (!ACCEPTED_ID_IMAGE_TYPES.includes(frontFile.type)) {
         ctx.addIssue({
           code: 'custom',
           message: 'Front image must be jpeg, jpg, png or webp',
           path: ['frontImage']
         });
       }
-      if (front.size > MAX_ID_IMAGE_SIZE) {
+      if (frontFile.size > MAX_ID_IMAGE_SIZE) {
         ctx.addIssue({
           code: 'too_big',
           maximum: MAX_ID_IMAGE_SIZE,
@@ -90,15 +74,15 @@ export const identityInfoSchema = z
       }
     }
 
-    if (back) {
-      if (!ACCEPTED_ID_IMAGE_TYPES.includes(back.type)) {
+    if (backFile) {
+      if (!ACCEPTED_ID_IMAGE_TYPES.includes(backFile.type)) {
         ctx.addIssue({
           code: 'custom',
           message: 'Back image must be jpeg, jpg, png or webp',
           path: ['backImage']
         });
       }
-      if (back.size > MAX_ID_IMAGE_SIZE) {
+      if (backFile.size > MAX_ID_IMAGE_SIZE) {
         ctx.addIssue({
           code: 'too_big',
           maximum: MAX_ID_IMAGE_SIZE,

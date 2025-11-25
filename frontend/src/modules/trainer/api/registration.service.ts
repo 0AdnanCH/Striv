@@ -1,9 +1,9 @@
 import { trainerRegistrationAPI } from './registration.api';
-import type { TrainerPersonalInfoPayload, ApiMessageResponse, TrainerProfessionalInfoPayload, TrainerWorkInfoPayload, TrainerIdentityInfoPayload } from '../types/trainerRegistration.types';
+import type { PersonalInfoPayload, ProfessionalInfoPayload, WorkInfoPayload, IdentityInfoPayload, TrainerFullInfo, PersonalInfoResponse, ProfessionalInfoResponse, WorkInfoResponse, TrainerKycResponse } from '../types/trainerRegistration.types';
 import { normalizeFile } from '../utils/normalizeFile.util';
 
 export const trainerRegistrationService = {
-  async submitPersonalInfo(payload: TrainerPersonalInfoPayload): Promise<ApiMessageResponse> {
+  async submitPersonalInfo(payload: PersonalInfoPayload): Promise<PersonalInfoResponse> {
     const formData = new FormData();
 
     formData.append('first_name', payload.first_name);
@@ -11,13 +11,15 @@ export const trainerRegistrationService = {
     formData.append('gender', payload.gender);
     formData.append('age', String(payload.age));
     formData.append('phone', payload.phone);
-    formData.append('profile_photo', payload.profile_photo, payload.profile_photo.name);
+    if (payload.profile_photo instanceof File) {
+      formData.append('profile_photo', payload.profile_photo, payload.profile_photo.name);
+    }
 
     const res = await trainerRegistrationAPI.submitPersonalInfo(formData);
     return res;
   },
 
-  async submitProfessionalInfo(payload: TrainerProfessionalInfoPayload): Promise<ApiMessageResponse> {
+  async submitProfessionalInfo(payload: ProfessionalInfoPayload): Promise<ProfessionalInfoResponse> {
     const formData = new FormData();
 
     payload.specialization.forEach((s) => {
@@ -69,15 +71,15 @@ export const trainerRegistrationService = {
       });
     }
 
-    const result = await trainerRegistrationAPI.submitProfessionalInfo(formData);
-    return result;
+    const res = await trainerRegistrationAPI.submitProfessionalInfo(formData);
+    return res;
   },
 
-  async submitWorkInfo(payload: TrainerWorkInfoPayload): Promise<ApiMessageResponse> {
+  async submitWorkInfo(payload: WorkInfoPayload): Promise<WorkInfoResponse> {
     return await trainerRegistrationAPI.submitWorkInfo(payload);
   },
 
-  async submitIdentityInfo(payload: TrainerIdentityInfoPayload): Promise<ApiMessageResponse> {
+  async submitIdentityInfo(payload: IdentityInfoPayload): Promise<TrainerKycResponse> {
     const formData = new FormData();
 
     formData.append('documentType', payload.documentType);
@@ -95,5 +97,10 @@ export const trainerRegistrationService = {
     }
 
     return await trainerRegistrationAPI.submitIdentityInfo(formData);
+  },
+
+  async fetchTrainerFullInfo(): Promise<TrainerFullInfo> {
+    const { data } = await trainerRegistrationAPI.fetchTrainerFullInfo();
+    return data;
   }
 };

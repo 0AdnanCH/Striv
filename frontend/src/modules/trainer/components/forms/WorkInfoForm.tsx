@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { workInfoSchema, type WorkInfoType } from '../../schemas/workInfo.schema';
@@ -9,30 +9,53 @@ import { Button } from '../../../../components/ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
-import { trainerRegistrationService } from '../../api/registration.service';
-import { handleApiError } from '../../../../utils/handleApiError.util';
-import { toast } from 'sonner';
+import { useTrainer } from '../../hooks/useTrainer';
+
+interface Props {
+  loading: boolean;
+  onNext?: (data: WorkInfoType) => void;
+  onPrev?: () => void;
+}
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
-type FormValues = WorkInfoType;
-
-const defaultValues: FormValues = {
+const defaultValues: WorkInfoType = {
   oneToOnePrice: undefined as any,
   groupSessionPrice: undefined as any,
   availability: []
 };
 
-const WorkInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = ({ onNext }) => {
+const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
+  const { trainer } = useTrainer();
+
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting }
-  } = useForm<FormValues>({
+    reset,
+    formState: { errors }
+  } = useForm<WorkInfoType>({
     resolver: zodResolver(workInfoSchema),
     mode: 'onBlur',
     defaultValues
   });
+
+  useEffect(() => {
+    if(!trainer) return;
+
+    const mappedValues: WorkInfoType = {
+      oneToOnePrice: trainer?.pricing?.oneToOne ?? (undefined as any),
+      groupSessionPrice: trainer?.pricing?.groupSession ?? (undefined as any),
+      availability: trainer?.availability?.length
+        ? trainer.availability.map((slot) => ({
+            day: slot.day,
+            startTime: slot.startTime,
+            endTime: slot.endTime
+          }))
+        : []
+    };
+
+    reset(mappedValues);
+  }, [trainer, reset])
 
   const availabilityArray = useFieldArray({
     control,
@@ -50,22 +73,13 @@ const WorkInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = ({ onNex
     availabilityArray.remove(index);
   };
 
-  const onSubmit = async (raw: FormValues) => {
-    const payload: FormValues = {
+  const onSubmit = async (raw: WorkInfoType) => {
+    const payload: WorkInfoType = {
       ...raw,
       availability: raw.availability
     };
 
-    console.log('WorkInfo submit payload:', payload);
-    // if (onNext) onNext(payload);
-    if (onNext) {
-      try {
-        const res = await trainerRegistrationService.submitWorkInfo(payload);
-        toast.success(res.message);
-      } catch (err: any) {
-        handleApiError('Trainer Work Info POST', err);
-      }
-    }
+    onNext?.(payload);
   };
 
   return (
@@ -229,10 +243,10 @@ const WorkInfoForm: React.FC<{ onNext?: (data: FormValues) => void }> = ({ onNex
 
         {/* Buttons */}
         <div className="flex items-center justify-end gap-3 pt-4">
-          <Button variant="outline" type="button" onClick={() => console.log('Previous')}>
+          <Button variant="outline" type="button" onClick={onPrev}>
             Previous
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={loading}>
             Next
           </Button>
         </div>
