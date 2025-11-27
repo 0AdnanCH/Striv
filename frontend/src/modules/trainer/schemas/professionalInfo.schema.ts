@@ -34,7 +34,7 @@ export const certificateSchema = z.object({
   certificateImage: z
     .any()
     .refine((file) => {
-      if (!file) return true; // optional
+      if (!file) return true; 
       if (file instanceof File) return true;
       if (file instanceof FileList && file.length === 1) return true;
       return false;
@@ -97,7 +97,7 @@ export const professionalInfoSchema = z.object({
 
   yearsOfExperience: z
     .number("Years of experience is required")
-    .min(0, "Years of experience cannot be negative")
+    .min(1, "Years of experience cannot be negative or zero")
     .max(70, "Years of experience is too high"),
 
   certificates: z.array(certificateSchema).optional(),

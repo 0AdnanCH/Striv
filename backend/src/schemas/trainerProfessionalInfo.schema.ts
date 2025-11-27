@@ -27,7 +27,7 @@ export const trainerProfessionalInfoSchema = z.object({
   yearsOfExperience: z
     .preprocess(val => Number(val), z
       .number('Years of experience must be a whole number')
-      .min(0, 'Years of experience cannot be negative')
+      .min(1, 'Years of experience cannot be negative')
     ),
 
   certificates: z.array(certificateSchema).optional(),
