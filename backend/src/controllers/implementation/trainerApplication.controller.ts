@@ -1,11 +1,10 @@
 import { Response, NextFunction } from 'express';
 import { ITrainerApplicationController } from '../interface/ITrainerApplication.controller';
 import { ITrainerApplicationService } from '../../services/interface/ITrainerApplication.service';
-import { TrainerKycDto, TrainerRegistrationStep1Dto, TrainerWorkInfoDto } from '../../dtos/trainerApplication.dto'; 
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 import { successResponse } from '../../utils/apiResponse.util';
 import { HTTP_STATUS } from '../../constants/httpStatus.constants';
-import { TrainerProfessionalInfoDto } from '../../schemas/trainerProfessionalInfo.schema';
+import { UploadedFile } from '../../types/trainer.type';
 
 export class TrainerApplicationController implements ITrainerApplicationController {
   constructor(private readonly _trainerApplicationService: ITrainerApplicationService) {}
@@ -26,15 +25,11 @@ export class TrainerApplicationController implements ITrainerApplicationControll
   async submitPersonalInfo(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.id;
-      const payload: TrainerRegistrationStep1Dto = req.body;
-
       if (!userId) return;
 
-      if (req.file) {
-        payload.profile_photo = req.file;
-      }
+      const profile_photo = req.file as UploadedFile | undefined;
 
-      const { message, data } = await this._trainerApplicationService.submitPersonalInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitPersonalInfo(userId, req.body, profile_photo);
 
       successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
@@ -47,11 +42,9 @@ export class TrainerApplicationController implements ITrainerApplicationControll
       const userId = req.user?.id;
       if (!userId) return;
 
-      const payload: TrainerProfessionalInfoDto = req.body;
+      const certificateFiles = req.files as UploadedFile[] | undefined;
 
-      const certificateFiles = req.files as Express.Multer.File[] | undefined;
-
-      const { message, data } = await this._trainerApplicationService.submitProfessionalInfo(userId, payload, certificateFiles);
+      const { message, data } = await this._trainerApplicationService.submitProfessionalInfo(userId, req.body, certificateFiles);
 
       successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
@@ -64,9 +57,7 @@ export class TrainerApplicationController implements ITrainerApplicationControll
       const userId = req.user?.id;
       if (!userId) return;
 
-      const payload: TrainerWorkInfoDto = req.body;
-
-      const { message, data } = await this._trainerApplicationService.submitWorkInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitWorkInfo(userId, req.body);
 
       successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error: any) {
@@ -83,13 +74,10 @@ export class TrainerApplicationController implements ITrainerApplicationControll
         [fieldname: string]: Express.Multer.File[];
       };
 
-      const payload: TrainerKycDto = {
-        ...req.body,
-        frontImage: files?.frontImage?.[0],
-        backImage: files?.backImage?.[0]
-      };
+      const frontImage = files?.frontImage?.[0] as UploadedFile;
+      const backImage = files?.backIMage?.[0] as UploadedFile;
 
-      const { message, data } = await this._trainerApplicationService.submitIdentityInfo(userId, payload);
+      const { message, data } = await this._trainerApplicationService.submitIdentityInfo(userId, req.body, frontImage, backImage);
 
       successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error) {

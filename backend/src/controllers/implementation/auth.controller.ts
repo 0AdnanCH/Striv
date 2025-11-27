@@ -21,8 +21,7 @@ export class AuthController implements IAuthController {
 
   async verifySignUpOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { email, otp } = req.body;
-      const { message, token, user } = await this._authService.verifySignUpOtp(email, otp);
+      const { message, token, user } = await this._authService.verifySignUpOtp(req.body);
       successResponse(res, message, { token, user }, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
@@ -31,8 +30,7 @@ export class AuthController implements IAuthController {
 
   async signin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { email, password } = req.body;
-      const { message, token, user } = await this._authService.signin(email, password);
+      const { message, token, user } = await this._authService.signin(req.body);
       successResponse(res, message, { token, user }, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
@@ -41,8 +39,7 @@ export class AuthController implements IAuthController {
 
   async resendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { email } = req.body;
-      const message = await this._authService.resendOtp(email);
+      const message = await this._authService.resendOtp(req.body);
       successResponse(res, message, null, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error)

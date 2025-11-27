@@ -1,4 +1,4 @@
-import { TrainerKycDto, TrainerRegistrationStep1Dto, TrainerWorkInfoDto } from "../../dtos/trainerApplication.dto";
+import { TrainerIdentityInfoRequestDto, TrainerPersonalInfoRequestDto, TrainerProfessionalInfoRequestDto, TrainerWorkInfoRequestDto } from "../../dtos/trainerApplicationRequest.dto";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { ITrainerApplicationService } from "../interface/ITrainerApplication.service";
 import { FileService } from "./file.service";
@@ -8,9 +8,9 @@ import { HTTP_STATUS } from "../../constants/httpStatus.constants";
 import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
 import { IUser } from "../../types/user.type";
 import { ITrainerRepository } from "../../repositories/interface/ITrainer.repository";
-import { TrainerProfessionalInfoDto } from "../../schemas/trainerProfessionalInfo.schema";
-import { ITrainer, ITrainerKyc, PersonalInfoResponse, ProfessionalInfoResponse, ResponseIdentityInfo, ResponsePersonalInfo, ResponseProfessionalInfo, TrainerFullInfo, TrainerFullInfoFetchResponse, TrainerKycResponse, WorkInfoResponse } from "../../types/trainer.type";
+import { ITrainer, ITrainerKyc, ResponseIdentityInfo, ResponsePersonalInfo, ResponseProfessionalInfo, UploadedFile } from "../../types/trainer.type";
 import { ITrainerKycRepository } from "../../repositories/interface/ITrainerKyc.repository";
+import { TrainerFullInfoResponseDto, TrainerIdentityInfoResponseDto, TrainerPersonalInfoResponseDto, TrainerProfessionalInfoResponseDto, TrainerWorkInfoResponseDto } from "../../dtos/trainerApplicationResponse.dto";
 
 export class TrainerApplicationService implements ITrainerApplicationService {
   constructor(
@@ -22,7 +22,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async getFullTrainerInfo(
     userId: string
-  ): Promise<TrainerFullInfoFetchResponse> {
+  ): Promise<TrainerFullInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -45,12 +45,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     const kyc = await this._trainerKycRepository.findByUserId(userId);
 
     const personalInfo: ResponsePersonalInfo = {
-      first_name: user.first_name || '',
-      last_name: user.last_name || '',
+      first_name: user.first_name,
+      last_name: user.last_name,
       gender: user.gender,
       age: user.age,
-      phone: user.phone || '',
-      profile_photo: user.profile_photo || ''
+      phone: user.phone,
+      profile_photo: user.profile_photo
     };
 
     const professionalInfo: ResponseProfessionalInfo = {
@@ -92,11 +92,11 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async submitPersonalInfo(
     userId: string, 
-    payload: TrainerRegistrationStep1Dto
-  ): Promise<PersonalInfoResponse> {
-    const { first_name, last_name, gender, phone, profile_photo } = payload;
+    payload: TrainerPersonalInfoRequestDto,
+    profilePhoto?: UploadedFile
+  ): Promise<TrainerPersonalInfoResponseDto> {
+    const { first_name, last_name, gender, phone } = payload;
     const age = Number(payload.age);
-    console.log(first_name, last_name, gender, phone)
 
     const user = await this._userRepository.findById(userId);
     if (!user) throw new BadRequestError({
@@ -107,8 +107,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
     let finalPhotoUrl = user.profile_photo;
 
-    if (profile_photo) {
-      finalPhotoUrl = await this._fileRepository.uploadUserProfilePhoto(userId, profile_photo);
+    if (profilePhoto) {
+      finalPhotoUrl = await this._fileRepository.uploadUserProfilePhoto(userId, profilePhoto);
     }
 
     if (!finalPhotoUrl) {
@@ -161,12 +161,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     return {
       message: RESPONSE_MESSAGES.TRAINER_PERSONAL_INFO_SUBMITTED,
       data: {
-        first_name: updatedUser.first_name || '',
-        last_name: updatedUser.last_name || '',
-        gender: updatedUser.gender || 'male',
-        age: updatedUser.age || (undefined as unknown as any),
-        phone: updatedUser.phone || '',
-        profile_photo: updatedUser.profile_photo || '',
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        gender: updatedUser.gender,
+        age: updatedUser.age,
+        phone: updatedUser.phone,
+        profile_photo: updatedUser.profile_photo,
         registrationStep: NEXT_STEP
       }
     };
@@ -174,9 +174,9 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async submitProfessionalInfo(
     userId: string,
-    payload: TrainerProfessionalInfoDto,
-    certificateFiles?: Express.Multer.File[]
-  ): Promise<ProfessionalInfoResponse> {
+    payload: TrainerProfessionalInfoRequestDto,
+    certificateFiles?: UploadedFile[]
+  ): Promise<TrainerProfessionalInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -266,14 +266,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       updatedTrainer = updated;
     }
 
-    console.log(updatedTrainer.certificates)
-
     return {
       message: RESPONSE_MESSAGES.TRAINER_PROFESSIONAL_INFO_SUBMITTED,
       data: {
         specialization: updatedTrainer.specialization,
         yearsOfExperience: updatedTrainer.yearsOfExperience,
-        additionalSkills: updatedTrainer.additionalSkills || [],
+        additionalSkills: updatedTrainer.additionalSkills,
         certificates: updatedTrainer.certificates,
         portfolio: updatedTrainer.portfolio,
         registrationStep: updatedTrainer.registrationStep
@@ -283,8 +281,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async submitWorkInfo(
     userId: string, 
-    payload: TrainerWorkInfoDto
-  ): Promise<WorkInfoResponse> {
+    payload: TrainerWorkInfoRequestDto
+  ): Promise<TrainerWorkInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -368,8 +366,10 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async submitIdentityInfo(
     userId: string, 
-    payload: TrainerKycDto
-  ): Promise<TrainerKycResponse> {
+    payload: TrainerIdentityInfoRequestDto,
+    frontImage?: UploadedFile,
+    backImage?: UploadedFile
+  ): Promise<TrainerIdentityInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -379,15 +379,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
 
-    const { documentType, frontImage, backImage } = payload;
+    const { documentType } = payload;
 
     let kycRecord = await this._trainerKycRepository.findByUserId(userId);
 
-    let existingFrontUrl = kycRecord?.frontImageUrl ?? null;
-    let existingBackUrl = kycRecord?.backImageUrl ?? null;
-
-    let finalFrontUrl = existingFrontUrl;
-    let finalBackUrl = existingBackUrl;
+    let finalFrontUrl = kycRecord?.frontImageUrl ?? null;
+    let finalBackUrl = kycRecord?.backImageUrl ?? null;
 
     if(frontImage) {
       finalFrontUrl = await this._fileRepository.uploadTrainerDocument(userId, frontImage);
@@ -414,8 +411,10 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
 
+    let newKycRecord;
+
     if (!kycRecord) {
-      await this._trainerKycRepository.create({
+      newKycRecord = await this._trainerKycRepository.create({
         userId,
         documentType,
         frontImageUrl: finalFrontUrl,
@@ -423,7 +422,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
         status: 'pending'
       } as unknown as ITrainerKyc);
     } else {
-      await this._trainerKycRepository.updateByUserId(userId, {
+      newKycRecord = await this._trainerKycRepository.updateByUserId(userId, {
         documentType,
         frontImageUrl: finalFrontUrl,
         backImageUrl: finalBackUrl || null,
@@ -432,13 +431,20 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
 
+    if (!newKycRecord) {
+      throw new BadRequestError({
+        statusCode: 404,
+        message: RESPONSE_MESSAGES.TRAINER_KYC_NOT_FOUND_AFTER_UPDATE,
+        logging: false
+      });
+    }
+
     return {
       message: RESPONSE_MESSAGES.TRAINER_IDENTITY_VERIFICATION_SUBMITTED,
       data: {
-        documentType: kycRecord?.documentType,
-        frontImage: kycRecord?.frontImageUrl,
-        backImage: kycRecord?.backImageUrl,
-        status: kycRecord?.status
+        documentType: newKycRecord.documentType,
+        frontImage: newKycRecord.frontImageUrl,
+        backImage: newKycRecord?.backImageUrl,
       }
     };
   }

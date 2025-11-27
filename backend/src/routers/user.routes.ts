@@ -3,7 +3,7 @@ import { UserController } from '../controllers/implementation/user.controller';
 import { UserService } from '../services/implementation/user.service'; 
 import { UserRepository } from '../repositories/implementation/user.repository'; 
 import { authenticate, authorizeRoles } from '../middlewares/auth.middleware'; 
-import { updateUserProfileSchema } from '../dtos/userProfile.dto';
+import { updateUserProfileSchema } from '../schemas/updateUserProfile.schema'; 
 import validate from '../middlewares/validation.middleware';
 
 const userRouter = express.Router();

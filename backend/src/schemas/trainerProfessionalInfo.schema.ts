@@ -34,5 +34,3 @@ export const trainerProfessionalInfoSchema = z.object({
 
   portfolio: portfolioSchema
 });
-
-export type TrainerProfessionalInfoDto = z.infer<typeof trainerProfessionalInfoSchema>;

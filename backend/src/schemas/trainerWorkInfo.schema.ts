@@ -46,5 +46,3 @@ export const trainerWorkInfoSchema = z.object({
 
   availability: z.array(availabilitySchema).min(1, 'You must specify at least one availability slot')
 });
-
-export type TrainerWorkInfoDto = z.infer<typeof trainerWorkInfoSchema>;

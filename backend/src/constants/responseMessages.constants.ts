@@ -47,5 +47,6 @@ export const RESPONSE_MESSAGES = {
   BACK_IMAGE_REQUIRED_FOR_SELECTED_DOC: 'Back image is required for the selected document type.',
   TRAINER_IDENTITY_VERIFICATION_SUBMITTED: 'Trainer identity verification submitted successfully.',
   TRAINER_NOT_FOUND_AFTER_UPDATE: 'Trainer not found after update.',
+  TRAINER_KYC_NOT_FOUND_AFTER_UPDATE: 'Trainer kyc not found after update.',
   NOTHING_TO_UPDATE: 'Nothing to update.',
 } as const;

@@ -7,11 +7,11 @@ import { UserRepository } from '../repositories/implementation/user.repository';
 import { TrainerRepository } from '../repositories/implementation/trainer.repository';
 import { authenticate, authorizeRoles } from '../middlewares/auth.middleware';
 import validate from '../middlewares/validation.middleware';
-import { TrainerRegistrationStep1Schema } from '../schemas/trainerApplication.schema';
+import { trainerPersonalInfoSchema } from '../schemas/trainerPersonalInfo.schema';
 import { trainerProfessionalInfoSchema } from '../schemas/trainerProfessionalInfo.schema';
 import { trainerWorkInfoSchema } from '../schemas/trainerWorkInfo.schema';
 import { TrainerKycRepository } from '../repositories/implementation/trainerKyc.repository';
-import { trainerKycSchema } from '../schemas/trainerKyc.schema';
+import { trainerKycSchema } from '../schemas/trainerIdentityInfo.schema';
 import { validateCertificateImages, validateIdentityImages, validateProfilePhoto } from '../middlewares/validateImageFile.middleware';
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -38,7 +38,7 @@ trainerApplicationRouter.post(
   authorizeRoles('client'),
   upload.single('profile_photo'),
   validateProfilePhoto,
-  validate(TrainerRegistrationStep1Schema),
+  validate(trainerPersonalInfoSchema),
   trainerApplicationController.submitPersonalInfo.bind(trainerApplicationController)
 );
 

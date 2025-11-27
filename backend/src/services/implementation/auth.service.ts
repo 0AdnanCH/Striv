@@ -1,4 +1,3 @@
-import { IUser, SignupData } from "../../types/user.type";
 import { IAuthService } from "../interface/IAuth.service";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
@@ -14,9 +13,13 @@ import mongoose, { ObjectId } from "mongoose";
 import { IPasswordResetTokenRepository } from "../../repositories/interface/IPasswordResetToken.repository";
 import { env } from "../../configs/env.config";
 import { CryptoUtil } from "../../utils/crypto.util";
-import type { ForgotPasswordDto, ResetPasswordDto } from "../../dtos/auth.dto";
 import { verifyGoogleAccessToken } from "../../utils/google.util";
 import { ChangePasswordDto } from "../../dtos/changePassword.dto";
+import { ForgotPasswordDto } from "../../dtos/forgotPassword.dto";
+import { ResetPasswordDto } from "../../dtos/resetPassword.dto";
+import { SignupDto } from "../../dtos/signup.dto";
+import { ResendOtpDto, VerifyOtpDto } from "../../dtos/verifyOtp.dto";
+import { SigninDto } from "../../dtos/signin.dto";
 
 export class AuthService implements IAuthService {
   constructor(
@@ -25,7 +28,7 @@ export class AuthService implements IAuthService {
     private readonly _resetTokenRepository: IPasswordResetTokenRepository,
   ) {}
 
-  async signup(user: SignupData): Promise<string> {
+  async signup(user: SignupDto): Promise<string> {
     const existingUser = await this._userRepository.findByEmail(user.email);
 
     if (existingUser && existingUser.isVerified) throw new BadRequestError({ statusCode: HTTP_STATUS.BAD_REQUEST, message: RESPONSE_MESSAGES.USER_ALREADY_EXISTS, logging: false });
@@ -61,7 +64,7 @@ export class AuthService implements IAuthService {
     return RESPONSE_MESSAGES.OTP_SENT;
   }
 
-  async verifySignUpOtp(email: string, otp: string): Promise<{ message: string; token: string; user: { id: ObjectId; role: UserRole; email: string; first_name: string; last_name: string } }> {
+  async verifySignUpOtp({ email, otp }: VerifyOtpDto): Promise<{ message: string; token: string; user: { id: ObjectId; role: UserRole; email: string; first_name: string; last_name: string } }> {
     const otpRecord = await this._otpRepository.findByEmail(email);
     if (!otpRecord) {
       throw new BadRequestError({
@@ -116,7 +119,7 @@ export class AuthService implements IAuthService {
     };
   }
 
-  async signin(email: string, password: string): Promise<{ message: string; token: string; user: { id: ObjectId; email: string; role: UserRole; first_name: string; last_name: string } }> {
+  async signin({ email, password }: SigninDto): Promise<{ message: string; token: string; user: { id: ObjectId; email: string; role: UserRole; first_name: string; last_name: string } }> {
     const user = await this._userRepository.findByEmail(email);
     if (!user) {
       throw new BadRequestError({ statusCode: HTTP_STATUS.UNAUTHORIZED, message: RESPONSE_MESSAGES.USER_NOT_FOUND, logging: false });
@@ -162,7 +165,7 @@ export class AuthService implements IAuthService {
     return { token, user: userData, message: RESPONSE_MESSAGES.LOGIN_SUCCESS };
   }
 
-  async resendOtp(email: string): Promise<string> {
+  async resendOtp({ email }: ResendOtpDto): Promise<string> {
     const user = await this._userRepository.findByEmail(email);
     if(!user) {
       throw new BadRequestError({

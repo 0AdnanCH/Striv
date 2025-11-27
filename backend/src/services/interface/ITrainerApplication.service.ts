@@ -1,14 +1,15 @@
-import { TrainerKycDto, TrainerRegistrationStep1Dto, TrainerWorkInfoDto } from '../../dtos/trainerApplication.dto';
-import { TrainerProfessionalInfoDto } from '../../schemas/trainerProfessionalInfo.schema';
-import { PersonalInfoResponse, ProfessionalInfoResponse, TrainerFullInfo, TrainerFullInfoFetchResponse, TrainerKycResponse, WorkInfoResponse } from '../../types/trainer.type';
+import { TrainerIdentityInfoRequestDto, TrainerPersonalInfoRequestDto, TrainerProfessionalInfoRequestDto, TrainerWorkInfoRequestDto } from '../../dtos/trainerApplicationRequest.dto';
+import { TrainerFullInfoResponseDto, TrainerIdentityInfoResponseDto, TrainerPersonalInfoResponseDto, TrainerProfessionalInfoResponseDto, TrainerWorkInfoResponseDto } from '../../dtos/trainerApplicationResponse.dto';
+import { UploadedFile } from '../../types/trainer.type';
 
 export interface ITrainerApplicationService {
-  getFullTrainerInfo(userId: string): Promise<TrainerFullInfoFetchResponse>;
+  getFullTrainerInfo(userId: string): Promise<TrainerFullInfoResponseDto>;
   submitPersonalInfo(
     userId: string,
-    payload: TrainerRegistrationStep1Dto
-  ): Promise<PersonalInfoResponse>;
-  submitProfessionalInfo(userId: string, payload: TrainerProfessionalInfoDto, certificateFiles?: Express.Multer.File[]): Promise<ProfessionalInfoResponse>;
-  submitWorkInfo(userId: string, payload: TrainerWorkInfoDto): Promise<WorkInfoResponse>;
-  submitIdentityInfo(userId: string, payload: TrainerKycDto): Promise<TrainerKycResponse>;
+    payload: TrainerPersonalInfoRequestDto,
+    profilePhoto?: UploadedFile
+  ): Promise<TrainerPersonalInfoResponseDto>;
+  submitProfessionalInfo(userId: string, payload: TrainerProfessionalInfoRequestDto, certificateFiles?: UploadedFile[]): Promise<TrainerProfessionalInfoResponseDto>;
+  submitWorkInfo(userId: string, payload: TrainerWorkInfoRequestDto): Promise<TrainerWorkInfoResponseDto>;
+  submitIdentityInfo(userId: string, payload: TrainerIdentityInfoRequestDto, frontImage?: UploadedFile, backImage?: UploadedFile): Promise<TrainerIdentityInfoResponseDto>;
 }
