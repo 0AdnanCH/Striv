@@ -3,12 +3,13 @@ import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
 import { UpdateUserProfileDto, UserProfileDto } from "../../dtos/userProfile.dto";
 import BadRequestError from "../../errors/badRequest.error";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
+import { UserProfileFetchResponse, UserProfileUpdateResponse } from "../../types/user.type";
 import { IUserService } from "../interface/IUser.service";
 
 export class UserService implements IUserService {
   constructor(private readonly _userRepository: IUserRepository) {}
 
-  async getCurrentUser(userId: string): Promise<UserProfileDto> {
+  async getCurrentUser(userId: string): Promise<UserProfileFetchResponse> {
     const user = await this._userRepository.findById(userId);
 
     if (!user) {
@@ -22,11 +23,11 @@ export class UserService implements IUserService {
     return this._toProfileResponse(user);
   }
 
-  async updateCurrentUser(userId: string, payload: UpdateUserProfileDto): Promise<UserProfileDto> {
+  async updateCurrentUser(userId: string, payload: UpdateUserProfileDto): Promise<UserProfileUpdateResponse> {
     if (!userId) {
       throw new BadRequestError({
-        statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Missing user id',
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: RESPONSE_MESSAGES.UNAUTHORIZED_USER_INFO_MISSING,
         logging: false
       });
     }
@@ -43,7 +44,7 @@ export class UserService implements IUserService {
     if (Object.keys(updatePayload).length === 0) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Nothing to update',
+        message: RESPONSE_MESSAGES.NOTHING_TO_UPDATE,
         logging: false
       });
     }
@@ -61,17 +62,20 @@ export class UserService implements IUserService {
     return this._toProfileResponse(updated);
   }
 
-  private _toProfileResponse(user: any): UserProfileDto {
+  private _toProfileResponse(user: any): UserProfileUpdateResponse {
     return {
-      id: user._id.toString(),
-      email: user.email,
-      first_name: user.first_name ?? '',
-      last_name: user.last_name ?? '',
-      role: user.role,
-      gender: user.gender ?? undefined,
-      age: user.age ?? undefined,
-      height: user.height ?? undefined,
-      weight: user.weight ?? undefined
+      message: RESPONSE_MESSAGES.PROFILE_UPDATED_SUCCESS,
+      user: {
+        id: user._id.toString(),
+        email: user.email,
+        first_name: user.first_name ?? '',
+        last_name: user.last_name ?? '',
+        role: user.role,
+        gender: user.gender ?? undefined,
+        age: user.age ?? undefined,
+        height: user.height ?? undefined,
+        weight: user.weight ?? undefined
+      }
     };
   }
 }

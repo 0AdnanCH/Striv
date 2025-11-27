@@ -197,3 +197,8 @@ export interface TrainerKycResponse {
     status?: TrainerStatus;
   };
 }
+
+export interface TrainerFullInfoFetchResponse {
+  message: string;
+  data: TrainerFullInfo;
+}

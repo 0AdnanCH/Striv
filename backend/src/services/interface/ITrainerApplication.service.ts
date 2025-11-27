@@ -1,9 +1,9 @@
 import { TrainerKycDto, TrainerRegistrationStep1Dto, TrainerWorkInfoDto } from '../../dtos/trainerApplication.dto';
 import { TrainerProfessionalInfoDto } from '../../schemas/trainerProfessionalInfo.schema';
-import { PersonalInfoResponse, ProfessionalInfoResponse, TrainerFullInfo, TrainerKycResponse, WorkInfoResponse } from '../../types/trainer.type';
+import { PersonalInfoResponse, ProfessionalInfoResponse, TrainerFullInfo, TrainerFullInfoFetchResponse, TrainerKycResponse, WorkInfoResponse } from '../../types/trainer.type';
 
 export interface ITrainerApplicationService {
-  getFullTrainerInfo(userId: string): Promise<TrainerFullInfo>;
+  getFullTrainerInfo(userId: string): Promise<TrainerFullInfoFetchResponse>;
   submitPersonalInfo(
     userId: string,
     payload: TrainerRegistrationStep1Dto

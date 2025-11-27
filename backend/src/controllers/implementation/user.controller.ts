@@ -4,7 +4,7 @@ import { IUserService } from '../../services/interface/IUser.service';
 import { successResponse } from '../../utils/apiResponse.util';
 import { HTTP_STATUS } from '../../constants/httpStatus.constants';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
-import { UpdateUserProfileDto } from '../../dtos/userProfile.dto';
+import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constants';
 
 export class UserController implements IUserController {
   constructor(private readonly _userService: IUserService) {}
@@ -16,13 +16,13 @@ export class UserController implements IUserController {
       if (!userId) {
         return next({
           statusCode: HTTP_STATUS.UNAUTHORIZED,
-          message: 'Unauthorized: user information missing'
+          message: RESPONSE_MESSAGES.UNAUTHORIZED_USER_INFO_MISSING
         });
       }
 
-      const profile = await this._userService.getCurrentUser(userId);
+      const { message, user } = await this._userService.getCurrentUser(userId);
 
-      successResponse(res, 'Profile fetched successfully', profile, HTTP_STATUS.OK);
+      successResponse(res, message, user, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
@@ -32,11 +32,14 @@ export class UserController implements IUserController {
     try {
       const userId = req.user?.id;
       if (!userId) {
-        throw new Error('Authenticated user missing');
+        return next({
+          statusCode: HTTP_STATUS.UNAUTHORIZED,
+          message: RESPONSE_MESSAGES.UNAUTHORIZED_USER_INFO_MISSING
+        });
       }
 
-      const updated = await this._userService.updateCurrentUser(userId, req.body);
-      successResponse(res, 'Profile updated successfully', updated, HTTP_STATUS.OK);
+      const { message, user } = await this._userService.updateCurrentUser(userId, req.body);
+      successResponse(res, message, user, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }

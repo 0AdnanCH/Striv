@@ -1,4 +1,4 @@
-import { IUser } from "../../types/user.type";
+import { IUser, SignupData } from "../../types/user.type";
 import { IAuthService } from "../interface/IAuth.service";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
@@ -25,14 +25,10 @@ export class AuthService implements IAuthService {
     private readonly _resetTokenRepository: IPasswordResetTokenRepository,
   ) {}
 
-  async signup(user: IUser): Promise<string> {
+  async signup(user: SignupData): Promise<string> {
     const existingUser = await this._userRepository.findByEmail(user.email);
 
     if (existingUser && existingUser.isVerified) throw new BadRequestError({ statusCode: HTTP_STATUS.BAD_REQUEST, message: RESPONSE_MESSAGES.USER_ALREADY_EXISTS, logging: false });
-
-    if (!user.password) {
-      throw new Error('Password is required for local sign-up');
-    }
 
     const hashedPassword = await hashPassword(user.password);
 
@@ -143,7 +139,11 @@ export class AuthService implements IAuthService {
     }
 
     if (!user.password) {
-      throw new Error('Password is required for local sign-up');
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: RESPONSE_MESSAGES.ACCOUNT_REGISTERED_WITH_OAUTH,
+        logging: false
+      });
     }
 
     const validPassword = await comparePassword(password, user.password);
@@ -302,10 +302,10 @@ export class AuthService implements IAuthService {
       });
     }
 
-    if (user.authProvider === 'google' || !user.password) {
+    if (!user.password) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Password change is not allowed for Google accounts',
+        message: RESPONSE_MESSAGES.PASSWORD_CHANGE_NOT_ALLOWED_FOR_GOOGLE,
         logging: false
       });
     }
@@ -323,6 +323,6 @@ export class AuthService implements IAuthService {
 
     await this._userRepository.updatePassword(user._id, hashedPassword);
 
-    return { message: 'Password updated successfully' };
+    return { message: RESPONSE_MESSAGES.PASSWORD_UPDATE_SUCCESS };
   }
 }

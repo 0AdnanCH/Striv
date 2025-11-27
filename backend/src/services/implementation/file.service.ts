@@ -1,3 +1,6 @@
+import { HTTP_STATUS } from '../../constants/httpStatus.constants';
+import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constants';
+import BadRequestError from '../../errors/badRequest.error';
 import { fileRepository } from '../../repositories/implementation/file.repository'; 
 import { generateFileName } from '../../utils/generateFileName.util';
 
@@ -25,7 +28,11 @@ export class FileService {
     const fileList = Array.isArray(files) ? files : [files];
 
     if (fileList.length === 0) {
-      throw new Error('No certificate files provided for upload.');
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.NO_CERTIFICATE_FILES_PROVIDED,
+        logging: false
+      });
     }
 
     const uploads = await Promise.all(

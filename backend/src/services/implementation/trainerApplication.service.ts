@@ -9,7 +9,7 @@ import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
 import { IUser } from "../../types/user.type";
 import { ITrainerRepository } from "../../repositories/interface/ITrainer.repository";
 import { TrainerProfessionalInfoDto } from "../../schemas/trainerProfessionalInfo.schema";
-import { ITrainer, ITrainerKyc, PersonalInfoResponse, ProfessionalInfoResponse, ResponseIdentityInfo, ResponsePersonalInfo, ResponseProfessionalInfo, TrainerFullInfo, TrainerKycResponse, WorkInfoResponse } from "../../types/trainer.type";
+import { ITrainer, ITrainerKyc, PersonalInfoResponse, ProfessionalInfoResponse, ResponseIdentityInfo, ResponsePersonalInfo, ResponseProfessionalInfo, TrainerFullInfo, TrainerFullInfoFetchResponse, TrainerKycResponse, WorkInfoResponse } from "../../types/trainer.type";
 import { ITrainerKycRepository } from "../../repositories/interface/ITrainerKyc.repository";
 
 export class TrainerApplicationService implements ITrainerApplicationService {
@@ -22,7 +22,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
   async getFullTrainerInfo(
     userId: string
-  ): Promise<TrainerFullInfo> {
+  ): Promise<TrainerFullInfoFetchResponse> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -34,8 +34,11 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     const trainer = await this._trainerRepository.findByUserId(userId);
     if (!trainer) {
       return {
-        trainer: null,
-        kyc: null,
+        message: RESPONSE_MESSAGES.TRAINER_INFO_FETCHED_SUCCESS,
+        data: {
+          trainer: null,
+          kyc: null,
+        }
       }
     }
 
@@ -76,12 +79,15 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     };
 
     return {
-      trainer: {
-        ...personalInfo,
-        ...professionalInfo
+      message: RESPONSE_MESSAGES.TRAINER_INFO_FETCHED_SUCCESS,
+      data: {
+        trainer: {
+          ...personalInfo,
+          ...professionalInfo
+        },
+        kyc: identityInfo
       },
-      kyc: identityInfo
-    };
+    } 
   }
 
   async submitPersonalInfo(
@@ -99,7 +105,6 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       logging: false,
     });
 
-    // ---- PHOTO UPLOAD ----
     let finalPhotoUrl = user.profile_photo;
 
     if (profile_photo) {
@@ -109,7 +114,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     if (!finalPhotoUrl) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Profile photo is required'
+        message: RESPONSE_MESSAGES.PROFILE_PHOTO_REQUIRED,
+        logging: false,
       });
     }
 
@@ -135,7 +141,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       if (!updated) {
         throw new BadRequestError({
           statusCode: 404,
-          message: 'User not found after update'
+          message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
+          logging: false
         });
       }
 
@@ -152,7 +159,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     }
 
     return {
-      message: 'Trainer personal information submitted successfully',
+      message: RESPONSE_MESSAGES.TRAINER_PERSONAL_INFO_SUBMITTED,
       data: {
         first_name: updatedUser.first_name || '',
         last_name: updatedUser.last_name || '',
@@ -209,8 +216,6 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     } = payload;
     const yearsOfExperience = Number(payload.yearsOfExperience);
 
-    console.log(certificates)
-
     const updatePayload: Partial<ITrainer> = {};
 
     if (specialization && specialization.join(',') !== trainer.specialization.join(',')) {
@@ -253,7 +258,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       if (!updated) {
         throw new BadRequestError({
           statusCode: 404,
-          message: 'Trainer not found after update'
+          message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
+          logging: false
         });
       }
 
@@ -263,7 +269,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     console.log(updatedTrainer.certificates)
 
     return {
-      message: 'Trainer professional information submitted successfully',
+      message: RESPONSE_MESSAGES.TRAINER_PROFESSIONAL_INFO_SUBMITTED,
       data: {
         specialization: updatedTrainer.specialization,
         yearsOfExperience: updatedTrainer.yearsOfExperience,
@@ -342,7 +348,8 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       if (!updated) {
         throw new BadRequestError({
           statusCode: 404,
-          message: 'Trainer not found after update'
+          message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
+          logging: false,
         });
       }
 
@@ -350,7 +357,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     }
 
     return {
-      message: 'Trainer work information submitted successfully',
+      message: RESPONSE_MESSAGES.TRAINER_WORK_INFO_SUBMITTED,
       data: {
         pricing: updatedTrainer.pricing,
         availability: updatedTrainer.availability,
@@ -394,14 +401,16 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     if (!finalFrontUrl) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Front image is required'
+        message: RESPONSE_MESSAGES.FRONT_IMAGE_REQUIRED,
+        logging: false,
       });
     }
 
     if (documentType !== 'pan_card' && !finalBackUrl) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        message: 'Back image is required for the selected document type'
+        message: RESPONSE_MESSAGES.BACK_IMAGE_REQUIRED_FOR_SELECTED_DOC,
+        logging: false,
       });
     }
 
@@ -424,7 +433,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     }
 
     return {
-      message: 'Trainer identity verification submitted successfully',
+      message: RESPONSE_MESSAGES.TRAINER_IDENTITY_VERIFICATION_SUBMITTED,
       data: {
         documentType: kycRecord?.documentType,
         frontImage: kycRecord?.frontImageUrl,

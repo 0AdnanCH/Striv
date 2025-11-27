@@ -1,6 +1,7 @@
 import { UpdateUserProfileDto, UserProfileDto } from "../../dtos/userProfile.dto"; 
+import { UserProfileFetchResponse, UserProfileUpdateResponse } from "../../types/user.type";
 
 export interface IUserService {
-  getCurrentUser(userId: string): Promise<UserProfileDto>;
-  updateCurrentUser(userId: string, payload: UpdateUserProfileDto): Promise<UserProfileDto>;
+  getCurrentUser(userId: string): Promise<UserProfileFetchResponse>;
+  updateCurrentUser(userId: string, payload: UpdateUserProfileDto): Promise<UserProfileUpdateResponse>;
 }

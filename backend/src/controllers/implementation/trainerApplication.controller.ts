@@ -15,9 +15,9 @@ export class TrainerApplicationController implements ITrainerApplicationControll
       const userId = req.user?.id;
       if (!userId) return;
 
-      const fullInfo = await this._trainerApplicationService.getFullTrainerInfo(userId);
+      const { message, data } = await this._trainerApplicationService.getFullTrainerInfo(userId);
 
-      successResponse(res, 'Trainer information fetched successfully', fullInfo, HTTP_STATUS.OK);
+      successResponse(res, message, data, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }
