@@ -3,7 +3,7 @@ import { ITrainerApplicationController } from '../interface/ITrainerApplication.
 import { ITrainerApplicationService } from '../../services/interface/ITrainerApplication.service';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
 import { successResponse } from '../../utils/apiResponse.util';
-import { HTTP_STATUS } from '../../constants/httpStatus.constants';
+import { HTTP_STATUS } from '../../constants/httpStatus.constant';
 import { UploadedFile } from '../../types/trainer.type';
 
 export class TrainerApplicationController implements ITrainerApplicationController {

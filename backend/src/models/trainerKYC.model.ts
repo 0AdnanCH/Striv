@@ -1,5 +1,6 @@
 import { Document, model, ObjectId, Schema } from "mongoose";
-import { ITrainerKyc, KycDocumentType, KycStatus } from "../types/trainer.type";
+import { ITrainerKyc } from "../types/trainer.type";
+import { DocumentType, Status } from "../constants/enums.constant";
 
 export interface TrainerKycDocument extends ITrainerKyc, Document<ObjectId> {
   _id: ObjectId;
@@ -11,7 +12,7 @@ const trainerKycSchema = new Schema<TrainerKycDocument>(
 
     documentType: {
       type: String,
-      enum: Object.values(KycDocumentType),
+      enum: DocumentType,
       required: true
     },
 
@@ -20,8 +21,8 @@ const trainerKycSchema = new Schema<TrainerKycDocument>(
 
     status: {
       type: String,
-      enum: Object.values(KycStatus),
-      default: KycStatus.PENDING
+      enum: Status,
+      default: Status.PENDING
     },
 
     rejectionReason: { type: String, required: false },

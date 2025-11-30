@@ -1,15 +1,15 @@
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
-import { UpdateUserProfileDto, UserProfileDto } from "../../dtos/userProfile.dto";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";  
+import { UpdateUserProfileRequestDto, UpdateUserProfileResponseDto } from "../../dtos/updateUserProfile.dto";
+import { UserProfileResponseDto } from "../../dtos/userProfile.dto";
 import BadRequestError from "../../errors/badRequest.error";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
-import { UserProfileFetchResponse, UserProfileUpdateResponse } from "../../types/user.type";
 import { IUserService } from "../interface/IUser.service";
 
 export class UserService implements IUserService {
   constructor(private readonly _userRepository: IUserRepository) {}
 
-  async getCurrentUser(userId: string): Promise<UserProfileFetchResponse> {
+  async getCurrentUser(userId: string): Promise<UserProfileResponseDto> {
     const user = await this._userRepository.findById(userId);
 
     if (!user) {
@@ -23,7 +23,7 @@ export class UserService implements IUserService {
     return this._toProfileResponse(user);
   }
 
-  async updateCurrentUser(userId: string, payload: UpdateUserProfileDto): Promise<UserProfileUpdateResponse> {
+  async updateCurrentUser(userId: string, payload: UpdateUserProfileRequestDto): Promise<UpdateUserProfileResponseDto> {
     if (!userId) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.UNAUTHORIZED,
@@ -32,7 +32,7 @@ export class UserService implements IUserService {
       });
     }
 
-    const updatePayload: Partial<UpdateUserProfileDto> = {};
+    const updatePayload: Partial<UpdateUserProfileRequestDto> = {};
 
     if (payload.first_name !== undefined) updatePayload.first_name = payload.first_name;
     if (payload.last_name !== undefined) updatePayload.last_name = payload.last_name;
@@ -62,7 +62,7 @@ export class UserService implements IUserService {
     return this._toProfileResponse(updated);
   }
 
-  private _toProfileResponse(user: any): UserProfileUpdateResponse {
+  private _toProfileResponse(user: any): UserProfileResponseDto {
     return {
       message: RESPONSE_MESSAGES.PROFILE_UPDATED_SUCCESS,
       user: {

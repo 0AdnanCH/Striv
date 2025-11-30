@@ -21,13 +21,45 @@ const tokenRepository = new PasswordResetTokenRepository();
 const authService = new AuthService(userRepository, otpRepository, tokenRepository);
 const authController = new AuthController(authService);
 
-authRouter.post('/signup', validate(signupSchema), authController.signup.bind(authController));
-authRouter.post('/signin', validate(signinSchema), authController.signin.bind(authController));
-authRouter.post('/verify-signup-otp', validate(verifyOtpSchema), authController.verifySignUpOtp.bind(authController));
-authRouter.post('/resend-otp', validate(emailSchema), authController.resendOtp.bind(authController));
-authRouter.post('/forgot-password', validate(emailSchema), authController.forgotPassword.bind(authController));
-authRouter.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword.bind(authController));
-authRouter.post('/google-signin', authController.signInWithGoogle.bind(authController));
-authRouter.patch('/change-password', authenticate, validate(changePasswordSchema), authController.changePassword.bind(authController));
+authRouter.post(
+  '/signup', 
+  validate(signupSchema), 
+  authController.signup.bind(authController)
+);
+authRouter.post(
+  '/signin', 
+  validate(signinSchema), 
+  authController.signin.bind(authController)
+);
+authRouter.post(
+  '/verify-signup-otp', 
+  validate(verifyOtpSchema), 
+  authController.verifySignUpOtp.bind(authController)
+);
+authRouter.post(
+  '/resend-otp', 
+  validate(emailSchema), 
+  authController.resendOtp.bind(authController)
+);
+authRouter.post(
+  '/forgot-password', 
+  validate(emailSchema), 
+  authController.forgotPassword.bind(authController)
+);
+authRouter.post(
+  '/reset-password', 
+  validate(resetPasswordSchema), 
+  authController.resetPassword.bind(authController)
+);
+authRouter.post(
+  '/google-signin', 
+  authController.signInWithGoogle.bind(authController)
+);
+authRouter.patch(
+  '/change-password', 
+  authenticate, 
+  validate(changePasswordSchema), 
+  authController.changePassword.bind(authController)
+);
 
 export default authRouter;

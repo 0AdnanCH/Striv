@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import BadRequestError from '../errors/badRequest.error';
-import { HTTP_STATUS } from '../constants/httpStatus.constants';
-import { RESPONSE_MESSAGES } from '../constants/responseMessages.constants';
+import { HTTP_STATUS } from '../constants/httpStatus.constant';
+import { RESPONSE_MESSAGES } from '../constants/responseMessages.constant';
 import { verifyToken } from '../utils/jwt.util';
 import { JwtUserPayload } from '../utils/jwt.util';
 

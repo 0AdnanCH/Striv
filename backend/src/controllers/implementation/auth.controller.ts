@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { IAuthController } from "../interface/IAuth.controller";
 import { IAuthService } from "../../services/interface/IAuth.service";
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
 import { successResponse } from "../../utils/apiResponse.util";
 import { AuthenticatedRequest } from "../../middlewares/auth.middleware";
 import BadRequestError from "../../errors/badRequest.error";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 
 export class AuthController implements IAuthController {
   constructor(private readonly _authService: IAuthService) {}

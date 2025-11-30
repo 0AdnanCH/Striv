@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { RESPONSE_MESSAGES } from '../constants/responseMessages.constant';
 
 export const certificateSchema = z.object({
-  title: z.string().min(1, 'Certificate title is required'),
-  issuer: z.string().min(1, 'Certificate issuer is required'),
-  issuedDate: z.union([z.string().transform((val) => new Date(val)), z.null()]).optional(),
+  title: z.string().min(1, RESPONSE_MESSAGES.INVALID_CREDENTIALS),
+  issuer: z.string().min(1, RESPONSE_MESSAGES.INVALID_CREDENTIALS),
+  issuedDate: z.union([z.string().transform((val) => new Date(val)), z.null()]).optional()
 });
 
 export const socialLinksSchema = z.object({
@@ -14,20 +15,20 @@ export const socialLinksSchema = z.object({
 });
 
 export const portfolioSchema = z.object({
-  bio: z.string().min(1, 'Bio is required'),
+  bio: z.string().min(1, RESPONSE_MESSAGES.INVALID_CREDENTIALS),
   achievements: z.array(z.string()).optional(),
   socialLinks: socialLinksSchema.optional()
 });
 
 export const trainerProfessionalInfoSchema = z.object({
-  specialization: z.array(z.string().min(1)).nonempty('At least one specialization is required'),
+  specialization: z.array(z.string().min(1)).nonempty(RESPONSE_MESSAGES.INVALID_CREDENTIALS),
 
   additionalSkills: z.array(z.string()).optional(),
 
   yearsOfExperience: z
     .preprocess(val => Number(val), z
-      .number('Years of experience must be a whole number')
-      .min(1, 'Years of experience cannot be negative')
+      .number(RESPONSE_MESSAGES.INVALID_CREDENTIALS)
+      .min(1, RESPONSE_MESSAGES.INVALID_CREDENTIALS)
     ),
 
   certificates: z.array(certificateSchema).optional(),

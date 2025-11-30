@@ -1,9 +1,5 @@
-import { AdminSigninDto } from "../../schemas/auth.schema";
-import { UserDocument } from "../../models/user.model";
+import { AdminSigninRequestDto, AdminSigninResponseDto } from "../../dtos/adminSignin.dto"; 
 
 export interface IAdminService {
-  signin(data: AdminSigninDto): Promise<{
-    token: string;
-    admin: Pick<UserDocument, 'id' | 'email' | 'first_name' | 'last_name' | 'role'>
-  }>;
+  signin(data: AdminSigninRequestDto): Promise<AdminSigninResponseDto>;
 }

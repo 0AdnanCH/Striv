@@ -1,42 +1,5 @@
 import { ObjectId } from 'mongoose';
-
-export interface CertificateInfo {
-  title: string;
-  issuer: string;
-  issuedDate?: Date | null;
-  fileUrl?: string;
-}
-
-export interface PricingInfo {
-  oneToOne: number;
-  groupSession: number;
-}
-
-export interface TrainerAvailability {
-  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
-  startTime: string;
-  endTime: string;
-}
-
-export interface SocialLinks {
-  website?: string | null;
-  instagram?: string | null;
-  youtube?: string | null;
-  linkedin?: string | null;
-}
-
-export interface PortfolioInfo {
-  bio: string;
-  achievements?: string[];
-  socialLinks?: SocialLinks;
-}
-
-export type TrainerStatus = 'pending' | 'approved' | 'rejected';
-export enum KycStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected'
-}
+import { Gender, WeekDay, DocumentType, Status, } from '../constants/enums.constant'; 
 
 export interface ITrainer {
   userId: ObjectId;
@@ -44,27 +7,26 @@ export interface ITrainer {
   additionalSkills?: string[];
   yearsOfExperience: number;
 
-  certificates: CertificateInfo[];
-
-  availability: TrainerAvailability[];
-
-  pricing: PricingInfo;
-
-  portfolio: PortfolioInfo;
+  certificates: ICertificateInfo[];
+  availability: ITrainerAvailability[];
+  pricing: IPricingInfo;
+  portfolio: IPortfolioInfo;
 
   registrationStep: number;
-  verificationStatus: TrainerStatus;
+  verificationStatus: Status;
   rejectionReason?: string | null;
 }
 
+// ------------------ KYC ------------------
+
 export interface ITrainerKyc {
   userId: ObjectId;
-  documentType: 'aadhaar' | 'driving_license' | 'pan_card';
+  documentType: DocumentType;
 
   frontImageUrl: string;
   backImageUrl?: string | null;
 
-  status: KycStatus;
+  status: Status;
   rejectionReason?: string;
 
   reviewedBy?: ObjectId;
@@ -74,50 +36,85 @@ export interface ITrainerKyc {
   updatedAt: Date;
 }
 
-export interface TrainerProfessionalInfo {
-  specialization: string[];
-  additionalSkills?: string[];
-  yearsOfExperience: number;
-  certificates?: CertificateInfo[];
-  portfolio: PortfolioInfo;
-}
+// ------------------ Certificates ------------------
 
-export interface ResponsePersonalInfo {
-  first_name?: string;
-  last_name?: string;
-  gender?: 'male' | 'female' ;
-  age?: number ;
-  phone?: string;
-  profile_photo?: string;
-}
-
-export interface ResponseProfessionalInfo {
-  specialization: string[];
-  additionalSkills?: string[];
-  yearsOfExperience: number;
-
-  certificates: ResponseCertificateInfo[];
-
-  availability: TrainerAvailability[];
-
-  pricing: PricingInfo;
-
-  portfolio: PortfolioInfo;
-
-  registrationStep: number;
-}
-
-export interface ResponseCertificateInfo {
+export interface ICertificateInfo {
   title: string;
   issuer: string;
   issuedDate?: Date | null;
   fileUrl?: string;
 }
 
-export interface ResponseIdentityInfo {
-  documentType?: 'aadhaar' | 'driving_license' | 'pan_card';
-  frontImage?: string;
-  backImage?: string;
+// ------------------ Pricing ------------------
+
+export interface IPricingInfo {
+  oneToOne: number;
+  groupSession: number;
+}
+
+// ------------------ Availability ------------------
+
+export interface ITrainerAvailability {
+  day: WeekDay;
+  startTime: string;
+  endTime: string;
+}
+
+// ------------------ Social / Portfolio ------------------
+
+export interface ISocialLinks {
+  website?: string | null;
+  instagram?: string | null;
+  youtube?: string | null;
+  linkedin?: string | null;
+}
+
+export interface IPortfolioInfo {
+  bio: string;
+  achievements?: string[];
+  socialLinks?: ISocialLinks;
+}
+
+// ------------------ Personal Info ------------------
+
+export interface ITrainerPersonalInfo {
+  first_name: string;
+  last_name: string;
+  gender: Gender;
+  age: number | null;
+  phone: string;
+  profile_photo: string;
+}
+
+// ------------------ Professional Info ------------------
+
+export interface ITrainerProfessionalInfo {
+  specialization: string[];
+  yearsOfExperience: number;
+  additionalSkills?: string[];
+  certificates?: ICertificateInfo[];
+  portfolio: IPortfolioInfo;
+}
+
+// ------------------ Work Info ------------------
+
+export interface ITrainerWorkInfo {
+  pricing: IPricingInfo;
+  availability: ITrainerAvailability[];
+}
+
+// ------------------ Identity Info ------------------
+
+export interface ITrainerIdentityInfo {
+  documentType: DocumentType;
+  frontImage: string;
+  backImage?: string | null;
+}
+
+// ------------------ Shared ------------------
+
+export interface IRegistrationStep {
+  registrationStep: number;
 }
 
 export type UploadedFile = Express.Multer.File;

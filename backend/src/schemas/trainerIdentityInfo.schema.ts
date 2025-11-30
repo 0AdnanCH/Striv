@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import { DocumentType } from '../constants/enums.constant';
+import { RESPONSE_MESSAGES } from '../constants/responseMessages.constant';
 
 export const trainerKycSchema = z.object({
-  documentType: z.enum(['aadhaar', 'driving_license', 'pan_card'], 'Document type is required')
+  documentType: z.enum(DocumentType, RESPONSE_MESSAGES.INVALID_CREDENTIALS)
 });

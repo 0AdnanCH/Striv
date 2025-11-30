@@ -11,7 +11,7 @@ export class PasswordResetTokenRepository
     super(PasswordResetToken);
   }
 
-  async findValidByHash(tokenHash: string) {
+  async findValidByHash(tokenHash: string): Promise<PasswordResetTokenDocument | null> {
     return this.model.findOne({
       tokenHash,
       usedAt: { $exists: false },
@@ -19,7 +19,7 @@ export class PasswordResetTokenRepository
     });
   }
 
-  async invalidateAllForUser(userId: string | ObjectId, session?: any) {
+  async invalidateAllForUser(userId: string | ObjectId, session?: any): Promise<void> {
     await this.model.updateMany(
       { userId: userId, usedAt: { $exists: false } },
       { $set: { usedAt: new Date() } },
@@ -27,7 +27,7 @@ export class PasswordResetTokenRepository
     );
   }
 
-  async markUsed(id: string | ObjectId, session?: any) {
+  async markUsed(id: string | ObjectId, session?: any): Promise<void> {
     await this.model.updateOne(
       { _id: id },
       { $set: { usedAt: new Date() } },
@@ -35,7 +35,7 @@ export class PasswordResetTokenRepository
     );
   }
 
-  async countRecentRequests(userId: string | ObjectId, since: Date) {
+  async countRecentRequests(userId: string | ObjectId, since: Date): Promise<number> {
     return this.model.countDocuments({
       userId: userId,
       createdAt: { $gte: since },

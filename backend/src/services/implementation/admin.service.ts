@@ -1,22 +1,20 @@
 import { IAdminService } from "../interface/IAdmin.service"; 
 import { IAuthService } from "../interface/IAuth.service";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
-import { AdminSigninDto } from "../../schemas/auth.schema";
-import { UserRole } from "../../constants/roles.constants";
+import { AdminSigninRequestDto, AdminSigninResponseDto } from "../../dtos/adminSignin.dto"; 
+import { UserRole } from "../../constants/enums.constant";
 import BadRequestError from "../../errors/badRequest.error";
-import { Request, Response, NextFunction } from "express";
-import { UserDocument } from "../../models/user.model";
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 
 export class AdminService implements IAdminService {
-  constructor(private readonly authService: IAuthService, private userRepository: IUserRepository) {}
+  constructor(private readonly _authService: IAuthService, private userRepository: IUserRepository) {}
 
-  async signin(data: AdminSigninDto): Promise<{ token: string; admin: Pick<UserDocument, "id" | "email" | "first_name" | "last_name" | "role">; }> {
+  async signin(data: AdminSigninRequestDto): Promise<AdminSigninResponseDto> {
  
-    const { email, password } = data;
+    const { email } = data;
 
-    const authResponse = await this.authService.signin(email, password);
+    const authResponse = await this._authService.signin(data);
 
     const user = await this.userRepository.findByEmail(email);
     if(!user) {

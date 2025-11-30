@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { IAdminUserController } from "../interface/IAdminUser.controller";
 import { IAdminUserService } from "../../services/interface/IAdminUser.service";
 import { successResponse } from "../../utils/apiResponse.util";
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 import { FetchUsersQuery } from "../../dtos/adminUser.dto";
 
 export class AdminUserController implements IAdminUserController {

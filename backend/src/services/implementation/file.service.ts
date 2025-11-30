@@ -1,11 +1,11 @@
-import { HTTP_STATUS } from '../../constants/httpStatus.constants';
-import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constants';
+import { HTTP_STATUS } from '../../constants/httpStatus.constant';
+import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constant';
 import BadRequestError from '../../errors/badRequest.error';
 import { fileRepository } from '../../repositories/implementation/file.repository'; 
 import { generateFileName } from '../../utils/generateFileName.util';
 
 export class FileService {
-  async uploadTrainerDocument(trainerId: string, file: Express.Multer.File) {
+  async uploadTrainerDocument(trainerId: string, file: Express.Multer.File): Promise<string> {
     const fileName = generateFileName(file.originalname);
 
     const key = `trainer/${trainerId}/documents/${fileName}`;
@@ -15,7 +15,7 @@ export class FileService {
     return url;
   }
 
-  async uploadUserProfilePhoto(userId: string, file: Express.Multer.File) {
+  async uploadUserProfilePhoto(userId: string, file: Express.Multer.File): Promise<string> {
     const fileName = generateFileName(file.originalname);
     const key = `users/${userId}/profile/${fileName}`;
 
@@ -24,7 +24,7 @@ export class FileService {
     return url;
   }
 
-  async uploadTrainerCertificates(trainerId: string, files: Express.Multer.File | Express.Multer.File[]) {
+  async uploadTrainerCertificates(trainerId: string, files: Express.Multer.File | Express.Multer.File[]): Promise<string[]> {
     const fileList = Array.isArray(files) ? files : [files];
 
     if (fileList.length === 0) {

@@ -2,13 +2,13 @@ import { TrainerIdentityInfoRequestDto, TrainerPersonalInfoRequestDto, TrainerPr
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { ITrainerApplicationService } from "../interface/ITrainerApplication.service";
 import { FileService } from "./file.service";
-import { UserRole } from "../../constants/roles.constants";
+import { DocumentType, Gender, UserRole } from "../../constants/enums.constant";
 import BadRequestError from "../../errors/badRequest.error";
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 import { IUser } from "../../types/user.type";
 import { ITrainerRepository } from "../../repositories/interface/ITrainer.repository";
-import { ITrainer, ITrainerKyc, ResponseIdentityInfo, ResponsePersonalInfo, ResponseProfessionalInfo, UploadedFile } from "../../types/trainer.type";
+import { ITrainer, ITrainerKyc, ITrainerIdentityInfo, UploadedFile, ITrainerPersonalInfo, ITrainerProfessionalInfo, ITrainerWorkInfo, IRegistrationStep } from "../../types/trainer.type";
 import { ITrainerKycRepository } from "../../repositories/interface/ITrainerKyc.repository";
 import { TrainerFullInfoResponseDto, TrainerIdentityInfoResponseDto, TrainerPersonalInfoResponseDto, TrainerProfessionalInfoResponseDto, TrainerWorkInfoResponseDto } from "../../dtos/trainerApplicationResponse.dto";
 
@@ -44,16 +44,16 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
     const kyc = await this._trainerKycRepository.findByUserId(userId);
 
-    const personalInfo: ResponsePersonalInfo = {
-      first_name: user.first_name,
-      last_name: user.last_name,
-      gender: user.gender,
-      age: user.age,
-      phone: user.phone,
-      profile_photo: user.profile_photo
+    const personalInfo: ITrainerPersonalInfo = {
+      first_name: user.first_name  || '',
+      last_name: user.last_name || '',
+      gender: user.gender || Gender.MALE,
+      age: user.age ?? null,
+      phone: user.phone || '',
+      profile_photo: user.profile_photo || ''
     };
 
-    const professionalInfo: ResponseProfessionalInfo = {
+    const proAndWorkInfo: ITrainerProfessionalInfo & ITrainerWorkInfo & IRegistrationStep = {
       specialization: trainer.specialization,
       additionalSkills: trainer.additionalSkills,
       yearsOfExperience: trainer.yearsOfExperience,
@@ -72,10 +72,10 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       registrationStep: trainer.registrationStep
     };
 
-    const identityInfo: ResponseIdentityInfo = {
-      documentType: kyc?.documentType,
-      frontImage: kyc?.frontImageUrl,
-      backImage: kyc?.backImageUrl || undefined
+    const identityInfo: ITrainerIdentityInfo = {
+      documentType: kyc?.documentType || DocumentType.AADHAAR,
+      frontImage: kyc?.frontImageUrl  || '',
+      backImage: kyc?.backImageUrl
     };
 
     return {
@@ -83,11 +83,11 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       data: {
         trainer: {
           ...personalInfo,
-          ...professionalInfo
+          ...proAndWorkInfo
         },
         kyc: identityInfo
-      },
-    } 
+      }
+    }; 
   }
 
   async submitPersonalInfo(
@@ -161,12 +161,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     return {
       message: RESPONSE_MESSAGES.TRAINER_PERSONAL_INFO_SUBMITTED,
       data: {
-        first_name: updatedUser.first_name,
-        last_name: updatedUser.last_name,
-        gender: updatedUser.gender,
-        age: updatedUser.age,
-        phone: updatedUser.phone,
-        profile_photo: updatedUser.profile_photo,
+        first_name: updatedUser.first_name || '',
+        last_name: updatedUser.last_name || '',
+        gender: updatedUser.gender || Gender.MALE,
+        age: updatedUser.age ?? 0,
+        phone: updatedUser.phone || '',
+        profile_photo: updatedUser.profile_photo || '',
         registrationStep: NEXT_STEP
       }
     };

@@ -13,6 +13,7 @@ import { trainerWorkInfoSchema } from '../schemas/trainerWorkInfo.schema';
 import { TrainerKycRepository } from '../repositories/implementation/trainerKyc.repository';
 import { trainerKycSchema } from '../schemas/trainerIdentityInfo.schema';
 import { validateCertificateImages, validateIdentityImages, validateProfilePhoto } from '../middlewares/validateImageFile.middleware';
+import { UserRole } from '../constants/enums.constant';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -28,14 +29,14 @@ const trainerApplicationController = new TrainerApplicationController(trainerApp
 trainerApplicationRouter.get(
   '/me',
   authenticate,
-  authorizeRoles('client'),
+  authorizeRoles(UserRole.CLIENT),
   trainerApplicationController.getFullTrainerInfo.bind(trainerApplicationController)
 );
 
 trainerApplicationRouter.post(
   '/personal-info',
   authenticate,
-  authorizeRoles('client'),
+  authorizeRoles(UserRole.CLIENT),
   upload.single('profile_photo'),
   validateProfilePhoto,
   validate(trainerPersonalInfoSchema),
@@ -45,7 +46,7 @@ trainerApplicationRouter.post(
 trainerApplicationRouter.post(
   '/professional-info',
   authenticate,
-  authorizeRoles('client'),
+  authorizeRoles(UserRole.CLIENT),
   upload.array('certificates'),
   validateCertificateImages,
   validate(trainerProfessionalInfoSchema),
@@ -55,7 +56,7 @@ trainerApplicationRouter.post(
 trainerApplicationRouter.post(
   '/work-info',
   authenticate,
-  authorizeRoles('client'),
+  authorizeRoles(UserRole.CLIENT),
   validate(trainerWorkInfoSchema),
   trainerApplicationController.submitWorkInfo.bind(trainerApplicationController)
 );
@@ -63,7 +64,7 @@ trainerApplicationRouter.post(
 trainerApplicationRouter.post(
   '/identity',
   authenticate,
-  authorizeRoles('client'),
+  authorizeRoles(UserRole.CLIENT),
   upload.fields([
     { name: 'frontImage', maxCount: 1 },
     { name: 'backImage', maxCount: 1 }

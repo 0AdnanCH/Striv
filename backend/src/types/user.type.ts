@@ -1,13 +1,12 @@
-import { UserRole } from "../constants/roles.constants";
-import { UserProfileDto } from "../dtos/userProfile.dto";
-export type GENDER = 'male' | 'female';
+import { ObjectId } from "mongoose";
+import { AuthProvider, Gender, UserRole } from "../constants/enums.constant";
 
 export interface IUser {
   first_name?: string;
   last_name?: string;
   email: string;
   password?: string;
-  gender?: GENDER;
+  gender?: Gender;
   age?: number;
   height?: number;
   weight?: number;
@@ -16,22 +15,26 @@ export interface IUser {
   role: UserRole;
   isVerified?: boolean;
   isBlocked?: boolean;
-  authProvider: 'local' | 'google';
+  authProvider: AuthProvider;
   googleId?: string;
 };
 
-export interface UserProfileUpdateResponse {
-  message: string;
-  user: UserProfileDto;
-};
-
-export interface UserProfileFetchResponse extends UserProfileUpdateResponse {};
-
-export interface SignupData {
+export interface IUserProfile {
+  id: string;
   first_name: string;
   last_name: string;
   email: string;
-  password: string;
-  gender: GENDER;
-  age: number;
+  role: string;
+  gender?: string;
+  age?: number;
+  height?: number;
+  weight?: number;
+}
+
+export interface IAuthUser {
+  id: ObjectId;
+  email: string;
+  role: UserRole;
+  first_name: string;
+  last_name: string;
 }

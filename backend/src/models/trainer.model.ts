@@ -1,5 +1,6 @@
 import { Schema, model, Document, ObjectId } from 'mongoose';
 import { ITrainer } from '../types/trainer.type';
+import { Status, WeekDay } from '../constants/enums.constant';
 
 export interface TrainerDocument extends ITrainer, Document<ObjectId> {
   _id: ObjectId;
@@ -32,7 +33,7 @@ const trainerSchema = new Schema<TrainerDocument>(
         {
           day: {
             type: String,
-            enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+            enum: WeekDay,
           },
           startTime: { type: String },
           endTime: { type: String }
@@ -58,8 +59,8 @@ const trainerSchema = new Schema<TrainerDocument>(
     },
     verificationStatus: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending'
+      enum: Status,
+      default: Status.PENDING
     },
     rejectionReason: { type: String, default: null }
   },

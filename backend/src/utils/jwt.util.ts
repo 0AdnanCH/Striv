@@ -1,11 +1,12 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { env } from '../configs/env.config';
+import { UserRole } from '../constants/enums.constant';
 
 const JWT_EXPIRES_IN= '7d';
 
 export interface JwtUserPayload {
   id: string;
-  role: 'admin' | 'trainer' | 'client';
+  role: UserRole;
 }
 
 export const generateToken = (payload: JwtUserPayload): string => {

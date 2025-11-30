@@ -49,4 +49,7 @@ export const RESPONSE_MESSAGES = {
   TRAINER_NOT_FOUND_AFTER_UPDATE: 'Trainer not found after update.',
   TRAINER_KYC_NOT_FOUND_AFTER_UPDATE: 'Trainer kyc not found after update.',
   NOTHING_TO_UPDATE: 'Nothing to update.',
+  INVALID_IMAGE_TYPE: 'Invalid file type. Only JPG, JPEG, PNG, and WebP are allowed.',
+  IMAGE_TOO_LARGE: 'Photo must be under 2MB.',
+  INVALID_REQ_DATA: 'Invalid request data',
 } as const;

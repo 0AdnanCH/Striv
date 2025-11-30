@@ -2,9 +2,9 @@ import { Response, NextFunction } from 'express';
 import { IUserController } from '../interface/IUser.controller';
 import { IUserService } from '../../services/interface/IUser.service'; 
 import { successResponse } from '../../utils/apiResponse.util';
-import { HTTP_STATUS } from '../../constants/httpStatus.constants';
+import { HTTP_STATUS } from '../../constants/httpStatus.constant';
 import { AuthenticatedRequest } from '../../middlewares/auth.middleware';
-import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constants';
+import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constant';
 
 export class UserController implements IUserController {
   constructor(private readonly _userService: IUserService) {}

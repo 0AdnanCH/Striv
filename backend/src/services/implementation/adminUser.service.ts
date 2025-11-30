@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from "../../constants/httpStatus.constants";
-import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constants";
+import { HTTP_STATUS } from "../../constants/httpStatus.constant";
+import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 import { FetchUsersQuery } from "../../dtos/adminUser.dto";
 import BadRequestError from "../../errors/badRequest.error";
 import { UserDocument } from "../../models/user.model";
@@ -8,14 +8,14 @@ import { PaginatedResult } from "../../types/pagination.types";
 import { IAdminUserService } from "../interface/IAdminUser.service";
 
 export class AdminUserService implements IAdminUserService {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(private readonly _userRepository: IUserRepository) {}
 
   async getAllUsers(query: FetchUsersQuery): Promise<PaginatedResult<UserDocument>> {
-    return await this.userRepository.findWithFilters(query);
+    return await this._userRepository.findWithFilters(query);
   }
 
   async blockUser(userId: string): Promise<UserDocument> {
-    const user = await this.userRepository.findOneAndUpdate(
+    const user = await this._userRepository.findOneAndUpdate(
       { _id: userId, role: { $ne: 'admin' } },
       { isBlocked: true },
       { new: true }
@@ -33,7 +33,7 @@ export class AdminUserService implements IAdminUserService {
   }
 
   async unblockUser(userId: string): Promise<UserDocument> {
-    const user = await this.userRepository.findOneAndUpdate(
+    const user = await this._userRepository.findOneAndUpdate(
       { _id: userId, role: { $ne: 'admin' } }, 
       { isBlocked: false }, 
       { new: true }

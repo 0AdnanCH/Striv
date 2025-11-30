@@ -10,6 +10,7 @@ import { AdminUserService } from '../services/implementation/adminUser.service';
 import { AdminUserController } from '../controllers/implementation/adminUser.controller';
 import { authenticate, authorizeRoles } from '../middlewares/auth.middleware';
 import { signinSchema } from '../schemas/signin.schema';
+import { UserRole } from '../constants/enums.constant';
 
 const adminRouter = express.Router();
 
@@ -23,9 +24,28 @@ const adminController = new AdminController(adminService);
 const adminUserService = new AdminUserService(userRepository);
 const adminUserController = new AdminUserController(adminUserService);
 
-adminRouter.post('/signin', validate(signinSchema), adminController.signin.bind(adminController));
-adminRouter.get('/users', authenticate, authorizeRoles('admin'), adminUserController.getAllUsers.bind(adminUserController));
-adminRouter.patch('/users/:userId/block', authenticate, authorizeRoles('admin'), adminUserController.blockUser.bind(adminUserController));
-adminRouter.patch('/users/:userId/unblock', authenticate, authorizeRoles('admin'), adminUserController.unblockUser.bind(adminUserController));
+adminRouter.post(
+  '/signin', 
+  validate(signinSchema), 
+  adminController.signin.bind(adminController)
+);
+adminRouter.get(
+  '/users', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminUserController.getAllUsers.bind(adminUserController)
+);
+adminRouter.patch(
+  '/users/:userId/block', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminUserController.blockUser.bind(adminUserController)
+);
+adminRouter.patch(
+  '/users/:userId/unblock', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminUserController.unblockUser.bind(adminUserController)
+);
 
 export default adminRouter;

@@ -1,6 +1,6 @@
 import { Schema, model, Document, ObjectId } from "mongoose";
 import { IUser } from "../types/user.type";
-import { UserRole } from "../constants/roles.constants";
+import { AuthProvider, Gender, UserRole } from "../constants/enums.constant";
 
 export interface UserDocument extends IUser, Document<ObjectId> {
   _id: ObjectId;
@@ -12,16 +12,16 @@ const userSchema = new Schema<UserDocument>(
     last_name: { type: String },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: false },
-    gender: { type: String, enum: ['male', 'female'], required: false },
+    gender: { type: String, enum: Gender, required: false },
     age: { type: Number, required: false },
     height: { type: Number, required: false },
     weight: { type: Number, required: false },
     phone: { type: String, required: false },
     profile_photo: { type: String, required: false },
-    role: { type: String, enum: Object.values(UserRole), default: UserRole.CLIENT },
+    role: { type: String, enum: UserRole, default: UserRole.CLIENT },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
-    authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
+    authProvider: { type: String, enum: AuthProvider, default: 'local' },
     googleId: { type: String, unique: true, sparse: true }
   },
   { timestamps: true }

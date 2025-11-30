@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/implementation/user.repository';
 import { authenticate, authorizeRoles } from '../middlewares/auth.middleware'; 
 import { updateUserProfileSchema } from '../schemas/updateUserProfile.schema'; 
 import validate from '../middlewares/validation.middleware';
+import { UserRole } from '../constants/enums.constant';
 
 const userRouter = express.Router();
 
@@ -15,12 +16,13 @@ const userController = new UserController(userService);
 userRouter.get(
   '/me', 
   authenticate, 
-  authorizeRoles('client', 'trainer'), 
-  userController.getMyProfile.bind(userController));
+  authorizeRoles(UserRole.CLIENT, UserRole.TRAINER), 
+  userController.getMyProfile.bind(userController)
+);
 userRouter.patch(
   '/me',
   authenticate,
-  authorizeRoles('client', 'trainer'),
+  authorizeRoles(UserRole.CLIENT, UserRole.TRAINER),
   validate(updateUserProfileSchema),
   userController.updateMyProfile.bind(userController)
 );

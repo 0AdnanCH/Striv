@@ -1,16 +1,6 @@
-import { z } from "zod";
-import { updateUserProfileSchema } from "../schemas/updateUserProfile.schema";
+import { IUserProfile } from "../types/user.type";
 
-export interface UserProfileDto {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: string;
-  gender?: string;
-  age?: number;
-  height?: number;
-  weight?: number;
+export type UserProfileResponseDto = {
+  message: string;
+  user: IUserProfile
 }
-
-export type UpdateUserProfileDto = z.infer<typeof updateUserProfileSchema>;
