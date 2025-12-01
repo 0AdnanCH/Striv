@@ -21,7 +21,7 @@ const userSchema = new Schema<UserDocument>(
     role: { type: String, enum: UserRole, default: UserRole.CLIENT },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
-    authProvider: { type: String, enum: AuthProvider, default: 'local' },
+    authProvider: { type: String, enum: AuthProvider, default: AuthProvider.LOCAL },
     googleId: { type: String, unique: true, sparse: true }
   },
   { timestamps: true }
