@@ -252,7 +252,11 @@ export class AuthService implements IAuthService {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const attempts = await this._resetTokenRepository.countRecentRequests(user._id, oneHourAgo);
     if (attempts >= 3) {
-      return { message: RESPONSE_MESSAGES.PASSWORD_RESET_ALREADY_SENT };
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.TOO_MANY_REQUESTS,
+        message: RESPONSE_MESSAGES.PASSWORD_RESET_ALREADY_SENT,
+        logging: false
+      });
     }
 
     const rawToken = CryptoUtil.randomToken();
