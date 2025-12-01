@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import BaseChangePasswordForm from '../../../../components/forms/BaseChangePasswordForm';
-import { clientService } from '../../api/client.service'; 
+import { BaseChangePasswordForm } from '../../../../components/shared/form'; 
+import { clientService } from '../../service/client.service'; 
 import { toast } from 'sonner'; 
 
 const ClientChangePassword: React.FC = () => {

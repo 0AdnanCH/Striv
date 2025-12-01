@@ -1,17 +1,17 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '../../../../components/ui/Button';
+import { Button } from '../../../../components/ui/button';
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from '../../../../components/ui/InputOtp';
+} from '../../../../components/ui/input-otp';
 
 import { cn } from '../../../../utils/cn.util'; 
-import { otpSchema, type OtpSchema } from '../../schemas';
+import { otpSchema, type OtpSchemaType } from '../../schemas';
 import { useOtpCooldown } from '../../hooks/useOtpCooldown';
-import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from '../../../../constants/otp.constants';
+import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from '../../../../constants/otp.constant';
 
 interface OtpFormProps {
   onSubmit: (otp: string) => void | Promise<void>;
@@ -29,7 +29,7 @@ const OtpForm: React.FC<OtpFormProps> = ({
     setValue,
     watch,
     formState: { errors }
-  } = useForm<OtpSchema>({
+  } = useForm<OtpSchemaType>({
     resolver: zodResolver(otpSchema),
     mode: 'onBlur',
   });
@@ -41,7 +41,7 @@ const OtpForm: React.FC<OtpFormProps> = ({
   
   const otpValue = watch('otp', '');
 
-  const handleFormSubmit = async (data: OtpSchema) => {
+  const handleFormSubmit = async (data: OtpSchemaType) => {
     await onSubmit(data.otp);
   };
 

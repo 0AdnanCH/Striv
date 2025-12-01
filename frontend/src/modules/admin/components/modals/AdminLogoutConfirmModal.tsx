@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseConfirmModal from '../../../../components/ui/BaseConfirmModal';
+import { BaseConfirmModal } from '../../../../components/shared/modal'; 
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 
 interface AdminLogoutConfirmModalProps {

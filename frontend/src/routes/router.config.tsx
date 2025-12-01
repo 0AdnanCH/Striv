@@ -6,6 +6,7 @@ import { authRoutes } from '../modules/auth/routes/authRoutes';
 import { publicAdminRoutes, protectedAdminRoutes } from '../modules/admin/routes/adminRoutes';
 import { protectedClientRoutes } from '../modules/client/routes/clientRoutes';
 import { protectedTrainerRoutes } from '../modules/trainer/routes/trainerRoutes';
+import { UserRole } from '../constants/userRole.constant';
 
 const baseRoutes: RouteObject[] = [
   {
@@ -31,7 +32,7 @@ const adminRoutes: RouteObject[] = [
     children: publicAdminRoutes,
   },
   {
-    element: <ProtectedRoute redirectTo='/admin/signin' allowedRoles={['admin']} />,
+    element: <ProtectedRoute redirectTo='/admin/signin' allowedRoles={[UserRole.ADMIN]} />,
     children: protectedAdminRoutes,
   }
 ];

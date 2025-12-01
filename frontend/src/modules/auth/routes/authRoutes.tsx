@@ -3,7 +3,7 @@ import SigninPage from '../pages/SigninPage';
 import SignupPage from '../pages/SignupPage';
 import VerifySignupOtpPage from '../pages/VerifySignupOtpPage';
 import UserAuthForgotPasswordPage from '../pages/UserAuthForgotPasswordPage';
-import UserAuthResetPasswordPage from '../pages/UserAuthResetPasswordPage';
+import UserAuthResetPasswordPage from '../pages/ResetPasswordPage';
 
 export const authRoutes: RouteObject[] = [
   { path: '/signin', element: <SigninPage /> },

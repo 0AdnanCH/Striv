@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { authService } from '../api/auth.service';
-import type { ForgotPasswordData } from '../types/auth.types';
+import { authService } from '../service/auth.service';
+import type { IForgotPasswordData } from '../types/auth.types';
 
 export function useForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const forgotPassword = async (data: ForgotPasswordData) => {
+  const forgotPassword = async (data: IForgotPasswordData) => {
     setLoading(true);
     setMessage(null);
 

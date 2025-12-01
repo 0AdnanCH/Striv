@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DocumentType } from '../constants/trainerDocType.constant';
 
 const MAX_ID_IMAGE_SIZE = 2 * 1024 * 1024; 
 const ACCEPTED_ID_IMAGE_TYPES: readonly string[] = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -22,7 +23,7 @@ const fileOrUrl = z.union([
 
 export const identityInfoSchema = z
   .object({
-    documentType: z.enum(['aadhaar', 'driving_license', 'pan_card'], 'Please select a valid document type'),
+    documentType: z.enum(DocumentType, 'Please select a valid document type'),
 
     frontImage: fileOrUrl,
 
@@ -43,7 +44,7 @@ export const identityInfoSchema = z
     // conditional: backImage required unless documentType is pan_card
       const hasBackUrl = typeof obj.backImage === 'string';
     const backFile = getFileFromValue(obj.backImage);
-    if (obj.documentType !== 'pan_card') {
+    if (obj.documentType !== DocumentType.PAN_CARD) {
       if(!hasBackUrl && !backFile) {
         ctx.addIssue({
           code: 'custom',

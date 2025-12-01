@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { LogOut, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuthContext } from '../../auth/context/AuthContext';
 import { cn } from '../../../utils/cn.util';
-import BaseConfirmModal from '../../../components/ui/BaseConfirmModal';
+import { BaseConfirmModal } from '../../../components/shared/modal'; 
 import { Link, useNavigate } from 'react-router-dom';
 import ClientChangePassword from '../components/forms/ClientChangePassword';
+import { UserRole } from '../../../constants/userRole.constant';
 
 const ClientChangePasswordPage: React.FC = () => {
   const { logout, user } = useAuthContext();
@@ -15,7 +16,7 @@ const ClientChangePasswordPage: React.FC = () => {
   const handleLogoutCancel = () => setShowLogoutModal(false);
 
   const handleLogoutConfirm = () => {
-    logout('client');
+    logout(UserRole.CLIENT);
     setShowLogoutModal(false);
   };
 

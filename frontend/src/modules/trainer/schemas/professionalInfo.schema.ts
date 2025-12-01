@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { URL_REGEX } from '../../../constants/regex.constant';
 
 const MAX_CERTIFICATE_IMAGE_SIZE = 2 * 1024 * 1024; 
 const ACCEPTED_CERTIFICATE_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -8,7 +9,7 @@ const optionalURL = z
   .trim()
   .transform(val => val === "" ? null : val)
   .nullable()
-  .refine(val => val === null || val === undefined || /^https?:\/\/.+/.test(val), "Invalid URL");
+  .refine(val => val === null || val === undefined || URL_REGEX.test(val), "Invalid URL");
 
 export const socialLinksSchema = z.object({
   website: optionalURL.optional(),
@@ -83,7 +84,6 @@ export const professionalInfoSchema = z.object({
     .array(
       z
       .string()
-      .regex(/^[A-Za-z\s]+$/, 'Achievement must contain only letters and spaces')
       .min(1, "Specialization cannot be empty"))
     .nonempty("At least one specialization is required"),
 
@@ -91,8 +91,7 @@ export const professionalInfoSchema = z.object({
     .array(
       z
       .string()
-      .trim()
-      .regex(/^[A-Za-z\s]+$/, 'Achievement must contain only letters and spaces'))
+      .trim())
     .optional(),
 
   yearsOfExperience: z

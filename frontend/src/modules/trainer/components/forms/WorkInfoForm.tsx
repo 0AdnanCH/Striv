@@ -1,23 +1,22 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { workInfoSchema, type WorkInfoType } from '../../schemas/workInfo.schema';
-import { Input } from '../../../../components/ui/Input';
-import { Button } from '../../../../components/ui/Button';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
+import { Input } from '../../../../components/ui/input';
+import { Button } from '../../../../components/ui/button';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
 import { useTrainer } from '../../hooks/useTrainer';
+import { WeekDay } from '../../constants/weekDay.constant';
 
 interface Props {
   loading: boolean;
-  onNext?: (data: WorkInfoType) => void;
-  onPrev?: () => void;
+  onNext: (data: WorkInfoType) => void;
+  onPrev: () => void;
 }
-
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
 const defaultValues: WorkInfoType = {
   oneToOnePrice: undefined as any,
@@ -39,23 +38,23 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
     defaultValues
   });
 
-  useEffect(() => {
-    if(!trainer) return;
+  // useEffect(() => {
+  //   if(!trainer) return;
 
-    const mappedValues: WorkInfoType = {
-      oneToOnePrice: trainer?.pricing?.oneToOne ?? (undefined as any),
-      groupSessionPrice: trainer?.pricing?.groupSession ?? (undefined as any),
-      availability: trainer?.availability?.length
-        ? trainer.availability.map((slot) => ({
-            day: slot.day,
-            startTime: slot.startTime,
-            endTime: slot.endTime
-          }))
-        : []
-    };
+  //   const mappedValues: WorkInfoType = {
+  //     oneToOnePrice: trainer?.pricing?.oneToOne ?? (undefined as any),
+  //     groupSessionPrice: trainer?.pricing?.groupSession ?? (undefined as any),
+  //     availability: trainer?.availability?.length
+  //       ? trainer.availability.map((slot) => ({
+  //           day: slot.day,
+  //           startTime: slot.startTime,
+  //           endTime: slot.endTime
+  //         }))
+  //       : []
+  //   };
 
-    reset(mappedValues);
-  }, [trainer, reset])
+  //   reset(mappedValues);
+  // }, [trainer, reset])
 
   const availabilityArray = useFieldArray({
     control,
@@ -64,7 +63,7 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
 
   const addSlot = () =>
     availabilityArray.append({
-      day: 'monday',
+      day: WeekDay.MONDAY,
       startTime: '09:00',
       endTime: '10:00'
     } as any);
@@ -73,17 +72,8 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
     availabilityArray.remove(index);
   };
 
-  const onSubmit = async (raw: WorkInfoType) => {
-    const payload: WorkInfoType = {
-      ...raw,
-      availability: raw.availability
-    };
-
-    onNext?.(payload);
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-3xl mx-auto">
+    <form onSubmit={handleSubmit(onNext)} className="w-full max-w-3xl mx-auto">
       <div className="grid grid-cols-1 gap-6">
         {/* Prices */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -182,7 +172,7 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
                             <SelectContent>
                               <SelectGroup>
                                 <SelectLabel>Day</SelectLabel>
-                                {DAYS.map((d) => (
+                                {Object.values(WeekDay).map((d) => (
                                   <SelectItem key={d} value={d}>
                                     {d[0].toUpperCase() + d.slice(1)}
                                   </SelectItem>

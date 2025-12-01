@@ -1,7 +1,6 @@
 import { z } from 'zod';
-
-const nameRegex = /^[A-Za-z][A-Za-z0-9_-]*$/;
-const passwordRegex = /^(?!.*\s)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?{}\[\]~])[A-Za-z\d!@#$%^&*()_\-+=<>?{}\[\]~]{8,}$/;
+import { NAME_REGEX, REGEX_LOWERCASE, REGEX_NO_WHITESPACE, REGEX_NUMBER, REGEX_SPECIAL_CHAR, REGEX_UPPERCASE } from '../../../constants/regex.constant';
+import { Gender } from '../../../constants/gender.constant';
 
 export const signupSchema = z
   .object({
@@ -9,18 +8,23 @@ export const signupSchema = z
       .string({ error: (iss) => (iss.input === undefined ? 'First name is required' : 'First name can include letters, numbers, _ and -, but must start with a letter') })
       .min(2, 'First name must be at least 2 characters long')
       .max(50, 'First name must be at most 50 characters long')
-      .regex(nameRegex, 'First name can include letters, numbers, _ and -, but must start with a letter'),
+      .regex(NAME_REGEX, 'First name can include letters, numbers, _ and -, but must start with a letter'),
     last_name: z
       .string({ error: (iss) => (iss.input === undefined ? 'Last name is required' : 'Last name can include letters, numbers, _ and -, but must start with a letter') })
       .min(2, 'Last name must be at least 2 characters long')
       .max(50, 'Last name must be at most 100 characters long')
-      .regex(nameRegex, 'Last name can include letters, numbers, _ and -, but must start with a letter'),
+      .regex(NAME_REGEX, 'Last name can include letters, numbers, _ and -, but must start with a letter'),
     email: z.email('Please enter a valid email address'),
     password: z
-      .string({ error: (iss) => (iss.input === undefined ? 'Password is required' : 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol') })
-      .regex(passwordRegex, 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol'),
+      .string('Password is required')
+      .min(8, 'New password must be at least 8 characters')
+      .regex(REGEX_NO_WHITESPACE, 'Must not contain any spaces')
+      .regex(REGEX_UPPERCASE, 'Must include at least one uppercase letter')
+      .regex(REGEX_LOWERCASE, 'Must include at least one lowercase letter')
+      .regex(REGEX_NUMBER, 'Must include at least one number')
+      .regex(REGEX_SPECIAL_CHAR, 'Must include at least one special character'),
     confirm_password: z.string('Confirm your password'),
-    gender: z.enum(['male', 'female'], "Gender must be either 'male' or 'female'"),
+    gender: z.enum(Gender, "Gender must be either 'male' or 'female'"),
     age: z
       .number({ error: (iss) => (iss.input === undefined ? 'Age is required' : 'Age must be a whole number') })
       .int('Age must be a whole number')
@@ -32,4 +36,4 @@ export const signupSchema = z
     path: ['confirm_password']
   });
 
-export type SignupSchema= z.infer<typeof signupSchema>;
+export type SignupSchemaType = z.infer<typeof signupSchema>;

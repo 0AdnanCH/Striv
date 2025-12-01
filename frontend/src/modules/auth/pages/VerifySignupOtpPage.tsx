@@ -27,11 +27,7 @@ const VerifySignupOtpPage = () => {
       return;
     }
 
-    try {
-      await verifySignupOtp({ email, otp });
-    } catch (error: any) {
-      handleApiError('VerifySignupOtp', error);
-    }
+    await verifySignupOtp({ email, otp });
   };
 
   const handleResendOtp = async () => {

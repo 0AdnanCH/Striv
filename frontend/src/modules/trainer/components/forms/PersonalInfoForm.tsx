@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { personalInfoSchema, type PersonalInfoType } from '../../schemas/personalInfo.schema'; 
-import { Input } from '../../../../components/ui/Input';
-import { Button } from '../../../../components/ui/Button';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/Select';
+import { Input } from '../../../../components/ui/input';
+import { Button } from '../../../../components/ui/button';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
 import { useTrainer } from '../../hooks/useTrainer';
+import { Gender } from '../../../../constants/gender.constant';
 
 interface Props {
   loading: boolean;
@@ -17,7 +18,7 @@ interface Props {
 const defaultValues: PersonalInfoType = {
   first_name: '',
   last_name: '',
-  gender: 'male',
+  gender: Gender.MALE,
   age: undefined as any,
   phone: '',
   profile_photo: undefined as any,
@@ -47,7 +48,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
     reset({
       first_name: trainer.first_name || '',
       last_name: trainer.last_name || '',
-      gender: trainer.gender || 'male',
+      gender: trainer.gender || Gender.MALE,
       age: trainer.age || undefined,
       phone: trainer.phone || '',
       profile_photo: undefined,
@@ -125,8 +126,8 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
                   <SelectContent position="popper" sideOffset={6}>
                     <SelectGroup>
                       <SelectLabel>Gender</SelectLabel>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value={Gender.MALE}>Male</SelectItem>
+                      <SelectItem value={Gender.FEMALE}>Female</SelectItem>
                       {/* <SelectItem value="other">Other</SelectItem> */}
                     </SelectGroup>
                   </SelectContent>

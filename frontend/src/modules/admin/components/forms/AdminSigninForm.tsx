@@ -1,9 +1,9 @@
 import React from 'react';
-import BaseSigninForm from '../../../../components/forms/BaseSigninForm';
-import { type SigninSchema } from '../../../auth/schemas';
+import { BaseSigninForm } from '../../../../components/shared/form';
+import type { IAdminSigninData } from '../../types/admin.types';
 
 interface AdminSigninFormProps {
-  onSubmit: (data: SigninSchema) => void;
+  onSubmit: (data: IAdminSigninData) => void;
   loading?: boolean;
 }
 

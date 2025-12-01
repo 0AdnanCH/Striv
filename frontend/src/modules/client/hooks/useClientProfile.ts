@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { clientService } from '../api/client.service';
-import type { ClientProfile } from '../types/client.types';
+import { clientService } from '../service/client.service';
+import type { IClientProfile } from '../types/client.types';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../utils/handleApiError.util';
 import { useAuthContext } from '../../auth/context/AuthContext';
 
 export const useClientProfile = () => {
   const { updateUser } = useAuthContext();
-  const [profile, setProfile] = useState<ClientProfile | null>(null);
+  const [profile, setProfile] = useState<IClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingField, setUpdatingField] = useState<string | null>(null);
 
@@ -34,7 +34,7 @@ export const useClientProfile = () => {
 
       setUpdatingField(field);
 
-      const previousValue = profile[field as keyof ClientProfile];
+      const previousValue = profile[field as keyof IClientProfile];
       setProfile((prev) => (prev ? { ...prev, [field]: value } : prev));
 
       try {

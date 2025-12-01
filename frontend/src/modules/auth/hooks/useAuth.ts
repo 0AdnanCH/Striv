@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { authService } from '../api/auth.service';
-import type { SignupData, SigninData, OtpVerifyData, ModifiedAuthResponse } from '../types/auth.types';
+import { authService } from '../service/auth.service';
+import type { ISignupData, ISigninData, IOtpVerifyData } from '../types/auth.types';
 import { useAuthContext } from '../context/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useOtpCooldown } from './useOtpCooldown';
-import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from '../../../constants/otp.constants'; 
+import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from '../../../constants/otp.constant'; 
 import { handleApiError } from '../../../utils/handleApiError.util';
 import { useGoogleLogin } from '@react-oauth/google';
 
@@ -56,7 +56,7 @@ export const useAuth = () => {
     }
   });
 
-  const signUp = async (data: SignupData): Promise<{ message: string }> => {
+  const signUp = async (data: ISignupData) => {
     setLoading(true);
     try {
       const response = await authService.signUp(data);
@@ -67,13 +67,14 @@ export const useAuth = () => {
       startCooldown();
 
       navigate('/verify-signup-otp', { state: { email: data.email } });
-      return response
+    } catch(error: any) {
+      handleApiError('Auth Signup', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const signIn = async (data: SigninData): Promise<ModifiedAuthResponse> => {
+  const signIn = async (data: ISigninData) => {
     setLoading(true);
     try {
       const response = await authService.signIn(data);
@@ -81,14 +82,14 @@ export const useAuth = () => {
 
       toast.success(response.message);
       navigate('/');
-
-      return response;
+    } catch(error: any) {
+      handleApiError('Auth Signin', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const verifySignupOtp = async (data: OtpVerifyData): Promise<ModifiedAuthResponse> => {
+  const verifySignupOtp = async (data: IOtpVerifyData) => {
     setLoading(true);
     try {
       const response = await authService.verifySignupOtp(data);
@@ -97,8 +98,8 @@ export const useAuth = () => {
       
       toast.success(response.message);
       navigate('/');
-
-      return response;
+    } catch(error: any) {
+      handleApiError('Auth Verify Signup Otp', error);
     } finally {
       setLoading(false);
     }

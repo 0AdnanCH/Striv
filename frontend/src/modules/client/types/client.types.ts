@@ -1,11 +1,14 @@
-export interface ClientProfile {
+import type { GenderType } from "../../../constants/gender.constant";
+import type { UserRoleType } from "../../../constants/userRole.constant";
+
+export interface IClientProfile {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: string;
+  role: UserRoleType;
 
-  gender?: string;
+  gender?: GenderType;
   age?: number;
   height?: number;
   weight?: number;
@@ -13,12 +16,12 @@ export interface ClientProfile {
   picture?: string;
 }
 
-export interface ClientProfileResponse {
+export interface IClientProfileResponse {
   message: string;
-  data: ClientProfile;
+  data: IClientProfile;
 }
 
-export interface UpdateClientProfileRequest {
+export interface IUpdateClientProfileRequest {
   first_name?: string;
   last_name?: string;
   gender?: string;
@@ -27,14 +30,14 @@ export interface UpdateClientProfileRequest {
   weight?: number;
 }
 
-export interface UpdateClientProfileResponse extends ClientProfileResponse {};
+export interface IUpdateClientProfileResponse extends IClientProfileResponse {};
 
-export interface ChangePasswordRequest {
+export interface IChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
 
-export interface ChangePasswordResponse {
+export interface IChangePasswordResponse {
   message: string;
 }

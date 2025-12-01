@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseUserProfile from '../../../../components/profile/BaseUserProfile'; 
+import { BaseUserProfile } from '../../../../components/shared/form'; 
 import { useClientProfile } from '../../hooks/useClientProfile';
 
 const ClientProfile: React.FC = () => {

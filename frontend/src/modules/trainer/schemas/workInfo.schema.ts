@@ -1,19 +1,9 @@
 import { z } from 'zod';
-
-const TIME_24H_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-const DAYS = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-] as const;
+import { TIME_24H_REGEX } from '../../../constants/regex.constant';
+import { WeekDay } from '../constants/weekDay.constant';
 
 export const availabilitySchema = z.object({
-  day: z.enum(DAYS, 'Invalid day selected'),
+  day: z.enum(WeekDay, 'Invalid day selected'),
 
   startTime: z
     .string()

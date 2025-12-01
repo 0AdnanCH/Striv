@@ -1,32 +1,34 @@
-export interface AdminSigninData {
+import { UserRole } from "../../../constants/userRole.constant";
+
+export interface IAdminSigninData {
   email: string;
   password: string;
 }
 
-export interface Admin {
+export interface IAdmin {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: 'admin';
+  role: typeof UserRole.ADMIN;
 }
 
-export interface AdminAuthResponse {
+export interface IAdminAuthResponse {
   success: boolean;
   message: string;
   data: {
     token: string;
-    admin: Admin;
+    admin: IAdmin;
   };
 }
 
-export interface ModifiedAdminAuthResponse {
+export interface IAdminAuthServiceResponse {
   message: string;
-  admin: Admin;
+  admin: IAdmin;
   token: string
 }
 
-export interface ApiError {
+export interface IApiError {
   status: number;
   message: string;
   details?: any;

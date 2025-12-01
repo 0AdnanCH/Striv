@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from "../../../constants/otp.constants";
+import { OTP_COOLDOWN_SECONDS, OTP_COOLDOWN_STORAGE_KEY } from "../../../constants/otp.constant";
 
 interface UseOtpCooldownOptions {
   duration?: number;

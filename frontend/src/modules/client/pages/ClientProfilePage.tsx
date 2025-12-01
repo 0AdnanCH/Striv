@@ -3,8 +3,9 @@ import ClientProfile from '../components/profile/ClientProfile';
 import { LogOut, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuthContext } from '../../auth/context/AuthContext';
 import { cn } from '../../../utils/cn.util';
-import BaseConfirmModal from '../../../components/ui/BaseConfirmModal';
+import { BaseConfirmModal } from '../../../components/shared/modal'; 
 import { Link, useNavigate } from 'react-router-dom';
+import { UserRole } from '../../../constants/userRole.constant';
 
 const ClientProfilePage: React.FC = () => {
   const { logout, user } = useAuthContext();
@@ -15,7 +16,7 @@ const ClientProfilePage: React.FC = () => {
   const handleLogoutCancel = () => setShowLogoutModal(false);
 
   const handleLogoutConfirm = () => {
-    logout('client');
+    logout(UserRole.CLIENT);
     setShowLogoutModal(false);
   };
 

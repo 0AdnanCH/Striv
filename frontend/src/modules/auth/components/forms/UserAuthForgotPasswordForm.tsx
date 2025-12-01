@@ -1,9 +1,9 @@
 import React from 'react';
-import BaseForgotPasswordForm from '../../../../components/forms/BaseForgotPasswordForm';
-import type { ForgotPasswordSchema } from '../../../../schemas/forgotPassword.schema';
+import { BaseForgotPasswordForm } from '../../../../components/shared/form'; 
+import type { EmailSchemaType } from '../../schemas';
 
 interface UserAuthForgotPasswordFormProps {
-  onSubmit: (data: ForgotPasswordSchema) => void;
+  onSubmit: (data: EmailSchemaType) => void;
   loading?: boolean;
 }
 

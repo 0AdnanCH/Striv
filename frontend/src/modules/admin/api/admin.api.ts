@@ -1,9 +1,10 @@
 import axiosClient from "../../../api/axiosClient";
-import type { AdminSigninData, AdminAuthResponse } from "../types/admin.types";
+import { UserRole } from "../../../constants/userRole.constant";
+import type { IAdminSigninData, IAdminAuthResponse } from "../types/admin.types";
 
 export const adminApi = {
-  async signin(data: AdminSigninData): Promise<AdminAuthResponse> {
-    const response = await axiosClient.post('/admin/signin', data, { role: 'admin' });
+  async signin(data: IAdminSigninData): Promise<IAdminAuthResponse> {
+    const response = await axiosClient.post('/admin/signin', data, { role: UserRole.ADMIN });
     return response.data;
   }
 }

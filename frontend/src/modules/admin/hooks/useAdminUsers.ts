@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { adminUserService } from '../api/adminUser.service';
-import type { AdminUser } from '../types/adminUser.types';
+import { adminUserService } from '../service/adminUser.service';
+import type { IAdminUser } from '../types/adminUser.types';
 
 export const useAdminUsers = (intitialPage = 1, limit = 10) => {
   // -- STATE MANAGEMENT --
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<IAdminUser[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(intitialPage);
   const [search, setSearch] = useState('');

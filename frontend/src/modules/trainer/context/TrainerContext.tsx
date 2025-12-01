@@ -1,21 +1,20 @@
-// TrainerContext.tsx
 'use client';
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { TrainerFullInfo } from '../types/trainerRegistration.types';
+import type { ITrainerFullInfoDraft } from '../types/trainerDraft.types';
 
 interface TrainerContextState {
-  trainerFullInfo: TrainerFullInfo | null;
-  setTrainerFullInfo: (value: TrainerFullInfo | ((prev: TrainerFullInfo | null) => TrainerFullInfo)) => void;
+  trainerFullInfo: ITrainerFullInfoDraft | null;
+  setTrainerFullInfo: (value: ITrainerFullInfoDraft | ((prev: ITrainerFullInfoDraft | null) => ITrainerFullInfoDraft)) => void;
   clearTrainerInfo: () => void;
 }
 
 const TrainerContext = createContext<TrainerContextState | undefined>(undefined);
 
 export function TrainerProvider({ children }: { children: ReactNode }) {
-  const [trainerFullInfo, setTrainerFullInfoState] = useState<TrainerFullInfo | null>(null);
+  const [trainerFullInfo, setTrainerFullInfoState] = useState<ITrainerFullInfoDraft | null>(null);
 
-  const setTrainerFullInfo = (value: TrainerFullInfo | ((prev: TrainerFullInfo | null) => TrainerFullInfo)) => {
+  const setTrainerFullInfo = (value: ITrainerFullInfoDraft | ((prev: ITrainerFullInfoDraft | null) => ITrainerFullInfoDraft)) => {
     if (typeof value === 'function') {
       setTrainerFullInfoState((prev) => value(prev));
     } else {

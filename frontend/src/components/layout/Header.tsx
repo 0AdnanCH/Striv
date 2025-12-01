@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { cn } from '../../utils/cn.util';
 import { useAuthContext } from '../../modules/auth/context/AuthContext';
-import BaseConfirmModal from '../ui/BaseConfirmModal';
+import { BaseConfirmModal } from '../shared/modal';
 
 interface HeaderProps {
   className?: string;

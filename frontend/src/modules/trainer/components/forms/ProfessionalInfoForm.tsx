@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { professionalInfoSchema, type ProfessionalInfoType } from '../../schemas/professionalInfo.schema';
-import { Input } from '../../../../components/ui/Input'; 
-import { Button } from '../../../../components/ui/Button';
+import { Input } from '../../../../components/ui/input'; 
+import { Button } from '../../../../components/ui/button';
 import { Label } from '@radix-ui/react-label';
 import { cn } from '../../../../utils/cn.util';
 import { useTrainer } from '../../hooks/useTrainer';
@@ -51,36 +51,36 @@ const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
     defaultValues
   });
 
-  useEffect(() => {
-    if (!trainer) return;
+  // useEffect(() => {
+  //   if (!trainer) return;
 
-    const mappedValues: ProfessionalInfoType = {
-      specialization: trainer.specialization || [],
-      additionalSkills: trainer.additionalSkills || [],
-      yearsOfExperience: trainer.yearsOfExperience ?? 0,
+  //   const mappedValues: ProfessionalInfoType = {
+  //     specialization: trainer.specialization || [],
+  //     additionalSkills: trainer.additionalSkills || [],
+  //     yearsOfExperience: trainer.yearsOfExperience ?? 0,
 
-      certificates:
-        trainer.certificates?.map((c) => ({
-          title: c.title,
-          issuer: c.issuer,
-          issuedDate: c.issuedDate ? new Date(c.issuedDate).toISOString().slice(0, 10) : null,
-          certificateImage: undefined,
-        })) || [],
+  //     certificates:
+  //       trainer.certificates?.map((c) => ({
+  //         title: c.title,
+  //         issuer: c.issuer,
+  //         issuedDate: c.issuedDate ? new Date(c.issuedDate).toISOString().slice(0, 10) : null,
+  //         certificateImage: undefined,
+  //       })) || [],
 
-      portfolio: {
-        bio: trainer.portfolio?.bio || '',
-        achievements: trainer.portfolio?.achievements || [],
-        socialLinks: {
-          website: trainer.portfolio?.socialLinks?.website || null,
-          instagram: trainer.portfolio?.socialLinks?.instagram || null,
-          youtube: trainer.portfolio?.socialLinks?.youtube || null,
-          linkedin: trainer.portfolio?.socialLinks?.linkedin || null
-        }
-      }
-    };
+  //     portfolio: {
+  //       bio: trainer.portfolio?.bio || '',
+  //       achievements: trainer.portfolio?.achievements || [],
+  //       socialLinks: {
+  //         website: trainer.portfolio?.socialLinks?.website || null,
+  //         instagram: trainer.portfolio?.socialLinks?.instagram || null,
+  //         youtube: trainer.portfolio?.socialLinks?.youtube || null,
+  //         linkedin: trainer.portfolio?.socialLinks?.linkedin || null
+  //       }
+  //     }
+  //   };
 
-    reset(mappedValues);
-  }, [trainer, reset]);
+  //   reset(mappedValues);
+  // }, [trainer, reset]);
 
   const specArray = useFieldArray({ control, name: 'specialization' as any });
   const skillsArray = useFieldArray({ control, name: 'additionalSkills' as any });

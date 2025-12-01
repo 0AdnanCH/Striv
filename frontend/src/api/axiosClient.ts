@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { tokenUtils } from '../utils/token.utils';
+import type { UserRoleType } from '../constants/userRole.constant';
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
@@ -10,7 +11,7 @@ const axiosClient = axios.create({
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
-    role?: 'admin' | 'client' | 'trainer';
+    role?: UserRoleType
   }
 }
 

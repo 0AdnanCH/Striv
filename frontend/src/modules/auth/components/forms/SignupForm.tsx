@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signupSchema, type SignupSchema } from '../../schemas';
+import { signupSchema, type SignupSchemaType } from '../../schemas';
 
-import { Input } from '../../../../components/ui/Input';
+import { Input } from '../../../../components/ui/input';
 import { Label } from '@radix-ui/react-label';
-import { Button } from '../../../../components/ui/Button'; 
+import { Button } from '../../../../components/ui/button'; 
 import { cn } from '../../../../utils/cn.util'; 
 import { 
   Select,
@@ -13,11 +13,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
- } from '../../../../components/ui/Select';
+ } from '../../../../components/ui/select';
 import { Eye, EyeOff } from 'lucide-react'; 
+import { Gender, type GenderType } from '../../../../constants/gender.constant';
 
 interface SignupFormProps {
-  onSubmit: (data: SignupSchema) => void;
+  onSubmit: (data: SignupSchemaType) => void;
   loading?: boolean;
 }
 
@@ -29,21 +30,17 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, loading }) => {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm<SignupSchema>({
+  } = useForm<SignupSchemaType>({
     resolver: zodResolver(signupSchema),
     mode: 'onBlur',
   });
 
   const handleGenderChange = (value: string) => {
-    setValue('gender', value as 'male' | 'female', { shouldValidate: true });
-  };
-  
-  const handleFormSubmit = (data: SignupSchema) => {
-    onSubmit(data);
+    setValue('gender', value as GenderType, { shouldValidate: true });
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className={cn('flex flex-col gap-6 w-full max-w-md mx-auto text-gray-800')}>
+    <form onSubmit={handleSubmit(onSubmit)} className={cn('flex flex-col gap-6 w-full max-w-md mx-auto text-gray-800')}>
       <h2 className="text-3xl font-bold text-center text-striv-primary">Create your account</h2>
       <p className="text-sm text-center text-striv-secondary mb-2">Start your personalized fitness and wellness journey ✨</p>
 
@@ -112,8 +109,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSubmit, loading }) => {
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
             <SelectContent position="popper" sideOffset={6}>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
+              <SelectItem value={Gender.MALE}>Male</SelectItem>
+              <SelectItem value={Gender.FEMALE}>Female</SelectItem>
               {/* <SelectItem value="other">Other</SelectItem> */}
             </SelectContent>
           </Select>

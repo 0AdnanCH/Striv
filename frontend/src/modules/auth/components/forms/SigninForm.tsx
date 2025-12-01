@@ -1,9 +1,9 @@
 import React from 'react';
-import BaseSigninForm from '../../../../components/forms/BaseSigninForm';
-import { type SigninSchema } from '../../schemas';
+import { BaseSigninForm } from '../../../../components/shared/form'; 
+import type { ISigninData } from '../../types/auth.types';
 
 interface AuthSigninFormProps {
-  onSubmit: (data: SigninSchema) => void;
+  onSubmit: (data: ISigninData) => void;
   onGoogleSignin: () => void;
   loading?: boolean;
 }

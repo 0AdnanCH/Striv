@@ -1,4 +1,6 @@
-export interface SignupData {
+import type { UserRoleType } from "../../../constants/userRole.constant";
+
+export interface ISignupData {
   first_name: string;
   last_name: string;
   email: string;
@@ -8,52 +10,52 @@ export interface SignupData {
   age: number;
 }
 
-export interface SigninData {
+export interface ISigninData {
   email: string;
   password: string;
 }
 
-export interface User {
+export interface IUser {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: 'admin' | 'trainer' | 'client';
+  role: UserRoleType;
 }
 
-export interface AuthResponse {
+export interface IAuthResponse {
   message: string;
   data: {
-    user: User;
+    user: IUser;
     token: string;
   };
 }
 
-export interface ModifiedAuthResponse {
+export interface IAuthServiceResponse {
   message: string;
-  user: User;
-  token: string
+  user: IUser;
+  token: string;
 }
 
-export interface OtpVerifyData {
+export interface IOtpVerifyData {
   email: string;
   otp: string;
 }
 
-export interface AuthContextType {
-  user: User | null;
+export interface IAuthContextType {
+  user: IUser | null;
   token: string | null;
-  login: (token: string, user: User, role?: 'admin' | 'trainer' | 'client') => void;
-  logout: (role?: 'admin' | 'trainer' | 'client') => void;
+  login: (token: string, user: IUser, role?: UserRoleType) => void;
+  logout: (role?: UserRoleType) => void;
   loading: boolean;
-  updateUser: (updated: Partial<User>) => void;
+  updateUser: (updated: Partial<IUser>) => void;
 }
 
-export interface ResetPasswordData {
+export interface IResetPasswordData {
   token: string;
   password: string;
 }
 
-export interface ForgotPasswordData {
+export interface IForgotPasswordData {
   email: string;
 }

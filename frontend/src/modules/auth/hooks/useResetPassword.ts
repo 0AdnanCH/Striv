@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { ResetPasswordData } from '../types/auth.types';
-import { authService } from '../api/auth.service';
+import type { IResetPasswordData } from '../types/auth.types';
+import { authService } from '../service/auth.service';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '../../../utils/handleApiError.util';
@@ -9,7 +9,7 @@ export function useResetPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const resetPassword = async (data: Omit<ResetPasswordData, 'token'>) => {
+  const resetPassword = async (data: Omit<IResetPasswordData, 'token'>) => {
     setLoading(true);
     try {
       const response = await authService.resetPassword(data);

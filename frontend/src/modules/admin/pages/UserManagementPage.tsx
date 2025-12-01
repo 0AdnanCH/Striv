@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import AdminSidebar from '../components/layout/AdminSidebar';
 import AdminHeader from '../components/layout/AdminHeader';
-import BaseTable, { type BaseTableColumn } from '../../../components/ui/BaseTable'; 
-import BaseSearchFilterBar from '../../../components/ui/BaseSearchFilterBar';
-import BasePagination from '../../../components/ui/BasePagination';
-import BaseConfirmModal from '../../../components/ui/BaseConfirmModal';
+import { BaseTable, type BaseTableColumn } from '../../../components/base/table'; 
+import { BaseSearchFilterBar } from '../../../components/base/search-filter'; 
+import BasePagination from '../../../components/base/pagination/BasePagination';
+import { BaseConfirmModal } from '../../../components/shared/modal'; 
 import { useAdminUsers } from '../hooks/useAdminUsers';
-import type { AdminUser } from '../types/adminUser.types';
+import type { IAdminUser } from '../types/adminUser.types';
+import { UserRole } from '../../../constants/userRole.constant';
 
 export default function UserManagementPage() {
   const {
@@ -39,7 +40,7 @@ export default function UserManagementPage() {
     }
   };
 
-  const columns: BaseTableColumn<AdminUser>[] = [
+  const columns: BaseTableColumn<IAdminUser>[] = [
     { key: 'first_name', label: 'First Name' },
     { key: 'last_name', label: 'Last Name' },
     { key: 'email', label: 'Email' },
@@ -59,7 +60,7 @@ export default function UserManagementPage() {
       label: 'Actions',
       render: (user) => (
         <div className="flex gap-2">
-          { user.role === 'admin' ? (
+          { user.role === UserRole.ADMIN ? (
             <span className="text-xs text-admin-secondary italic">(Admin cannot be blocked)</span>
           ) : user.isBlocked ? (
             <button
@@ -108,7 +109,7 @@ export default function UserManagementPage() {
         <BaseSearchFilterBar
           searchPlaceholder="Search users..."
           filters={[
-            { label: 'Role', key: 'role', options: ['Admin', 'Trainer', 'Client'] },
+            { label: 'Role', key: 'role', options: Object.values(UserRole) },
             { label: 'Status', key: 'status', options: ['Verified', 'Unverified'] }
           ]}
           onSearch={handleSearch}

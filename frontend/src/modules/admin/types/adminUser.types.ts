@@ -1,26 +1,28 @@
-export interface AdminUser {
+import type { UserRoleType } from "../../../constants/userRole.constant";
+
+export interface IAdminUser {
   _id: string;
   first_name: string;
   last_name: string;
   email: string;
-  role: 'admin' | 'trainer' | 'client';
+  role: UserRoleType;
   isVerified: boolean;
   isBlocked: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface FetchUsersParams {
+export interface IFetchUsersParams {
   page?: number;
   limit?: number;
   search?: string;
-  role?: string;
+  role?: UserRoleType;
   status?: string;
 }
 
-export interface PaginatedUsersResponse {
+export interface IPaginatedUsersResponse {
   data: {
-    users: AdminUser[];
+    users: IAdminUser[];
     total: number;
     page: number;
     limit: number;
