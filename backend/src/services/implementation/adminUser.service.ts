@@ -6,6 +6,7 @@ import { UserDocument } from "../../models/user.model";
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { PaginatedResult } from "../../types/pagination.types";
 import { IAdminUserService } from "../interface/IAdminUser.service";
+import { UserRole } from "../../constants/enums.constant";
 
 export class AdminUserService implements IAdminUserService {
   constructor(private readonly _userRepository: IUserRepository) {}
@@ -16,7 +17,7 @@ export class AdminUserService implements IAdminUserService {
 
   async blockUser(userId: string): Promise<UserDocument> {
     const user = await this._userRepository.findOneAndUpdate(
-      { _id: userId, role: { $ne: 'admin' } },
+      { _id: userId, role: { $ne: UserRole.ADMIN } },
       { isBlocked: true },
       { new: true }
     );
@@ -34,7 +35,7 @@ export class AdminUserService implements IAdminUserService {
 
   async unblockUser(userId: string): Promise<UserDocument> {
     const user = await this._userRepository.findOneAndUpdate(
-      { _id: userId, role: { $ne: 'admin' } }, 
+      { _id: userId, role: { $ne: UserRole.ADMIN } }, 
       { isBlocked: false }, 
       { new: true }
     );
