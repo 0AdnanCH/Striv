@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { Gender, WeekDay, DocumentType, Status, } from '../constants/enums.constant'; 
+import { Gender, WeekDay, DocumentType, Status, TrainerApplicationStatus, } from '../constants/enums.constant'; 
 
 export interface ITrainer {
   userId: ObjectId;
@@ -12,8 +12,8 @@ export interface ITrainer {
   pricing: IPricingInfo;
   portfolio: IPortfolioInfo;
 
-  registrationStep: number;
-  verificationStatus: Status;
+  applicationStep: number;
+  applicationStatus: TrainerApplicationStatus;
   rejectionReason?: string | null;
 }
 
@@ -111,10 +111,8 @@ export interface ITrainerIdentityInfo {
   backImage?: string | null;
 }
 
-// ------------------ Shared ------------------
-
-export interface IRegistrationStep {
-  registrationStep: number;
+export interface IApplicationStep {
+  applicationStep: number;
 }
 
 export type UploadedFile = Express.Multer.File;

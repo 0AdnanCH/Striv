@@ -1,8 +1,7 @@
-import { trainerRegistrationAPI } from '../api/trainerApplication.api';
-import type { PersonalInfoPayload, ProfessionalInfoPayload, WorkInfoPayload, IdentityInfoPayload, ITrainerFullInfo, IPersonalInfoResponse, IProfessionalInfoResponse, IWorkInfoResponse, ITrainerIdentityResponse } from '../types/trainerApplication.types';
-import { normalizeFile } from '../utils/normalizeFile.util';
+import { trainerApplicationAPI } from '../api/trainerApplication.api';
+import type { PersonalInfoPayload, ProfessionalInfoPayload, WorkInfoPayload, IdentityInfoPayload, IPersonalInfoResponse, IProfessionalInfoResponse, IWorkInfoResponse, ITrainerIdentityResponse, ITrainerFullInfoResponse } from '../types/trainerApplication.types';
 
-export const trainerRegistrationService = {
+export const trainerApplicationService = {
   async submitPersonalInfo(payload: PersonalInfoPayload): Promise<IPersonalInfoResponse> {
     const formData = new FormData();
 
@@ -15,8 +14,8 @@ export const trainerRegistrationService = {
       formData.append('profile_photo', payload.profile_photo, payload.profile_photo.name);
     }
 
-    const res = await trainerRegistrationAPI.submitPersonalInfo(formData);
-    return res;
+    const res = await trainerApplicationAPI.submitPersonalInfo(formData);
+    return { message: res.message, personalInfo: res.data };
   },
 
   async submitProfessionalInfo(payload: ProfessionalInfoPayload): Promise<IProfessionalInfoResponse> {
@@ -71,12 +70,13 @@ export const trainerRegistrationService = {
       });
     }
 
-    const res = await trainerRegistrationAPI.submitProfessionalInfo(formData);
-    return res;
+    const res = await trainerApplicationAPI.submitProfessionalInfo(formData);
+    return { message: res.message, professionalInfo: res.data };
   },
 
   async submitWorkInfo(payload: WorkInfoPayload): Promise<IWorkInfoResponse> {
-    return await trainerRegistrationAPI.submitWorkInfo(payload);
+    const res = await trainerApplicationAPI.submitWorkInfo(payload);
+    return { message: res.message, workInfo: res.data };
   },
 
   async submitIdentityInfo(payload: IdentityInfoPayload): Promise<ITrainerIdentityResponse> {
@@ -84,9 +84,8 @@ export const trainerRegistrationService = {
 
     formData.append('documentType', payload.documentType);
 
-    const front = normalizeFile(payload.frontImage);
-    const back = normalizeFile(payload.backImage);
-
+    const front = payload.frontImage;
+    const back = payload.backImage;
 
     if (front) {
       formData.append('frontImage', front, front.name);
@@ -96,11 +95,12 @@ export const trainerRegistrationService = {
       formData.append('backImage', back, back.name);
     }
 
-    return await trainerRegistrationAPI.submitIdentityInfo(formData);
+    const res = await trainerApplicationAPI.submitIdentityInfo(formData);
+    return { message: res.message, identityInfo: res.data };
   },
 
-  async fetchTrainerFullInfo(): Promise<ITrainerFullInfo> {
-    const { data } = await trainerRegistrationAPI.fetchTrainerFullInfo();
-    return data;
+  async fetchTrainerFullInfo(): Promise<ITrainerFullInfoResponse> {
+    const res = await trainerApplicationAPI.fetchTrainerFullInfo();
+    return { message: res.message, trainerInfo: res.data };
   }
 };

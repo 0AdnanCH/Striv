@@ -4,16 +4,17 @@ import './index.css';
 import App from './App.tsx';
 import { AuthProvider } from './modules/auth/context/AuthContext.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { TrainerProvider } from './modules/trainer/context/TrainerContext.tsx';
+import { Provider } from 'react-redux';
+import { store } from './app/store.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <AuthProvider>
-        <TrainerProvider>
+    <Provider store={store}>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <AuthProvider>
           <App />
-        </TrainerProvider>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+        </AuthProvider>
+      </GoogleOAuthProvider>
+    </Provider>
   </StrictMode>
 );

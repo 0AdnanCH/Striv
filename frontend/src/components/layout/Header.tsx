@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex items-center gap-4">
           {/* Trainer Registration Button */}
           <button
-            onClick={() => navigate('/trainer/register')}
+            onClick={() => navigate('/trainer/application')}
             className="px-4 py-2 rounded-lg font-medium border border-white text-white hover:bg-white hover:text-striv-primary transition-all duration-200"
           >
             Become a Trainer

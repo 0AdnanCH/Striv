@@ -46,3 +46,13 @@ export enum DocumentType {
   DRIVING_LICENSE = 'driving_license',
   PAN_CARD = 'pan_card'
 }
+
+export enum TrainerApplicationStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED', // User completed all steps
+  UNDER_REVIEW = 'UNDER_REVIEW', // Admin reviewing
+  APPROVED = 'APPROVED', // Trainer is approved
+  REJECTED = 'REJECTED', // Admin rejected
+  REVISION_REQUIRED = 'REVISION_REQUIRED' // Admin wants corrections
+}

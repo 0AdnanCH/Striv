@@ -75,7 +75,7 @@ export class TrainerApplicationController implements ITrainerApplicationControll
       };
 
       const frontImage = files?.frontImage?.[0] as UploadedFile;
-      const backImage = files?.backIMage?.[0] as UploadedFile;
+      const backImage = files?.backImage?.[0] as UploadedFile;
 
       const { message, data } = await this._trainerApplicationService.submitIdentityInfo(userId, req.body, frontImage, backImage);
 

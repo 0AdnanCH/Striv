@@ -14,20 +14,14 @@ function getFileFromValue(val: any): File | null {
   return null;
 }
 
-const fileOrUrl = z.union([
-  z.instanceof(File).optional(),
-  z.url().optional(),
-  z.any().optional() 
-]);
-
 
 export const identityInfoSchema = z
   .object({
     documentType: z.enum(DocumentType, 'Please select a valid document type'),
 
-    frontImage: fileOrUrl,
+    frontImage: z.any(),
 
-    backImage: fileOrUrl,
+    backImage: z.any().optional(),
   })
   .superRefine((obj, ctx) => {
     // ensure frontImage exists and is a real file

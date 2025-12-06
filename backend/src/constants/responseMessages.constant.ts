@@ -51,5 +51,9 @@ export const RESPONSE_MESSAGES = {
   NOTHING_TO_UPDATE: 'Nothing to update.',
   INVALID_IMAGE_TYPE: 'Invalid file type. Only JPG, JPEG, PNG, and WebP are allowed.',
   IMAGE_TOO_LARGE: 'Photo must be under 2MB.',
-  INVALID_REQ_DATA: 'Invalid request data',
+  INVALID_REQ_DATA: 'Invalid request data.',
+  PROFESSIONAL_INFO_ALREADY_SUBMITTED: 'Professional information has already been submitted.',
+  WORK_INFO_ALREADY_SUBMITTED: 'Work information has already been submitted.',
+  TRAINER_PROFILE_NOT_INITIALIZED: 'Trainer profile is not initialized. Please complete previous steps first.',
+  IDENTITY_INFO_ALREADY_SUBMITTED: 'Identity information has already been submitted.',
 } as const;

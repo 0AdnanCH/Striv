@@ -1,4 +1,5 @@
 import type { GenderType } from "../../../constants/gender.constant";
+import type { TrainerApplicationStatusType } from "../constants/trainerApplicationStatus.constant";
 import type { DocumentTypeType } from "../constants/trainerDocType.constant";
 import type { WeekDayType } from "../constants/weekDay.constant";
 
@@ -8,7 +9,7 @@ export interface PersonalInfoPayload {
   gender: GenderType;
   age: number;
   phone: string;
-  profile_photo: File;
+  profile_photo?: File | null;
 }
 
 export interface ProfessionalInfoPayload {
@@ -36,7 +37,7 @@ export interface WorkInfoPayload {
 export interface IdentityInfoPayload {
   documentType: DocumentTypeType;
   frontImage: File;
-  backImage?: File;
+  backImage?: File | null;
 }
 
 
@@ -102,36 +103,63 @@ export interface ITrainerIdentityInfo {
 
 export interface IPersonalInfoResponse {
   message: string;
-  data: IPersonalInfo & IRegistrationStep;
+  personalInfo: IPersonalInfo;
+}
+
+export interface IPersonalInfoApiResponse {
+  message: string;
+  data: IPersonalInfo;
 }
 
 export interface IProfessionalInfoResponse {
   message: string;
-  data: IProfessionalInfo & IRegistrationStep;
+  professionalInfo: IProfessionalInfo;
+}
+
+export interface IProfessionalInfoApiResponse {
+  message: string;
+  data: IProfessionalInfo;
 }
 
 export interface IWorkInfoResponse {
   message: string;
-  data: IWorkInfo & IRegistrationStep;
+  workInfo: IWorkInfo;
 }
 
-export interface IRegistrationStep {
-  registrationStep: number;
+export interface IWorkInfoApiResponse {
+  message: string;
+  data: IWorkInfo;
+}
+
+export interface IApplicationStep {
+  applicationStep: number;
 }
 
 export interface ITrainerIdentityResponse {
   message: string;
+  identityInfo: ITrainerIdentityInfo;
+}
+
+export interface ITrainerIdentityApiResponse {
+  message: string;
   data: ITrainerIdentityInfo;
 }
 
-export interface ITrainer extends IPersonalInfo, IProfessionalInfo, IWorkInfo, IRegistrationStep {}
-
 export interface ITrainerFullInfo {
-  trainer: ITrainer | null;
-  kyc: ITrainerIdentityInfo | null;
+  personalInfo: IPersonalInfo | null;
+  professionalInfo: IProfessionalInfo | null;
+  workInfo: IWorkInfo | null;
+  identityInfo: ITrainerIdentityInfo | null;
+  applicationStep: number;
+  applicationStatus: TrainerApplicationStatusType
 }
 
 export interface ITrainerFullInfoResponse {
+  message: string;
+  trainerInfo: ITrainerFullInfo;
+}
+
+export interface ITrainerFullInfoApiResponse {
   message: string;
   data: ITrainerFullInfo;
 }

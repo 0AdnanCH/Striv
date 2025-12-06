@@ -1,142 +1,99 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { identityInfoSchema, type IdentityInfoType } from '../../schemas/identityInfo.schema';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../../../components/ui/select';
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from '../../../../components/ui/select';
 import { Input } from '../../../../components/ui/input';
 import { Button } from '../../../../components/ui/button';
 import { Label } from '@radix-ui/react-label';
-import { useTrainer } from '../../hooks/useTrainer';
 import { DocumentType } from '../../constants/trainerDocType.constant';
+import type { IdentityInfoPayload, ITrainerIdentityInfo } from '../../types/trainerApplication.types';
 
 interface Props {
   loading: boolean;
-  onNext: (data: IdentityInfoType) => void;
-  onPrev: () => void;
+  onNext: (data: IdentityInfoPayload) => void;
+  defaultValues?: ITrainerIdentityInfo | null
 }
 
 const ACCEPTED_EXT = '.jpg, .jpeg, .png, .webp';
 
-const defaultValues: IdentityInfoType = {
+const defaultValues = {
   documentType: DocumentType.AADHAAR,
   frontImage: undefined as any,
   backImage: undefined as any
 };
 
-const IdentityInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
-  const { kyc } = useTrainer();
-
-  // used to avoid running the "initial reset" more than once
-  const initializedRef = useRef(false);
-
+const IdentityInfoForm: React.FC<Props> = ({ loading, onNext }) => {
   const {
     handleSubmit,
     setValue,
     watch,
     control,
-    reset,
     formState: { errors }
   } = useForm<IdentityInfoType>({
     resolver: zodResolver(identityInfoSchema),
     mode: 'onBlur',
-    defaultValues
+    defaultValues: defaultValues
   });
 
   // Keep preview URLs separate from form values
-  const [frontPreview, setFrontPreview] = useState<string | null>(kyc?.frontImage ?? null);
-  const [backPreview, setBackPreview] = useState<string | null>(kyc?.backImage ?? null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
+  const [backPreview, setBackPreview] = useState<string | null>(null);
 
   // derive docType from form state (controlled)
   const docType = watch('documentType');
-
-  // Utility: extract a File from a possible File | FileList | undefined
-  const extractFile = (v: any): File | null => {
-    if (!v) return null;
-    if (v instanceof File) return v;
-    if (typeof FileList !== 'undefined' && v instanceof FileList) return v.length > 0 ? v[0] : null;
-    if (Array.isArray(v) && v.length > 0 && v[0] instanceof File) return v[0];
-    return null;
-  };
-
-  // INITIALIZATION: only run reset when KYC arrives the first time (or changes from null to a value)
-  useEffect(() => {
-    if (!kyc) return;
-
-    // If we've already initialized the form from KYC, don't reset again (prevents overwriting user changes)
-    if (initializedRef.current) {
-      // still sync previews if they changed on backend (but don't reset form fields)
-      if (kyc.frontImage) setFrontPreview(kyc.frontImage);
-      if (kyc.backImage) setBackPreview(kyc.backImage ?? null);
-      return;
-    }
-
-    // Reset only once using KYC values as initial defaults
-    reset({
-      documentType: (kyc.documentType as IdentityInfoType['documentType']) ?? DocumentType.AADHAAR,
-      // file inputs must be undefined (we display preview separately)
-      frontImage: (kyc.frontImage as string) || undefined,
-      backImage: (kyc.backImage as string) || undefined
-    });
-    console.log(docType)
-
-    setFrontPreview(kyc.frontImage ?? null);
-    setBackPreview(kyc.backImage ?? null);
-
-    initializedRef.current = true;
-  }, [kyc, reset]);
+  const frontFile = watch('frontImage');
+  const backFile = watch('backImage');
 
   // When user selects a file for frontImage, show the object URL preview immediately
   useEffect(() => {
-    const file = extractFile(watch('frontImage'));
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setFrontPreview(url);
-      return () => URL.revokeObjectURL(url);
-    }
-
-    // if no file selected and KYC has a stored URL, show that; otherwise clear
-    if (kyc?.frontImage) {
-      setFrontPreview(kyc.frontImage);
+    if (!frontFile) {
+      setFrontPreview(null);
       return;
     }
+    const url = URL.createObjectURL(frontFile);
+    setFrontPreview(url);
 
-    setFrontPreview(null);
-  }, [watch('frontImage'), kyc]);
+    return () => URL.revokeObjectURL(url);
+  }, [frontFile]);
 
   // Same for backImage
   useEffect(() => {
-    const file = extractFile(watch('backImage'));
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setBackPreview(url);
-      return () => URL.revokeObjectURL(url);
-    }
-
-    if (kyc?.backImage) {
-      setBackPreview(kyc.backImage);
+    if (!backFile) {
+      setBackPreview(null);
       return;
     }
 
-    setBackPreview(null);
-  }, [watch('backImage'), kyc]);
+    const url = URL.createObjectURL(backFile);
+    setBackPreview(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [backFile]);
 
   // If user chooses PAN, automatically clear backImage input and preview (form-level)
   useEffect(() => {
     if (docType === DocumentType.PAN_CARD) {
-      setValue('backImage', undefined, { shouldValidate: true, shouldDirty: true });
+      setValue('backImage', null, { shouldValidate: true, shouldDirty: true });
       setBackPreview(null);
     }
   }, [docType, setValue]);
 
   const setFileField = (field: 'frontImage' | 'backImage', files: FileList | null) => {
-    if (!files || files.length === 0) {
-      setValue(field, undefined, { shouldValidate: true, shouldDirty: true });
+    const file = files && files.length > 0 ? files[0] : null;
+    if (!file) {
+      setValue(field, null, { shouldValidate: true, shouldDirty: true });
       return;
     }
     // store FileList in form; validation helper will pick it up
-    setValue(field, files, { shouldValidate: true, shouldDirty: true });
+    setValue(field, file, { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -149,7 +106,7 @@ const IdentityInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
             control={control}
             name="documentType"
             render={({ field }) => (
-              <Select key={field.value} value={field.value} onValueChange={(v) => field.onChange(v)}>
+              <Select value={field.value} onValueChange={(v) => field.onChange(v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select document type" />
                 </SelectTrigger>
@@ -192,11 +149,7 @@ const IdentityInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
           </div>
         )}
 
-        <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={onPrev}>
-            Previous
-          </Button>
-
+        <div className="flex justify-end pt-4">
           <Button type="submit" disabled={loading}>
             Submit
           </Button>

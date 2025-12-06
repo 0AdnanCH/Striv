@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { professionalInfoSchema, type ProfessionalInfoType } from '../../schemas/professionalInfo.schema';
@@ -8,14 +8,14 @@ import { Input } from '../../../../components/ui/input';
 import { Button } from '../../../../components/ui/button';
 import { Label } from '@radix-ui/react-label';
 import { cn } from '../../../../utils/cn.util';
-import { useTrainer } from '../../hooks/useTrainer';
+import type { IProfessionalInfo } from '../../types/trainerApplication.types';
 
 const ACCEPTED_CERT_IMAGE_EXT = '.jpg, .jpeg, .png, .webp';
 
 interface Props {
   loading: boolean;
-  onNext?: (data: ProfessionalInfoType) => void;
-  onPrev?: () => void;
+  onNext: (data: ProfessionalInfoType) => void;
+  defaultValues?: IProfessionalInfo | null;
 }
 
 const defaultValues: ProfessionalInfoType = {
@@ -35,52 +35,18 @@ const defaultValues: ProfessionalInfoType = {
   }
 };
 
-const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
-  const { trainer } = useTrainer();
-  
+const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext }) => {
   const {
     register,
     control,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors }
   } = useForm<ProfessionalInfoType>({
     resolver: zodResolver(professionalInfoSchema),
     mode: 'onBlur',
-    defaultValues
+    defaultValues: defaultValues
   });
-
-  // useEffect(() => {
-  //   if (!trainer) return;
-
-  //   const mappedValues: ProfessionalInfoType = {
-  //     specialization: trainer.specialization || [],
-  //     additionalSkills: trainer.additionalSkills || [],
-  //     yearsOfExperience: trainer.yearsOfExperience ?? 0,
-
-  //     certificates:
-  //       trainer.certificates?.map((c) => ({
-  //         title: c.title,
-  //         issuer: c.issuer,
-  //         issuedDate: c.issuedDate ? new Date(c.issuedDate).toISOString().slice(0, 10) : null,
-  //         certificateImage: undefined,
-  //       })) || [],
-
-  //     portfolio: {
-  //       bio: trainer.portfolio?.bio || '',
-  //       achievements: trainer.portfolio?.achievements || [],
-  //       socialLinks: {
-  //         website: trainer.portfolio?.socialLinks?.website || null,
-  //         instagram: trainer.portfolio?.socialLinks?.instagram || null,
-  //         youtube: trainer.portfolio?.socialLinks?.youtube || null,
-  //         linkedin: trainer.portfolio?.socialLinks?.linkedin || null
-  //       }
-  //     }
-  //   };
-
-  //   reset(mappedValues);
-  // }, [trainer, reset]);
 
   const specArray = useFieldArray({ control, name: 'specialization' as any });
   const skillsArray = useFieldArray({ control, name: 'additionalSkills' as any });
@@ -114,21 +80,20 @@ const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
   const onSubmit = async (raw: ProfessionalInfoType) => {
     const payload: ProfessionalInfoType = {
       ...raw,
-      certificates: raw.certificates?.map((c: any) => {
-        const issuedDate = typeof c.issuedDate === 'string' && c.issuedDate ? new Date(c.issuedDate).toISOString() : null;
-
-        return {
-          ...c,
-          issuedDate
-        };
-      }),
+      certificates: raw.certificates?.map((c: any) => ({
+        ...c,
+        issuedDate: 
+          typeof c.issuedDate === 'string' && c.issuedDate 
+            ? new Date(c.issuedDate).toISOString() 
+            : null,
+      })),
       portfolio: {
         ...raw.portfolio,
         socialLinks: normalizeSocialLinks(raw.portfolio?.socialLinks)
       }
     };
 
-    onNext?.(payload);
+    onNext(payload);
   };
 
   return (
@@ -387,10 +352,7 @@ const ProfessionalInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Button variant="outline" type="button" onClick={onPrev}>
-            Previous
-          </Button>
+        <div className="flex justify-end pt-4">
           <Button type="submit" disabled={loading}>
             Next
           </Button>

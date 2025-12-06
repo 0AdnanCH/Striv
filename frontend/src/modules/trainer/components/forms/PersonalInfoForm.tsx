@@ -1,32 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { personalInfoSchema, type PersonalInfoType } from '../../schemas/personalInfo.schema'; 
 import { Input } from '../../../../components/ui/input';
 import { Button } from '../../../../components/ui/button';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/select';
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem, 
+  SelectLabel,
+  SelectGroup
+} from '../../../../components/ui/select';
 import { Label } from '@radix-ui/react-label';
-import { SelectGroup } from '@radix-ui/react-select';
-import { useTrainer } from '../../hooks/useTrainer';
 import { Gender } from '../../../../constants/gender.constant';
+import type { IPersonalInfo, PersonalInfoPayload } from '../../types/trainerApplication.types';
 
 interface Props {
   loading: boolean;
-  onNext?: (data: PersonalInfoType) => void;
+  onNext: (data: PersonalInfoPayload) => void;
+  defaultValues?: IPersonalInfo | null;
 }
 
-const defaultValues: PersonalInfoType = {
+const baseDefaults: PersonalInfoType = {
   first_name: '',
   last_name: '',
   gender: Gender.MALE,
   age: undefined as any,
   phone: '',
   profile_photo: undefined as any,
-  existingProfilePhotoUrl: null,
+  existingProfilePhotoUrl: null
 };
 
-const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
-  const { trainer } = useTrainer();
+const PersonalInfoForm: React.FC<Props> = ({ onNext, loading, defaultValues }) => {
+  const mergedDefaults = useMemo<PersonalInfoType>(() => {
+    return {
+      ...baseDefaults,
+      ...defaultValues,
+      age: defaultValues?.age as undefined as any,
+      profile_photo: null,
+      existingProfilePhotoUrl: defaultValues?.profile_photo ?? null
+    };
+  }, [defaultValues]);
 
   const {
     register,
@@ -34,37 +50,24 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
     control,
     setValue,
     watch,
-    reset,
     formState: { errors }
   } = useForm<PersonalInfoType>({
     resolver: zodResolver(personalInfoSchema),
     mode: 'onTouched',
-    defaultValues
+    defaultValues: mergedDefaults
   });
 
-  useEffect(() => {
-    if (!trainer) return;
-
-    reset({
-      first_name: trainer.first_name || '',
-      last_name: trainer.last_name || '',
-      gender: trainer.gender || Gender.MALE,
-      age: trainer.age || undefined,
-      phone: trainer.phone || '',
-      profile_photo: undefined,
-      existingProfilePhotoUrl: trainer.profile_photo || null,
-    });
-
-    setPreviewUrl(trainer.profile_photo || null);
-  }, [trainer, reset]);
-
-
   const watchedPhoto = watch('profile_photo');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(trainer?.profile_photo || null);
+  const watchedExistingUrl = watch('existingProfilePhotoUrl');
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
 
   useEffect(() => {
-    if (!watchedPhoto) return;
+    if (!watchedPhoto) {
+      setPreviewUrl(null);
+      return;
+    };
     let file: File | null = null;
     if (watchedPhoto instanceof File) file = watchedPhoto;
     else if ((watchedPhoto as FileList)?.length) file = (watchedPhoto as FileList)[0];
@@ -82,10 +85,10 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
 
   const onSubmit = async (data: PersonalInfoType) => {
     const payload: PersonalInfoType = { ...data };
-    if ((payload.profile_photo as FileList)?.length) 
-      payload.profile_photo = (data.profile_photo as FileList)[0];
-   
-    onNext?.(payload);
+    if ((payload.profile_photo as unknown as FileList)?.length) 
+      payload.profile_photo = (data.profile_photo as unknown as FileList)[0];
+    console.log('submiting...')
+    onNext(payload);
   };
 
   return (
@@ -97,7 +100,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
             <Label htmlFor="first_name" className="mb-2 block">
               First name
             </Label>
-            <Input id="first_name" type="text" placeholder="First name" {...register('first_name')} />
+            <Input id="first_name" placeholder="First name" {...register('first_name')} />
             {errors.first_name && <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>}
           </div>
 
@@ -105,7 +108,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
             <Label htmlFor="last_name" className="mb-2 block">
               Last name
             </Label>
-            <Input id="last_name" type="text" placeholder="Last name" {...register('last_name')} />
+            <Input id="last_name" placeholder="Last name" {...register('last_name')} />
             {errors.last_name && <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>}
           </div>
         </div>
@@ -119,7 +122,7 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
               control={control}
               name="gender"
               render={({ field }) => (
-                <Select key={field.value} onValueChange={(val) => field.onChange(val)} value={field.value}>
+                <Select onValueChange={(val) => field.onChange(val)} value={field.value}>
                   <SelectTrigger id="gender">
                     <SelectValue>{field.value}</SelectValue>
                   </SelectTrigger>
@@ -195,14 +198,19 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading }) => {
               <img src={previewUrl} alt="preview" className="h-24 w-24 rounded-full object-cover border" />
             </div>
           )}
+
+          {/* Existing photo preview (when no new file chosen) */}
+          {!previewUrl && watchedExistingUrl && (
+            <div className="mt-2">
+              <img src={watchedExistingUrl} className="h-24 w-24 rounded-full object-cover border" />
+            </div>
+          )}
+
           {errors.profile_photo && typeof errors.profile_photo.message === 'string' && <p className="mt-1 text-sm text-red-600">{errors.profile_photo.message}</p>}
         </div>
 
         {/* Buttons */}
         <div className="flex items-center justify-end gap-3 pt-4">
-          <Button variant="outline" type="button" onClick={() => console.log('Previous (none)')}>
-            Previous
-          </Button>
           <Button type="submit" disabled={loading}>
             Next
           </Button>

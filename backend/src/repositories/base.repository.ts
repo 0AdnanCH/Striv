@@ -1,4 +1,4 @@
-import { Document, FilterQuery, Model, QueryOptions, Types, UpdateQuery } from "mongoose";
+import { Document, FilterQuery, Model, ObjectId, QueryOptions, UpdateQuery } from "mongoose";
 import { IBaseRepository } from "./interface/IBase.repository";
 
 export abstract class BaseRepository<T extends Document> implements IBaseRepository<T> {
@@ -12,7 +12,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
     return await this.model.find();
   }
 
-  async findById(id: Types.ObjectId | string): Promise<T | null> {
+  async findById(id: ObjectId | string): Promise<T | null> {
     return await this.model.findById(id);
   }
 
@@ -20,7 +20,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
     return await this.model.findOne(filter);
   }
 
-  async findByIdAndUpdate(id: string | Types.ObjectId, update: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T | null> {
+  async findByIdAndUpdate(id: string | ObjectId, update: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T | null> {
     return await this.model.findByIdAndUpdate(id, update, options);
   }
 
@@ -28,7 +28,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
     return await this.model.findOneAndUpdate(filter, update, options);
   }
 
-  async delete(id: Types.ObjectId): Promise<void> {
+  async delete(id: ObjectId): Promise<void> {
     await this.model.findByIdAndDelete(id);
   }
 }

@@ -2,13 +2,13 @@ import { TrainerIdentityInfoRequestDto, TrainerPersonalInfoRequestDto, TrainerPr
 import { IUserRepository } from "../../repositories/interface/IUser.repository";
 import { ITrainerApplicationService } from "../interface/ITrainerApplication.service";
 import { FileService } from "./file.service";
-import { DocumentType, Gender, UserRole } from "../../constants/enums.constant";
+import { Gender, Status, TrainerApplicationStatus } from "../../constants/enums.constant";
 import BadRequestError from "../../errors/badRequest.error";
 import { HTTP_STATUS } from "../../constants/httpStatus.constant";
 import { RESPONSE_MESSAGES } from "../../constants/responseMessages.constant";
 import { IUser } from "../../types/user.type";
 import { ITrainerRepository } from "../../repositories/interface/ITrainer.repository";
-import { ITrainer, ITrainerKyc, ITrainerIdentityInfo, UploadedFile, ITrainerPersonalInfo, ITrainerProfessionalInfo, ITrainerWorkInfo, IRegistrationStep } from "../../types/trainer.type";
+import { ITrainer, ITrainerKyc, ITrainerIdentityInfo, UploadedFile, ITrainerPersonalInfo, ITrainerProfessionalInfo, ITrainerWorkInfo, IApplicationStep } from "../../types/trainer.type";
 import { ITrainerKycRepository } from "../../repositories/interface/ITrainerKyc.repository";
 import { TrainerFullInfoResponseDto, TrainerIdentityInfoResponseDto, TrainerPersonalInfoResponseDto, TrainerProfessionalInfoResponseDto, TrainerWorkInfoResponseDto } from "../../dtos/trainerApplicationResponse.dto";
 
@@ -17,12 +17,27 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     private readonly _userRepository: IUserRepository,
     private readonly _trainerRepository: ITrainerRepository,
     private readonly _trainerKycRepository: ITrainerKycRepository,
-    private readonly _fileRepository: FileService,
+    private readonly _fileRepository: FileService
   ) {}
 
-  async getFullTrainerInfo(
-    userId: string
-  ): Promise<TrainerFullInfoResponseDto> {
+  private async _markApplicationCompleted(userId: string) {
+    await this._trainerRepository.updateByUserId(userId, {
+      applicationStatus: TrainerApplicationStatus.COMPLETED,
+      applicationStep: 4
+    });
+  }
+
+  private _ensureCanSubmitStep(currentStep: number, requiredStep: number, message: string) {
+    if (currentStep > requiredStep) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message,
+        logging: false
+      });
+    }
+  }
+
+  async getFullTrainerInfo(userId: string): Promise<TrainerFullInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -32,20 +47,10 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
     const trainer = await this._trainerRepository.findByUserId(userId);
-    if (!trainer) {
-      return {
-        message: RESPONSE_MESSAGES.TRAINER_INFO_FETCHED_SUCCESS,
-        data: {
-          trainer: null,
-          kyc: null,
-        }
-      }
-    }
-
-    const kyc = await this._trainerKycRepository.findByUserId(userId);
+    const trainerKyc = await this._trainerKycRepository.findByUserId(userId);
 
     const personalInfo: ITrainerPersonalInfo = {
-      first_name: user.first_name  || '',
+      first_name: user.first_name || '',
       last_name: user.last_name || '',
       gender: user.gender || Gender.MALE,
       age: user.age ?? null,
@@ -53,57 +58,70 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       profile_photo: user.profile_photo || ''
     };
 
-    const proAndWorkInfo: ITrainerProfessionalInfo & ITrainerWorkInfo & IRegistrationStep = {
-      specialization: trainer.specialization,
-      additionalSkills: trainer.additionalSkills,
-      yearsOfExperience: trainer.yearsOfExperience,
+    if (!trainer) {
+      return {
+        message: RESPONSE_MESSAGES.TRAINER_INFO_FETCHED_SUCCESS,
+        data: {
+          personalInfo,
+          professionalInfo: null,
+          workInfo: null,
+          identityInfo: null,
+          applicationStep: 1,
+          applicationStatus: TrainerApplicationStatus.NOT_STARTED
+        }
+      };
+    }
 
+    const professionalInfo: ITrainerProfessionalInfo = {
+      specialization: trainer.specialization,
+      yearsOfExperience: trainer.yearsOfExperience,
+      additionalSkills: trainer.additionalSkills || [],
       certificates: (trainer.certificates || []).map((c) => ({
         title: c.title,
         issuer: c.issuer,
         issuedDate: c.issuedDate,
         fileUrl: c.fileUrl
       })),
+      portfolio: trainer.portfolio
+    };
 
-      availability: trainer.availability,
+    const workInfo: ITrainerWorkInfo = {
       pricing: trainer.pricing,
-      portfolio: trainer.portfolio,
-
-      registrationStep: trainer.registrationStep
+      availability: trainer.availability
     };
 
-    const identityInfo: ITrainerIdentityInfo = {
-      documentType: kyc?.documentType || DocumentType.AADHAAR,
-      frontImage: kyc?.frontImageUrl  || '',
-      backImage: kyc?.backImageUrl
-    };
+    const identityInfo: ITrainerIdentityInfo | null = trainerKyc
+      ? {
+          documentType: trainerKyc.documentType,
+          frontImage: trainerKyc.frontImageUrl,
+          backImage: trainerKyc.backImageUrl ?? null
+        }
+      : null;
 
     return {
       message: RESPONSE_MESSAGES.TRAINER_INFO_FETCHED_SUCCESS,
       data: {
-        trainer: {
-          ...personalInfo,
-          ...proAndWorkInfo
-        },
-        kyc: identityInfo
+        personalInfo,
+        professionalInfo,
+        workInfo,
+        identityInfo,
+        applicationStep: trainer.applicationStep,
+        applicationStatus: trainer.applicationStatus
       }
-    }; 
+    };
   }
 
-  async submitPersonalInfo(
-    userId: string, 
-    payload: TrainerPersonalInfoRequestDto,
-    profilePhoto?: UploadedFile
-  ): Promise<TrainerPersonalInfoResponseDto> {
+  async submitPersonalInfo(userId: string, payload: TrainerPersonalInfoRequestDto, profilePhoto?: UploadedFile): Promise<TrainerPersonalInfoResponseDto> {
     const { first_name, last_name, gender, phone } = payload;
     const age = Number(payload.age);
 
     const user = await this._userRepository.findById(userId);
-    if (!user) throw new BadRequestError({
-      statusCode: HTTP_STATUS.NOT_FOUND,
-      message: RESPONSE_MESSAGES.USER_NOT_FOUND,
-      logging: false,
-    });
+    if (!user)
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: RESPONSE_MESSAGES.USER_NOT_FOUND,
+        logging: false
+      });
 
     let finalPhotoUrl = user.profile_photo;
 
@@ -115,7 +133,7 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         message: RESPONSE_MESSAGES.PROFILE_PHOTO_REQUIRED,
-        logging: false,
+        logging: false
       });
     }
 
@@ -149,12 +167,25 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       updatedUser = updated;
     }
 
-    const trainer = await this._trainerRepository.findByUserId(userId);
+    let trainer = await this._trainerRepository.findByUserId(userId);
+
+    if (!trainer) {
+      trainer = await this._trainerRepository.create({
+        userId,
+        specialization: [],
+        yearsOfExperience: 0,
+        portfolio: { bio: '', achievements: [], socialLinks: {} },
+        additionalSkills: [],
+        certificates: []
+      } as unknown as ITrainer);
+    }
+
     const NEXT_STEP = 2;
 
-    if (trainer && trainer.registrationStep < NEXT_STEP) {
+    if (trainer.applicationStep < NEXT_STEP) {
       await this._trainerRepository.updateByUserId(userId, {
-        registrationStep: NEXT_STEP
+        applicationStep: NEXT_STEP,
+        applicationStatus: TrainerApplicationStatus.IN_PROGRESS
       });
     }
 
@@ -166,17 +197,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
         gender: updatedUser.gender || Gender.MALE,
         age: updatedUser.age ?? 0,
         phone: updatedUser.phone || '',
-        profile_photo: updatedUser.profile_photo || '',
-        registrationStep: NEXT_STEP
+        profile_photo: updatedUser.profile_photo || ''
       }
     };
   }
 
-  async submitProfessionalInfo(
-    userId: string,
-    payload: TrainerProfessionalInfoRequestDto,
-    certificateFiles?: UploadedFile[]
-  ): Promise<TrainerProfessionalInfoResponseDto> {
+  async submitProfessionalInfo(userId: string, payload: TrainerProfessionalInfoRequestDto, certificateFiles?: UploadedFile[]): Promise<TrainerProfessionalInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -199,71 +225,45 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       } as unknown as ITrainer);
     }
 
+    const PROFESSIONAL_STEP = 2;
+
+    this._ensureCanSubmitStep(trainer.applicationStep, PROFESSIONAL_STEP, RESPONSE_MESSAGES.PROFESSIONAL_INFO_ALREADY_SUBMITTED);
+
     let uploadedCertificateUrls: string[] = [];
 
     if (certificateFiles && certificateFiles.length > 0) {
-      uploadedCertificateUrls = await this._fileRepository.uploadTrainerCertificates(
-        trainer._id.toString(), 
-        certificateFiles
-      );
+      uploadedCertificateUrls = await this._fileRepository.uploadTrainerCertificates(trainer._id.toString(), certificateFiles);
     }
 
-    const {
+    const { specialization, yearsOfExperience, portfolio, additionalSkills, certificates } = payload;
+
+    const updatedCertificates =
+      certificates?.map((cert, i) => ({
+        ...cert,
+        fileUrl: uploadedCertificateUrls[i] ?? null
+      })) ?? [];
+
+    const updatePayload: ITrainerProfessionalInfo & IApplicationStep = {
       specialization,
-      portfolio,
+      yearsOfExperience: Number(yearsOfExperience),
       additionalSkills,
-      certificates
-    } = payload;
-    const yearsOfExperience = Number(payload.yearsOfExperience);
-
-    const updatePayload: Partial<ITrainer> = {};
-
-    if (specialization && specialization.join(',') !== trainer.specialization.join(',')) {
-      updatePayload.specialization = specialization;
-    }
-
-    if (yearsOfExperience !== trainer.yearsOfExperience) {
-      updatePayload.yearsOfExperience = yearsOfExperience;
-    }
-
-    if (additionalSkills && trainer.additionalSkills && additionalSkills.join(',') !== trainer.additionalSkills.join(',')) {
-      updatePayload.additionalSkills = additionalSkills;
-    }
-
-    if (portfolio) {
-      updatePayload.portfolio = {
-        bio: portfolio.bio ?? '',
+      certificates: updatedCertificates,
+      portfolio: {
+        bio: portfolio.bio,
         achievements: portfolio.achievements ?? [],
         socialLinks: portfolio.socialLinks ?? {}
-      };
-    }
+      },
+      applicationStep: 3
+    };
 
-    if (certificates) {
-      updatePayload.certificates = (certificates || []).map((cert, index) => ({
-        ...cert,
-        fileUrl: uploadedCertificateUrls[index]
-      }));
-    }
+    const updatedTrainer = await this._trainerRepository.findByIdAndUpdate(trainer._id, updatePayload, { new: true });
 
-    const NEXT_STEP = 3;
-    if(trainer.registrationStep < NEXT_STEP) {
-      updatePayload.registrationStep = NEXT_STEP;
-    }
-      
-    let updatedTrainer = trainer;
-
-    if (Object.keys(updatePayload).length > 0) {
-      const updated = await this._trainerRepository.findByIdAndUpdate(trainer._id.toString(), updatePayload, { new: true });
-
-      if (!updated) {
-        throw new BadRequestError({
-          statusCode: 404,
-          message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
-          logging: false
-        });
-      }
-
-      updatedTrainer = updated;
+    if (!updatedTrainer) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
+        logging: false
+      });
     }
 
     return {
@@ -273,16 +273,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
         yearsOfExperience: updatedTrainer.yearsOfExperience,
         additionalSkills: updatedTrainer.additionalSkills,
         certificates: updatedTrainer.certificates,
-        portfolio: updatedTrainer.portfolio,
-        registrationStep: updatedTrainer.registrationStep
+        portfolio: updatedTrainer.portfolio
       }
     };
   }
 
-  async submitWorkInfo(
-    userId: string, 
-    payload: TrainerWorkInfoRequestDto
-  ): Promise<TrainerWorkInfoResponseDto> {
+  async submitWorkInfo(userId: string, payload: TrainerWorkInfoRequestDto): Promise<TrainerWorkInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -295,81 +291,49 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     let trainer = await this._trainerRepository.findByUserId(userId);
 
     if (!trainer) {
-      trainer = await this._trainerRepository.create({
-        userId,
-        specialization: [],
-        yearsOfExperience: 0,
-        additionalSkills: [],
-        certificates: [],
-        pricing: {
-          oneToOne: 0,
-          groupSession: 0
-        },
-        availability: [],
-        portfolio: {
-          bio: '',
-          achievements: [],
-          socialLinks: {}
-        }
-      } as unknown as ITrainer);
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.TRAINER_PROFILE_NOT_INITIALIZED,
+        logging: false
+      });
     }
 
-    const { oneToOnePrice, groupSessionPrice , availability } = payload;
+    const WORK_INFO_STEP = 3;
 
-    const updatePayload: Partial<ITrainer> = {};
+    this._ensureCanSubmitStep(trainer.applicationStep, WORK_INFO_STEP, RESPONSE_MESSAGES.WORK_INFO_ALREADY_SUBMITTED);
 
-    const pricingChanged = oneToOnePrice !== trainer.pricing.oneToOne || groupSessionPrice !== trainer.pricing.groupSession;
+    const { oneToOnePrice, groupSessionPrice, availability } = payload;
 
-    if (pricingChanged) {
-      updatePayload.pricing = {
+    const updatePayload: ITrainerWorkInfo & IApplicationStep = {
+      pricing: {
         oneToOne: oneToOnePrice,
-        groupSession: groupSessionPrice,
-      };
-    }
+        groupSession: groupSessionPrice
+      },
+      availability: availability,
 
-    const availabilityChanged = JSON.stringify(availability) !== JSON.stringify(trainer.availability);
+      applicationStep: 4
+    };
 
-    if (availabilityChanged) {
-      updatePayload.availability = availability;
-    }
-    
-    const NEXT_STEP = 4;
-    if (trainer.registrationStep < NEXT_STEP) {
-      updatePayload.registrationStep = NEXT_STEP;
-    }
+    const updatedTrainer = await this._trainerRepository.findByIdAndUpdate(trainer._id.toString(), updatePayload, { new: true });
 
-    let updatedTrainer = trainer;
-
-    if (Object.keys(updatePayload).length > 0) {
-      const updated = await this._trainerRepository.findByIdAndUpdate(trainer._id.toString(), updatePayload, { new: true });
-
-      if (!updated) {
-        throw new BadRequestError({
-          statusCode: 404,
-          message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
-          logging: false,
-        });
-      }
-
-      updatedTrainer = updated;
+    if (!updatedTrainer) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: RESPONSE_MESSAGES.TRAINER_NOT_FOUND_AFTER_UPDATE,
+        logging: false
+      });
     }
 
     return {
       message: RESPONSE_MESSAGES.TRAINER_WORK_INFO_SUBMITTED,
       data: {
         pricing: updatedTrainer.pricing,
-        availability: updatedTrainer.availability,
-        registrationStep: updatedTrainer.registrationStep
+        availability: updatedTrainer.availability
       }
     };
   }
 
-  async submitIdentityInfo(
-    userId: string, 
-    payload: TrainerIdentityInfoRequestDto,
-    frontImage?: UploadedFile,
-    backImage?: UploadedFile
-  ): Promise<TrainerIdentityInfoResponseDto> {
+  async submitIdentityInfo(userId: string, payload: TrainerIdentityInfoRequestDto, frontImage?: UploadedFile, backImage?: UploadedFile): Promise<TrainerIdentityInfoResponseDto> {
     const user = await this._userRepository.findById(userId);
     if (!user) {
       throw new BadRequestError({
@@ -379,54 +343,78 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
 
+    const trainer = await this._trainerRepository.findByUserId(userId);
+
+    if (!trainer) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.TRAINER_PROFILE_NOT_INITIALIZED,
+        logging: false
+      });
+    }
+
+    // -----------------------------------------
+    // 3️⃣ Onboarding Status Guard
+    // Identity can be submitted ONLY when applicationStatus === IN_PROGRESS
+    //
+    // After submission -> status = COMPLETED
+    // After admin review -> status = UNDER_REVIEW | APPROVED | REJECTED
+    //
+    // So checking "IN_PROGRESS" is better than checking COMPLETED.
+    // -----------------------------------------
+    if (trainer.applicationStatus !== TrainerApplicationStatus.IN_PROGRESS) {
+      throw new BadRequestError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        message: RESPONSE_MESSAGES.IDENTITY_INFO_ALREADY_SUBMITTED,
+        logging: false
+      });
+    }
+
     const { documentType } = payload;
 
-    let kycRecord = await this._trainerKycRepository.findByUserId(userId);
-
-    let finalFrontUrl = kycRecord?.frontImageUrl ?? null;
-    let finalBackUrl = kycRecord?.backImageUrl ?? null;
-
-    if(frontImage) {
-      finalFrontUrl = await this._fileRepository.uploadTrainerDocument(userId, frontImage);
-    }
-
-    
-    if (backImage) {
-      finalBackUrl = await this._fileRepository.uploadTrainerDocument(userId, backImage);
-    }
-
-    if (!finalFrontUrl) {
+    if (!frontImage) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         message: RESPONSE_MESSAGES.FRONT_IMAGE_REQUIRED,
-        logging: false,
+        logging: false
       });
     }
 
-    if (documentType !== 'pan_card' && !finalBackUrl) {
+    if (documentType !== 'pan_card' && !backImage) {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         message: RESPONSE_MESSAGES.BACK_IMAGE_REQUIRED_FOR_SELECTED_DOC,
-        logging: false,
+        logging: false
       });
     }
 
-    let newKycRecord;
+    const frontUrl = await this._fileRepository.uploadTrainerDocument(userId, frontImage);
+
+    let backUrl: string | null = null;
+    if (backImage) {
+      backUrl = await this._fileRepository.uploadTrainerDocument(userId, backImage);
+    }
+
+
+    const kycRecord = await this._trainerKycRepository.findByUserId(userId);
+
+    let newKycRecord: ITrainerKyc | null;
 
     if (!kycRecord) {
       newKycRecord = await this._trainerKycRepository.create({
         userId,
         documentType,
-        frontImageUrl: finalFrontUrl,
-        backImageUrl: finalBackUrl || null,
-        status: 'pending'
+        frontImageUrl: frontUrl,
+        backImageUrl: backUrl,
+        status: Status.PENDING,
+        rejectionReason: null
       } as unknown as ITrainerKyc);
     } else {
       newKycRecord = await this._trainerKycRepository.updateByUserId(userId, {
         documentType,
-        frontImageUrl: finalFrontUrl,
-        backImageUrl: finalBackUrl || null,
-        status: 'pending',
+        frontImageUrl: frontUrl,
+        backImageUrl: backUrl,
+        status: Status.PENDING,
         rejectionReason: null
       });
     }
@@ -439,12 +427,14 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       });
     }
 
+    await this._markApplicationCompleted(userId);
+
     return {
       message: RESPONSE_MESSAGES.TRAINER_IDENTITY_VERIFICATION_SUBMITTED,
       data: {
         documentType: newKycRecord.documentType,
         frontImage: newKycRecord.frontImageUrl,
-        backImage: newKycRecord?.backImageUrl,
+        backImage: newKycRecord?.backImageUrl
       }
     };
   }

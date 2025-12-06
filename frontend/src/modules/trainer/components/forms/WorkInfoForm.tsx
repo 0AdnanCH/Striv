@@ -9,13 +9,13 @@ import { Button } from '../../../../components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectLabel } from '../../../../components/ui/select';
 import { Label } from '@radix-ui/react-label';
 import { SelectGroup } from '@radix-ui/react-select';
-import { useTrainer } from '../../hooks/useTrainer';
 import { WeekDay } from '../../constants/weekDay.constant';
+import type { IWorkInfo } from '../../types/trainerApplication.types';
 
 interface Props {
   loading: boolean;
   onNext: (data: WorkInfoType) => void;
-  onPrev: () => void;
+  defaultValues?: IWorkInfo | null
 }
 
 const defaultValues: WorkInfoType = {
@@ -24,41 +24,20 @@ const defaultValues: WorkInfoType = {
   availability: []
 };
 
-const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
-  const { trainer } = useTrainer();
-
+const WorkInfoForm: React.FC<Props> = ({ loading, onNext }) => {
   const {
     control,
     handleSubmit,
-    reset,
     formState: { errors }
   } = useForm<WorkInfoType>({
     resolver: zodResolver(workInfoSchema),
     mode: 'onBlur',
-    defaultValues
+    defaultValues: defaultValues,
   });
-
-  // useEffect(() => {
-  //   if(!trainer) return;
-
-  //   const mappedValues: WorkInfoType = {
-  //     oneToOnePrice: trainer?.pricing?.oneToOne ?? (undefined as any),
-  //     groupSessionPrice: trainer?.pricing?.groupSession ?? (undefined as any),
-  //     availability: trainer?.availability?.length
-  //       ? trainer.availability.map((slot) => ({
-  //           day: slot.day,
-  //           startTime: slot.startTime,
-  //           endTime: slot.endTime
-  //         }))
-  //       : []
-  //   };
-
-  //   reset(mappedValues);
-  // }, [trainer, reset])
 
   const availabilityArray = useFieldArray({
     control,
-    name: 'availability' as any
+    name: 'availability',
   });
 
   const addSlot = () =>
@@ -66,7 +45,7 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
       day: WeekDay.MONDAY,
       startTime: '09:00',
       endTime: '10:00'
-    } as any);
+    });
 
   const removeSlot = (index: number) => {
     availabilityArray.remove(index);
@@ -232,10 +211,7 @@ const WorkInfoForm: React.FC<Props> = ({ loading, onNext, onPrev }) => {
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Button variant="outline" type="button" onClick={onPrev}>
-            Previous
-          </Button>
+        <div className="flex justify-end pt-4">
           <Button type="submit" disabled={loading}>
             Next
           </Button>

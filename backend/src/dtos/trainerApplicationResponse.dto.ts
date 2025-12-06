@@ -1,18 +1,19 @@
-import { IRegistrationStep, ITrainerIdentityInfo, ITrainerPersonalInfo, ITrainerProfessionalInfo, ITrainerWorkInfo } from "../types/trainer.type";
+import { TrainerApplicationStatus } from "../constants/enums.constant";
+import { ITrainerIdentityInfo, ITrainerPersonalInfo, ITrainerProfessionalInfo, ITrainerWorkInfo } from "../types/trainer.type";
 
 export interface TrainerPersonalInfoResponseDto {
   message: string;
-  data: ITrainerPersonalInfo & IRegistrationStep;
+  data: ITrainerPersonalInfo;
 }
 
 export interface TrainerProfessionalInfoResponseDto {
   message: string;
-  data: ITrainerProfessionalInfo & IRegistrationStep;
+  data: ITrainerProfessionalInfo;
 }
 
 export interface TrainerWorkInfoResponseDto {
   message: string;
-  data: ITrainerWorkInfo & IRegistrationStep;
+  data: ITrainerWorkInfo;
 }
 
 export interface TrainerIdentityInfoResponseDto {
@@ -23,7 +24,11 @@ export interface TrainerIdentityInfoResponseDto {
 export interface TrainerFullInfoResponseDto {
   message: string;
   data: {
-    trainer: ITrainerPersonalInfo & ITrainerProfessionalInfo & ITrainerWorkInfo & IRegistrationStep | null;
-    kyc: ITrainerIdentityInfo | null;
+    personalInfo: ITrainerPersonalInfo | null;
+    professionalInfo: ITrainerProfessionalInfo | null;
+    workInfo: ITrainerWorkInfo | null;
+    identityInfo: ITrainerIdentityInfo | null;
+    applicationStep: number;
+    applicationStatus: TrainerApplicationStatus;
   };
 }

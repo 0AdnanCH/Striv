@@ -1,6 +1,6 @@
 import { Schema, model, Document, ObjectId } from 'mongoose';
 import { ITrainer } from '../types/trainer.type';
-import { Status, WeekDay } from '../constants/enums.constant';
+import { TrainerApplicationStatus, WeekDay } from '../constants/enums.constant';
 
 export interface TrainerDocument extends ITrainer, Document<ObjectId> {
   _id: ObjectId;
@@ -52,15 +52,15 @@ const trainerSchema = new Schema<TrainerDocument>(
         linkedin: { type: String, default: null }
       }
     },
-    registrationStep: {
+    applicationStep: {
       type: Number,
       enum: [1, 2, 3, 4],
       default: 1
     },
-    verificationStatus: {
+    applicationStatus: {
       type: String,
-      enum: Status,
-      default: Status.PENDING
+      enum: TrainerApplicationStatus,
+      default: TrainerApplicationStatus.NOT_STARTED
     },
     rejectionReason: { type: String, default: null }
   },
