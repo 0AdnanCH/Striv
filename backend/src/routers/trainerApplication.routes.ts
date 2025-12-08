@@ -14,6 +14,7 @@ import { TrainerKycRepository } from '../repositories/implementation/trainerKyc.
 import { trainerKycSchema } from '../schemas/trainerIdentityInfo.schema';
 import { validateCertificateImages, validateIdentityImages, validateProfilePhoto } from '../middlewares/validateImageFile.middleware';
 import { UserRole } from '../constants/enums.constant';
+import { TrainerApplicationRepository } from '../repositories/implementation/trainerApplication.repository';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -23,7 +24,8 @@ const userRepository = new UserRepository();
 const fileRepository = new FileService();
 const trainerRepository = new TrainerRepository();
 const trainerKycRepository = new TrainerKycRepository();
-const trainerApplicationService = new TrainerApplicationService(userRepository, trainerRepository, trainerKycRepository, fileRepository);
+const trainerApplicationRepository = new TrainerApplicationRepository();
+const trainerApplicationService = new TrainerApplicationService(userRepository, trainerRepository, trainerKycRepository, fileRepository, trainerApplicationRepository);
 const trainerApplicationController = new TrainerApplicationController(trainerApplicationService);
 
 trainerApplicationRouter.get(

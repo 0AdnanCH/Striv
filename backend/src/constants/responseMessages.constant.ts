@@ -56,4 +56,6 @@ export const RESPONSE_MESSAGES = {
   WORK_INFO_ALREADY_SUBMITTED: 'Work information has already been submitted.',
   TRAINER_PROFILE_NOT_INITIALIZED: 'Trainer profile is not initialized. Please complete previous steps first.',
   IDENTITY_INFO_ALREADY_SUBMITTED: 'Identity information has already been submitted.',
+  COMPLETE_PREVIOUS_STEP: 'Please complete previous information first.',
+  APPLICATION_NOT_STARTED: 'Trainer application process has not been started. Please complete personal information first.'
 } as const;

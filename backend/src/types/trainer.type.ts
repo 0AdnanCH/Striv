@@ -36,6 +36,25 @@ export interface ITrainerKyc {
   updatedAt: Date;
 }
 
+export interface ITrainerApplication {
+  trainerId: ObjectId; // Reference to the Trainer Data model
+
+  status: TrainerApplicationStatus;
+  applicationStep: number;
+
+  // Tracking Dates
+  submissionDate?: Date; // When status turned to COMPLETED
+
+  // Admin Review Meta-data
+  reviewerId?: ObjectId; // Reference to AdminUser
+  reviewedAt?: Date;
+  rejectionDetails?: IRejectionDetails;
+
+  // Mongoose Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // ------------------ Certificates ------------------
 
 export interface ICertificateInfo {
@@ -113,6 +132,13 @@ export interface ITrainerIdentityInfo {
 
 export interface IApplicationStep {
   applicationStep: number;
+}
+
+export interface IRejectionDetails {
+  code?: string; // Machine readable: 'ID_BLURRY', 'CERT_EXPIRED'
+  reasonTemplate?: string; // The human-readable standard text
+  adminFeedback?: string; // Specific instructions from the admin
+  failedSections?: string[]; // e.g., ['identityInfo', 'professionalInfo']
 }
 
 export type UploadedFile = Express.Multer.File;

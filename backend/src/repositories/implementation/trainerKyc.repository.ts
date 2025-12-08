@@ -1,7 +1,7 @@
 import { UpdateQuery } from "mongoose";
 import { TrainerKyc, TrainerKycDocument } from "../../models/trainerKyc.model";
 import { BaseRepository } from "../base.repository";
-import { ITrainerKycRepository } from "../interface/ITrainerKyc.repository";
+import { ITrainerKycRepository } from "../interface/ITrianerKyc.repository";
 
 export class TrainerKycRepository extends BaseRepository<TrainerKycDocument> implements ITrainerKycRepository {
   constructor() {

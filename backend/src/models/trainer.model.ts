@@ -61,8 +61,7 @@ const trainerSchema = new Schema<TrainerDocument>(
       type: String,
       enum: TrainerApplicationStatus,
       default: TrainerApplicationStatus.NOT_STARTED
-    },
-    rejectionReason: { type: String, default: null }
+    }
   },
   { timestamps: true }
 );
