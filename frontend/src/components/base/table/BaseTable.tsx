@@ -102,5 +102,3 @@ export function BaseTable<T extends Record<string, any>>({
     </div>
   );
 }
-
-export default BaseTable;

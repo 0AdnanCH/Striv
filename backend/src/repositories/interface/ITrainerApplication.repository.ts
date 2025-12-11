@@ -14,9 +14,10 @@ export interface IPaginatedResult<T> {
 
 // DTO for Admin Filters
 export interface IApplicationFilter {
+  search: string;
+  page: number;
+  limit: number;
   status?: TrainerApplicationStatus;
-  page?: number;
-  limit?: number;
   sortBy?: string; // e.g., 'submissionDate'
   sortOrder?: 'asc' | 'desc';
 }
@@ -26,15 +27,11 @@ export interface ITrainerApplicationRepository extends IBaseRepository<TrainerAp
   findByTrainerId(trainerId: string | ObjectId): Promise<TrainerApplicationDocument | null>;
 
   // Admin Side Methods
-  findWithFilters(filter: IApplicationFilter): Promise<IPaginatedResult<TrainerApplicationDocument>>;
-  
+  findWithAggregation(filter: IApplicationFilter): Promise<{ data: any[]; total: number }>;
+
   // Review Logic
   assignReviewer(applicationId: string | ObjectId, reviewerId: string | ObjectId): Promise<TrainerApplicationDocument | null>;
-  updateStatus(
-    applicationId: string | ObjectId, 
-    status: TrainerApplicationStatus, 
-    rejectionDetails?: IRejectionDetails
-  ): Promise<TrainerApplicationDocument | null>;
+  updateStatus(applicationId: string | ObjectId, status: TrainerApplicationStatus, rejectionDetails?: IRejectionDetails): Promise<TrainerApplicationDocument | null>;
 
   ensureApplicationExists(trainerId: string | ObjectId, initialStep: number): Promise<TrainerApplicationDocument>;
   updateStep(trainerId: string | ObjectId, newStep: number): Promise<TrainerApplicationDocument | null>;

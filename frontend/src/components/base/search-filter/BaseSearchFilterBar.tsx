@@ -80,5 +80,3 @@ export const BaseSearchFilterBar: React.FC<BaseSearchFilterBarProps> = ({
     </div>
   );
 };
-
-export default BaseSearchFilterBar;

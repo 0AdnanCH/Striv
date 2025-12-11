@@ -11,18 +11,27 @@ import { AdminUserController } from '../controllers/implementation/adminUser.con
 import { authenticate, authorizeRoles } from '../middlewares/auth.middleware';
 import { signinSchema } from '../schemas/signin.schema';
 import { UserRole } from '../constants/enums.constant';
+import { TrainerApplicationRepository } from '../repositories/implementation/trainerApplication.repository';
+import { AdminTrainerApplicationService } from '../services/implementation/adminTrainerApplication.service'; 
+import { AdminTrainerApplicationController } from '../controllers/implementation/adminTrainerApplication.controller'; 
 
 const adminRouter = express.Router();
 
+
+
 const userRepository = new UserRepository();
-const otpRepository = new OtpRepository
-const tokenRepository = new PasswordResetTokenRepository()
+const otpRepository = new OtpRepository();
+const tokenRepository = new PasswordResetTokenRepository();
 const authService = new AuthService(userRepository, otpRepository, tokenRepository);
 const adminService = new AdminService(authService, userRepository);
 const adminController = new AdminController(adminService);
 
 const adminUserService = new AdminUserService(userRepository);
 const adminUserController = new AdminUserController(adminUserService);
+
+const trainerApplicationRepository = new TrainerApplicationRepository();
+const adminTrainerApplicationService = new AdminTrainerApplicationService(trainerApplicationRepository);
+const adminTrainerApplicationController = new AdminTrainerApplicationController(adminTrainerApplicationService);
 
 adminRouter.post(
   '/signin', 
@@ -46,6 +55,13 @@ adminRouter.patch(
   authenticate, 
   authorizeRoles(UserRole.ADMIN), 
   adminUserController.unblockUser.bind(adminUserController)
+);
+
+adminRouter.get(
+  '/trainer/applications', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminTrainerApplicationController.getApplications.bind(adminTrainerApplicationController)
 );
 
 export default adminRouter;

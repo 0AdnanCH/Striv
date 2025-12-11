@@ -3,6 +3,8 @@ import AdminSigninPage from '../pages/AdminSigninPage';
 import AdminDashboard from '../pages/AdminDashboard';
 
 import UserManagementPage from '../pages/UserManagementPage';
+import TrainerApplicationsListPage from '../pages/TrainerApplicationsListPage';
+import TrainerVerificationPage from '../pages/TrainerVerificationPage';
 
 export const publicAdminRoutes: RouteObject[] = [
   {
@@ -19,5 +21,13 @@ export const protectedAdminRoutes: RouteObject[] = [
   {
     path: '/admin/users',
     element: <UserManagementPage />
+  },
+  {
+    path: '/admin/trainer-application-list',
+    element: <TrainerApplicationsListPage />
+  },
+  {
+    path: '/admin/trainer-verification',
+    element: <TrainerVerificationPage />
   }
 ];

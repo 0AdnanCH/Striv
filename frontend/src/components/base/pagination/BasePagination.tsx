@@ -14,7 +14,7 @@ interface BasePaginationProps {
   };
 }
 
-const BasePagination: React.FC<BasePaginationProps> = ({
+export const BasePagination: React.FC<BasePaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
@@ -60,5 +60,3 @@ const BasePagination: React.FC<BasePaginationProps> = ({
     </div>
   );
 };
-
-export default BasePagination;

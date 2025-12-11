@@ -3,7 +3,7 @@ import AdminSidebar from '../components/layout/AdminSidebar';
 import AdminHeader from '../components/layout/AdminHeader';
 import { BaseTable, type BaseTableColumn } from '../../../components/base/table'; 
 import { BaseSearchFilterBar } from '../../../components/base/search-filter'; 
-import BasePagination from '../../../components/base/pagination/BasePagination';
+import { BasePagination } from '../../../components/base/pagination';
 import { BaseConfirmModal } from '../../../components/shared/modal'; 
 import { useAdminUsers } from '../hooks/useAdminUsers';
 import type { IAdminUser } from '../types/adminUser.types';

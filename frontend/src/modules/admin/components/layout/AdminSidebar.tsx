@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Settings, BarChart3, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, BarChart3, Menu, X, ClipboardCheck } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../../../utils/cn.util';
 
@@ -20,6 +20,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ items, onToggle }) =
   const navItems = items || [
     { name: 'Main Management', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'User Management', path: '/admin/users', icon: Users },
+    { name: 'Trainer Applications', path: '/admin/trainer-application-list', icon: ClipboardCheck },
     { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
     { name: 'Settings', path: '/admin/settings', icon: Settings }
   ];
