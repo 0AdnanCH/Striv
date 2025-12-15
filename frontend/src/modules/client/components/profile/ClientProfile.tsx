@@ -14,31 +14,33 @@ const ClientProfile: React.FC = () => {
   }
 
   return (
-    <BaseUserProfile
-      data={{
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        email: profile.email,
-        role: profile.role,
-        gender: profile.gender,
-        age: profile.age,
-        height: profile.height,
-        weight: profile.weight
-      }}
-      showGender
-      showAge
-      showHeight
-      showWeight
-      onFieldUpdate={handleFieldUpdate}
-      theme={{
-        primary: 'text-striv-primary',
-        accent: 'from-striv-primary to-striv-accent',
-        bg: 'transparent', // ⭐ IMPORTANT - no white box inside another white box
-        border: 'border-striv-muted',
-        text: 'text-gray-700',
-        buttonBg: 'bg-striv-primary'
-      }}
-    />
+    <div className="bg-white/70 backdrop-blur-md border border-striv-muted/30 rounded-2xl p-8 sm:p-10 shadow-md">
+      <BaseUserProfile
+        data={{
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          email: profile.email,
+          role: profile.role,
+          gender: profile.gender,
+          age: profile.age,
+          height: profile.height,
+          weight: profile.weight
+        }}
+        showGender
+        showAge
+        showHeight
+        showWeight
+        onFieldUpdate={handleFieldUpdate}
+        theme={{
+          primary: 'text-striv-primary',
+          accent: 'from-striv-primary to-striv-accent',
+          bg: 'transparent', // ⭐ IMPORTANT - no white box inside another white box
+          border: 'border-striv-muted',
+          text: 'text-gray-700',
+          buttonBg: 'bg-striv-primary'
+        }}
+      />
+    </div>
   );
 };
 

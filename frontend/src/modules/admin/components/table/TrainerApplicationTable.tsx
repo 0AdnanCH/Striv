@@ -3,6 +3,7 @@ import { Eye } from 'lucide-react';
 import { BaseTable, type BaseTableColumn } from '../../../../components/base/table'; 
 import type { TrainerApplicationListItem } from '../../types/adminTrainer.types'; 
 import { TrainerApplicationStatus } from '../../../trainer/constants/trainerApplicationStatus.constant'; 
+import { useNavigate } from 'react-router-dom';
 
 // --- INTERNAL HELPER: STATUS BADGE ---
 const StatusBadge = ({ status }: { status: string }) => {
@@ -25,6 +26,7 @@ interface TrainerApplicationTableProps {
 }
 
 export const TrainerApplicationTable: React.FC<TrainerApplicationTableProps> = ({ data, loading }) => {
+  const navigate = useNavigate();
   const columns: BaseTableColumn<TrainerApplicationListItem>[] = [
     { 
       key: 'fullName', 
@@ -73,7 +75,7 @@ export const TrainerApplicationTable: React.FC<TrainerApplicationTableProps> = (
       render: (row) => (
         <button 
           // In a real app, use navigate() here. e.g. navigate(`/admin/verifications/${row.applicationId}`)
-          onClick={() => console.log(`Maps to /admin/verify/${row._id}`)}
+          onClick={() => navigate(`/admin/trainer-verification/${row._id}`)}
           className="bg-[#3B82F6] text-white p-2 rounded-lg hover:bg-blue-600 transition shadow-sm flex items-center gap-2 ml-auto text-xs font-medium"
         >
           <Eye size={16} />

@@ -14,6 +14,8 @@ import { UserRole } from '../constants/enums.constant';
 import { TrainerApplicationRepository } from '../repositories/implementation/trainerApplication.repository';
 import { AdminTrainerApplicationService } from '../services/implementation/adminTrainerApplication.service'; 
 import { AdminTrainerApplicationController } from '../controllers/implementation/adminTrainerApplication.controller'; 
+import { TrainerRepository } from '../repositories/implementation/trainer.repository';
+import { TrainerKycRepository } from '../repositories/implementation/trainerKyc.repository';
 
 const adminRouter = express.Router();
 
@@ -30,7 +32,15 @@ const adminUserService = new AdminUserService(userRepository);
 const adminUserController = new AdminUserController(adminUserService);
 
 const trainerApplicationRepository = new TrainerApplicationRepository();
-const adminTrainerApplicationService = new AdminTrainerApplicationService(trainerApplicationRepository);
+const trainerRepository = new TrainerRepository();
+const trainerKycRepository = new TrainerKycRepository();
+
+const adminTrainerApplicationService = new AdminTrainerApplicationService(
+  trainerApplicationRepository,
+  trainerRepository,
+  userRepository,
+  trainerKycRepository,
+);
 const adminTrainerApplicationController = new AdminTrainerApplicationController(adminTrainerApplicationService);
 
 adminRouter.post(
@@ -63,5 +73,27 @@ adminRouter.get(
   authorizeRoles(UserRole.ADMIN), 
   adminTrainerApplicationController.getApplications.bind(adminTrainerApplicationController)
 );
+
+adminRouter.get(
+  '/trainer/application/:id/details', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminTrainerApplicationController.getVerificationDetails.bind(adminTrainerApplicationController)
+);
+
+adminRouter.patch(
+  '/trainer/application/:id/approve', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminTrainerApplicationController.approveApplication.bind(adminTrainerApplicationController)
+);
+
+adminRouter.patch(
+  '/trainer/application/:id/reject', 
+  authenticate, 
+  authorizeRoles(UserRole.ADMIN), 
+  adminTrainerApplicationController.rejectApplication.bind(adminTrainerApplicationController)
+);
+
 
 export default adminRouter;

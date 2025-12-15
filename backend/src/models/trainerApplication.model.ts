@@ -22,7 +22,7 @@ const TrainerApplicationSchema = new Schema<TrainerApplicationDocument>(
   {
     trainerId: {
       type: Schema.Types.ObjectId,
-      ref: 'Trainer', // Assuming your main data model is named 'Trainer'
+      ref: 'Trainer', 
       required: true,
       unique: true, // Optimization: One active application per trainer
       index: true
@@ -43,7 +43,7 @@ const TrainerApplicationSchema = new Schema<TrainerApplicationDocument>(
     },
     reviewerId: {
       type: Schema.Types.ObjectId,
-      ref: 'Admin', // Assuming you have an Admin model
+      ref: 'User', 
       default: null
     },
     reviewedAt: {
@@ -62,13 +62,9 @@ const TrainerApplicationSchema = new Schema<TrainerApplicationDocument>(
 );
 
 // 3. Database Optimizations (Compound Indexes)
-
-// Scenario: Admin wants to see "All COMPLETED applications sorted by submission date"
-// This compound index makes that query instant.
 TrainerApplicationSchema.index({ status: 1, submissionDate: -1 });
 
 // 4. Pre-save Hooks (Optional Logic)
-// Example: If status changes to COMPLETED, auto-set submissionDate if missing
 TrainerApplicationSchema.pre('save', function(next) {
   if (this.isModified('status') && this.status === TrainerApplicationStatus.COMPLETED) {
     if (!this.submissionDate) {

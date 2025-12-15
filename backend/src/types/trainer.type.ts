@@ -11,10 +11,6 @@ export interface ITrainer {
   availability: ITrainerAvailability[];
   pricing: IPricingInfo;
   portfolio: IPortfolioInfo;
-
-  applicationStep: number;
-  applicationStatus: TrainerApplicationStatus;
-  rejectionReason?: string | null;
 }
 
 // ------------------ KYC ------------------

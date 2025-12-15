@@ -27,7 +27,7 @@ export const protectedAdminRoutes: RouteObject[] = [
     element: <TrainerApplicationsListPage />
   },
   {
-    path: '/admin/trainer-verification',
+    path: '/admin/trainer-verification/:id',
     element: <TrainerVerificationPage />
   }
 ];

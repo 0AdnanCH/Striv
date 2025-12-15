@@ -1,48 +1,82 @@
-import type { SerializedError } from '@reduxjs/toolkit';
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
-import { AxiosError } from 'axios';
+import { type SerializedError } from '@reduxjs/toolkit';
+import { type FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
-export function handleApiError(context: string, error: unknown, customMessage?: string): void {
-  let message = customMessage || 'Something went wrong. Please try again.';
+/**
+ * Type Guard for RTK Query FetchBaseQueryError
+ * Strictly checks for the presence of 'status' AND guarantees it's not an Axios error
+ */
+function isRTKFetchError(error: unknown): error is FetchBaseQueryError {
+  return (
+    typeof error === 'object' && error !== null && 'status' in error && !('name' in error && error.name === 'AxiosError') // Defensively ensure it's not Axios
+  );
+}
 
-  console.error(`[${context} API ERROR]`, error);
+/**
+ * Type Guard for RTK SerializedError
+ */
+function isRTKSerializedError(error: unknown): error is SerializedError {
+  return (
+    typeof error === 'object' && error !== null && 'message' in error && !('status' in error) // Ensure it doesn't overlap with FetchBaseQueryError
+  );
+}
 
-  const isRTKFetchError = (error: any): error is FetchBaseQueryError => error && typeof error === 'object' && ('status' in error || 'error' in error);
-
-  const isRTKSerializedError = (err: any): err is SerializedError => err && typeof err === 'object' && ('message' in err || 'name' in err);
-
-  // 1️⃣ RTK Query: FetchBaseQueryError
-  if (isRTKFetchError(error)) {
-    // Case: RTK Query returns structured error
-    if ('data' in error && (error.data as any)?.message) {
-      message = (error.data as any).message;
-    } else if ('error' in error && typeof error.error === 'string') {
-      message = error.error; // Network errors
+/**
+ * Extraction Strategy:
+ * Decouples the "how to get the string" from the "how to show it"
+ */
+function getErrorMessage(error: unknown): string | null {
+  // 1️⃣ Axios Error (Class check is most specific)
+  if (isAxiosError(error)) {
+    // Backend returned a specific error response (e.g., 400 Bad Request)
+    if (error.response?.data && typeof error.response.data === 'object' && 'message' in error.response.data) {
+      return String((error.response.data as any).message);
     }
-
-    // 2️⃣ RTK Query: SerializedError
-  } else if (isRTKSerializedError(error)) {
-    if (error.message) {
-      message = error.message;
-    } else if (error.name) {
-      message = error.name;
-    }
-
-    // 3️⃣ Axios Error
-  } else if (error instanceof AxiosError) {
-    // Case 1: Backend responded with an error (4xx / 5xx)
-    if (error.response?.data?.message) {
-      message = error.response.data.message;
-    } else if (error.message) {
-      // Case 2: Network or CORS error
-      message = error.message;
-    }
-
-    // 4️⃣ Default JS Error
-  } else if (error instanceof Error) {
-    message = error.message;
+    // Network errors (e.g., timeout, DNS)
+    return error.message;
   }
 
-  toast.error(message);
+  // 2️⃣ RTK Query: FetchBaseQueryError
+  if (isRTKFetchError(error)) {
+    // Case: Server returned JSON with a message
+    if ('data' in error && typeof error.data === 'object' && error.data !== null) {
+      if ('message' in error.data) return String((error.data as any).message);
+      if ('error' in error.data) return String((error.data as any).error);
+    }
+    // Case: Primitive error (like string)
+    if ('error' in error) return String(error.error);
+
+    return JSON.stringify(error.data); // Fallback for unhandled shapes
+  }
+
+  // 3️⃣ RTK Query: SerializedError
+  if (isRTKSerializedError(error)) {
+    return error.message || error.name || null;
+  }
+
+  // 4️⃣ Native JS Error
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  // 5️⃣ Fallback for strings/unknowns
+  if (typeof error === 'string') return error;
+
+  return null;
+}
+
+/**
+ * Main Utility Function
+ */
+export function handleApiError(context: string, error: unknown, customMessage?: string): void {
+  console.error(`[${context} API ERROR]`, error);
+
+  // Extract the specific message using our strategy
+  const specificMessage = getErrorMessage(error);
+
+  // Decide the final message
+  const finalMessage = specificMessage || customMessage || 'Something went wrong. Please try again.';
+
+  toast.error(finalMessage);
 }

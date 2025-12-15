@@ -66,3 +66,22 @@ export const MOCK_TRAINER_DATA = {
     backImage: null,
   } as ITrainerIdentityInfo,
 };
+
+export interface ApproveApplicationResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}
+
+export interface ITrainerRejectionPayload {
+  code?: string;
+  reasonTemplate?: string;
+  adminFeedback: string;
+  failedSections: string[];
+}
+
+export interface RejectApplicationResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}

@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Settings, BarChart3, Menu, X, ClipboardCheck } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Settings, 
+  BarChart3, 
+  Menu, 
+  X, 
+  ClipboardCheck, 
+  ShieldCheck // Icon for verification
+} from 'lucide-react';
+import { NavLink, useLocation, matchPath } from 'react-router-dom';
 import { cn } from '../../../../utils/cn.util';
 
 export interface SidebarItem {
@@ -16,6 +25,7 @@ interface AdminSidebarProps {
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ items, onToggle }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const location = useLocation(); 
 
   const navItems = items || [
     { name: 'Main Management', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -31,6 +41,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ items, onToggle }) =
     onToggle?.(next);
   };
 
+  // Helper to check if we are currently on the verification details page
+  const isVerificationPage = matchPath('/admin/trainer-verification/:id', location.pathname);
+
   return (
     <aside className={cn('h-screen flex flex-col transition-all duration-300 shadow-xl', isOpen ? 'w-64' : 'w-20', 'bg-admin-primary text-admin-bg')}>
       {/* Header Section */}
@@ -42,27 +55,54 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ items, onToggle }) =
       </div>
 
       {/* Nav Links */}
-      <nav className="flex flex-col gap-1 mt-4">
-        {navItems.map(({ name, path, icon: Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-4 px-6 py-3 text-admin-bg transition-colors',
-                'hover:bg-admin-secondary/30 hover:text-admin-accent',
-                isActive && 'bg-admin-secondary/30 text-admin-accent font-medium'
-              )
-            }
-          >
-            <Icon size={20} />
-            {isOpen && <span className="text-sm font-medium">{name}</span>}
-          </NavLink>
-        ))}
+      <nav className="flex flex-col gap-1 mt-4 overflow-y-auto">
+        {navItems.map(({ name, path, icon: Icon }) => {
+          const isParentActive = path === '/admin/trainer-application-list' && !!isVerificationPage;
+
+          return (
+            <div key={path} className="flex flex-col">
+              {/* Main Menu Item */}
+              <NavLink
+                to={path}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-4 px-6 py-3 text-admin-bg transition-colors relative',
+                    'hover:bg-admin-secondary/30 hover:text-admin-accent',
+                    // Highlight this parent if it's strictly active OR if we are on its child page
+                    (isActive || isParentActive) && 'bg-admin-secondary/30 text-admin-accent font-medium'
+                  )
+                }
+              >
+                <Icon size={20} />
+                {isOpen && <span className="text-sm font-medium">{name}</span>}
+                
+                {/* Optional: Add a small indicator if it's the parent of the active page */}
+                {isOpen && isParentActive && (
+                   <span className="absolute right-4 w-1.5 h-1.5 rounded-full bg-admin-accent animate-pulse" />
+                )}
+              </NavLink>
+
+              {isOpen && path === '/admin/trainer-application-list' && isVerificationPage && (
+                <div className="animate-in slide-in-from-left-2 duration-300">
+                  <div className="flex items-center gap-4 px-6 py-2 text-admin-accent bg-admin-secondary/10 border-l-4 border-admin-accent ml-0">
+                    <div className="ml-1 min-w-[20px] flex justify-center">
+                       <ShieldCheck size={16} /> 
+                    </div>
+                    <span className="text-xs font-semibold tracking-wide uppercase">
+                      Verification In Progress
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       {/* Footer */}
-      <div className="mt-auto p-6 border-t border-admin-secondary text-sm text-admin-secondary">{isOpen ? '© 2025 Striv Admin' : '©'}</div>
+      <div className="mt-auto p-6 border-t border-admin-secondary text-sm text-admin-secondary whitespace-nowrap overflow-hidden">
+        {isOpen ? '© 2025 Striv Admin' : '©'}
+      </div>
     </aside>
   );
 };

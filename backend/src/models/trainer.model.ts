@@ -51,16 +51,6 @@ const trainerSchema = new Schema<TrainerDocument>(
         youtube: { type: String, default: null },
         linkedin: { type: String, default: null }
       }
-    },
-    applicationStep: {
-      type: Number,
-      enum: [1, 2, 3, 4],
-      default: 1
-    },
-    applicationStatus: {
-      type: String,
-      enum: TrainerApplicationStatus,
-      default: TrainerApplicationStatus.NOT_STARTED
     }
   },
   { timestamps: true }

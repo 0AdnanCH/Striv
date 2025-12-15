@@ -18,17 +18,6 @@ const trainerKycSchema = new Schema<TrainerKycDocument>(
 
     frontImageUrl: { type: String, required: true },
     backImageUrl: { type: String, required: false },
-
-    status: {
-      type: String,
-      enum: Status,
-      default: Status.PENDING
-    },
-
-    rejectionReason: { type: String, required: false },
-
-    reviewedBy: { type: Schema.Types.ObjectId, ref: 'User', required: false },
-    reviewedAt: { type: Date, required: false }
   },
   { timestamps: true }
 );

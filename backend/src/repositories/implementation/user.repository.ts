@@ -4,7 +4,8 @@ import { IUser } from "../../types/user.type";
 import { User, UserDocument } from "../../models/user.model";
 import { FetchUsersQuery } from "../../dtos/adminUser.dto";
 import { PaginatedResult } from "../../types/pagination.types";
-import { ObjectId } from "mongoose";
+import { ClientSession, ObjectId } from "mongoose";
+import { UserRole } from "../../constants/enums.constant";
 
 export class UserRepository extends BaseRepository<UserDocument> implements IUserRepository {
   constructor() {
@@ -45,6 +46,14 @@ export class UserRepository extends BaseRepository<UserDocument> implements IUse
       { _id: userId },
       { $set: { password: hashedPassword } },
       { session }
+    ).exec();
+  }
+
+  async updateRole(id: string | ObjectId, role: UserRole, session?: ClientSession): Promise<UserDocument | null> {
+    return await this.model.findByIdAndUpdate(
+      id,
+      { $set: { role: role } },
+      { new: true, session }
     ).exec();
   }
 }

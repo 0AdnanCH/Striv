@@ -1,4 +1,4 @@
-import { ObjectId, PipelineStage } from 'mongoose';
+import { ClientSession, ObjectId, PipelineStage } from 'mongoose';
 import { IApplicationFilter, ITrainerApplicationRepository } from '../interface/ITrainerApplication.repository';
 import { BaseRepository } from '../base.repository';
 import { TrainerApplication, TrainerApplicationDocument } from '../../models/trainerApplication.model';
@@ -190,18 +190,43 @@ export class TrainerApplicationRepository extends BaseRepository<TrainerApplicat
    * Handles the final approval or rejection logic.
    * Updates status, timestamps, and optionally rejection details.
    */
-  async updateStatus(applicationId: string, status: TrainerApplicationStatus, rejectionDetails?: IRejectionDetails): Promise<TrainerApplicationDocument | null> {
-    const updateData: any = {
-      status,
-      reviewedAt: new Date()
-    };
+  async updateStatus(
+    applicationId: string | ObjectId, 
+    status: TrainerApplicationStatus, 
+    reviewerId: string | ObjectId, 
+    session?: ClientSession
+  ): Promise<TrainerApplicationDocument | null> {
+    return this.model.findByIdAndUpdate(
+      applicationId,
+      {
+        $set: {
+          status,
+          reviewerId,
+          reviewedAt: new Date()
+        }
+      },
+      { new: true, session }
+    ).exec();
+  }
 
-    // If rejected or revision requested, add the details
-    if (rejectionDetails) {
-      updateData.rejectionDetails = rejectionDetails;
-    }
-
-    return this.model.findByIdAndUpdate(applicationId, { $set: updateData }, { new: true }).exec();
+  async rejectApplication(
+    applicationId: string | ObjectId, 
+    rejectionDetails: IRejectionDetails, 
+    reviewerId: string | ObjectId, 
+    session?: ClientSession
+  ): Promise<TrainerApplicationDocument | null> {
+    return this.model.findByIdAndUpdate(
+      applicationId,
+      {
+        $set: {
+          status: TrainerApplicationStatus.REJECTED,
+          rejectionDetails: rejectionDetails,
+          reviewerId: reviewerId,
+          reviewedAt: new Date()
+        }
+      },
+      { new: true, session }
+    ).exec();
   }
 
   async ensureApplicationExists(trainerId: string | ObjectId, initialStep: number): Promise<TrainerApplicationDocument> {
