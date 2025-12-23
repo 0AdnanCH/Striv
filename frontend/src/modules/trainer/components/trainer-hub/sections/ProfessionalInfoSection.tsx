@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as LinkIcon, Calendar } from 'lucide-react';
+import { Link as LinkIcon } from 'lucide-react';
 import { SectionCard, InfoRow } from '../shared/TrainerHubUI';
 import { EditInput, ChipArrayEditor } from '../shared/TrainerHubInputs';
 import { CertificatesEditor } from '../editors/CertificatesEditor';
@@ -27,12 +27,7 @@ export const ProfessionalInfoSection: React.FC<Props> = ({
   onSocialUpdate 
 }) => {
   return (
-    <SectionCard 
-      title="Professional Qualifications" 
-      isEditing={isEditing} 
-      canEdit={canEdit} 
-      onEdit={onEdit} 
-      onCancel={onCancel}>
+    <SectionCard title="Professional Qualifications" isEditing={isEditing} canEdit={canEdit} onEdit={onEdit} onCancel={onCancel}>
       {isEditing ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -83,21 +78,33 @@ export const ProfessionalInfoSection: React.FC<Props> = ({
           </div>
 
           <div className="mt-4">
-            <p className="text-sm font-medium text-striv-secondary mb-2">Certificates</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <p className="text-sm font-medium text-striv-secondary mb-3">Certificates</p>
+            <div className="grid grid-cols-1 gap-4">
               {data?.certificates?.map((cert, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-striv-bg/30 p-3 rounded-lg border border-striv-muted/30">
-                  <div className="bg-white p-2 rounded-full shadow-sm">
-                    <Calendar size={16} className="text-striv-accent" />
+                <div key={idx} className="flex gap-4 bg-white p-3 rounded-xl border border-striv-muted/30 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Certificate Image Thumbnail */}
+                  <div className="shrink-0 w-24 h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    {cert.fileUrl ? (
+                      <img src={cert.fileUrl} alt={cert.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <span className="text-xs text-center p-1">No Image</span>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">{cert.title}</p>
-                    <p className="text-xs text-striv-secondary">
-                      {cert.issuer} • {cert.issuedDate ? new Date(cert.issuedDate).toLocaleDateString() : 'No Date'}
-                    </p>
+
+                  {/* Certificate Info */}
+                  <div className="flex flex-col justify-center">
+                    <h5 className="font-bold text-gray-800 text-base">{cert.title || 'Untitled Certificate'}</h5>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="px-2 py-0.5 bg-striv-bg text-striv-primary text-xs font-bold rounded">{cert.issuer || 'Unknown Issuer'}</span>
+                      <span className="text-xs text-striv-secondary">Issued: {cert.issuedDate ? new Date(cert.issuedDate).toLocaleDateString() : 'N/A'}</span>
+                    </div>
                   </div>
                 </div>
               ))}
+
+              {(!data?.certificates || data.certificates.length === 0) && <div className="text-sm text-gray-400 italic">No certificates added.</div>}
             </div>
           </div>
         </>

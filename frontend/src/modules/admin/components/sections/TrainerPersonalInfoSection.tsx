@@ -5,7 +5,11 @@ export const TrainerPersonalInfoSection = ({ data }: { data: IPersonalInfo & { e
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="flex items-start gap-6 mb-8">
-        <img src={data.profile_photo} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-sm" />
+        <img
+          src={typeof data.profile_photo === 'string' ? data.profile_photo : 'https://via.placeholder.com/150'}
+          alt="Profile"
+          className="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-sm"
+        />
         <div>
           <h3 className="text-xl font-bold text-slate-800">
             {data.first_name} {data.last_name}

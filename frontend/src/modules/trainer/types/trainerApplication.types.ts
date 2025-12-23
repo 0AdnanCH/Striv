@@ -79,7 +79,7 @@ export interface IPersonalInfo {
   gender: GenderType;
   age: number | null;
   phone: string;
-  profile_photo: string;
+  profile_photo: string | File;
 }
 
 export interface IProfessionalInfo {

@@ -40,7 +40,9 @@ const PersonalInfoForm: React.FC<Props> = ({ onNext, loading, defaultValues }) =
       ...defaultValues,
       age: defaultValues?.age as undefined as any,
       profile_photo: null,
-      existingProfilePhotoUrl: defaultValues?.profile_photo ?? null
+      existingProfilePhotoUrl: typeof defaultValues?.profile_photo === 'string' 
+      ? defaultValues.profile_photo 
+      : null
     };
   }, [defaultValues]);
 
