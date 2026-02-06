@@ -100,9 +100,12 @@ export class AdminTrainerApplicationService implements IAdminTrainerApplicationS
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         email: user.email,
-        gender: user.gender || Gender.MALE,
-        age: user.age || 0,
-        phone: user.phone || '',
+        // gender: user.gender || Gender.MALE,
+        // age: user.age || 0,
+        // phone: user.phone || '',
+        gender: Gender.MALE,
+        age: 0,
+        phone: '',
         profile_photo: user.profile_photo || ''
       },
 

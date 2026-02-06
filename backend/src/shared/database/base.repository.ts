@@ -1,5 +1,5 @@
 import { Document, FilterQuery, Model, ObjectId, QueryOptions, UpdateQuery } from "mongoose";
-import { IBaseRepository } from "./interface/IBase.repository";
+import { IBaseRepository } from "./base.interface"; 
 
 export abstract class BaseRepository<T extends Document> implements IBaseRepository<T> {
   constructor(protected readonly model: Model<T>) {}
@@ -10,26 +10,26 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
   }
 
   async findAll(): Promise<T[]> {
-    return await this.model.find();
+    return await this.model.find().exec();
   }
 
-  async findById(id: ObjectId | string): Promise<T | null> {
-    return await this.model.findById(id);
+  async findById(id: string): Promise<T | null> {
+    return await this.model.findById(id).exec();
   }
 
   async findOne(filter: FilterQuery<T>): Promise<T | null> {
-    return await this.model.findOne(filter);
+    return await this.model.findOne(filter).exec();
   }
 
-  async findByIdAndUpdate(id: string | ObjectId, update: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T | null> {
-    return await this.model.findByIdAndUpdate(id, update, options);
+  async findByIdAndUpdate(id: string, update: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T | null> {
+    return await this.model.findByIdAndUpdate(id, update, options).exec();
   }
 
   async findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: QueryOptions<T>): Promise<T | null> {
-    return await this.model.findOneAndUpdate(filter, update, options);
+    return await this.model.findOneAndUpdate(filter, update, options).exec();
   }
 
-  async delete(id: ObjectId): Promise<void> {
-    await this.model.findByIdAndDelete(id);
+  async delete(id: string): Promise<void> {
+    await this.model.findByIdAndDelete(id).exec();
   }
 }

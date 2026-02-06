@@ -5,11 +5,17 @@ export const env = {
   get PORT() {
     return process.env.PORT;
   },
+  get NODE_ENV() {
+    return process.env.NODE_ENV;
+  },
   get MONGO_URI() {
     return process.env.MONGO_URI;
   },
-  get JWT_SECRET() {
+  get JWT_ACCESS_SECRET() {
     return process.env.JWT_SECRET;
+  },
+  get JWT_REFRESH_SECRET() {
+    return process.env.JWT_REFRESH_SECRET;
   },
   get BCRYPT_SALT_ROUNDS() {
     return Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
@@ -34,5 +40,5 @@ export const env = {
   },
   get AWS_S3_BUCKET() {
     return process.env.AWS_S3_BUCKET;
-  },
+  }
 };

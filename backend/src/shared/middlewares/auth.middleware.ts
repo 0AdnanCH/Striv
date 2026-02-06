@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import BadRequestError from '../errors/badRequest.error';
-import { HTTP_STATUS } from '../constants/httpStatus.constant';
-import { RESPONSE_MESSAGES } from '../constants/responseMessages.constant';
-import { JwtUserPayload, verifyAccessToken } from '../shared/utils/jwt.util';
-
+import BadRequestError from '../../errors/badRequest.error'; 
+import { HTTP_STATUS } from '../../constants/httpStatus.constant'; 
+import { RESPONSE_MESSAGES } from '../../constants/responseMessages.constant'; 
+import { JwtUserPayload, verifyAccessToken } from '../utils/jwt.util';
 
 export interface AuthenticatedRequest extends Request {
   user?: { id: string; role: JwtUserPayload['role'] };
@@ -26,7 +25,7 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     if (!token || token === 'undefined' || token === 'null') {
       throw new BadRequestError({
         statusCode: HTTP_STATUS.UNAUTHORIZED,
@@ -43,7 +42,7 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
     if (err instanceof BadRequestError) {
       return next(err);
     }
-    console.error(err)
+    console.error(err);
     next(
       new BadRequestError({
         statusCode: HTTP_STATUS.UNAUTHORIZED,

@@ -77,9 +77,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
     const personalInfo: ITrainerPersonalInfo = {
       first_name: user.first_name || '',
       last_name: user.last_name || '',
-      gender: user.gender || Gender.MALE,
-      age: user.age ?? null,
-      phone: user.phone || '',
+      // gender: user.gender || Gender.MALE,
+      // age: user.age ?? null,
+      // phone: user.phone || '',
+      gender: Gender.MALE,
+      age: null,
+      phone: '',
       profile_photo: user.profile_photo || ''
     };
 
@@ -161,9 +164,9 @@ export class TrainerApplicationService implements ITrainerApplicationService {
 
     if (first_name && first_name !== user.first_name) updateUserPayload.first_name = first_name;
     if (last_name && last_name !== user.last_name) updateUserPayload.last_name = last_name;
-    if (gender && gender !== user.gender) updateUserPayload.gender = gender;
-    if (age && age !== user.age) updateUserPayload.age = age;
-    if (phone && phone !== user.phone) updateUserPayload.phone = phone;
+    // if (gender && gender !== user.gender) updateUserPayload.gender = gender;
+    // if (age && age !== user.age) updateUserPayload.age = age;
+    // if (phone && phone !== user.phone) updateUserPayload.phone = phone;
     if (finalPhotoUrl !== user.profile_photo) updateUserPayload.profile_photo = finalPhotoUrl;
 
     let updatedUser = user;
@@ -203,9 +206,12 @@ export class TrainerApplicationService implements ITrainerApplicationService {
       data: {
         first_name: updatedUser.first_name || '',
         last_name: updatedUser.last_name || '',
-        gender: updatedUser.gender || Gender.MALE,
-        age: updatedUser.age ?? 0,
-        phone: updatedUser.phone || '',
+        // gender: updatedUser.gender || Gender.MALE,
+        // age: updatedUser.age ?? 0,
+        // phone: updatedUser.phone || '',
+        gender: Gender.MALE,
+        age: null,
+        phone: '',
         profile_photo: updatedUser.profile_photo || ''
       }
     };

@@ -1,12 +1,8 @@
 import { Schema, model, Document, ObjectId } from "mongoose";
-import { IUser } from "../types/user.type";
-import { AuthProvider, Gender, UserRole } from "../constants/enums.constant";
+import { IUser } from "./interfaces"; 
+import { AuthProvider, UserRole } from '../../constants/enums.constant';
 
-export interface UserDocument extends IUser, Document<ObjectId> {
-  _id: ObjectId;
-}
-
-const userSchema = new Schema<UserDocument>(
+const userSchema = new Schema<IUser>(
   {
     // --- AUTHENTICATION ---
     email: {
@@ -35,9 +31,9 @@ const userSchema = new Schema<UserDocument>(
     },
 
     // --- BASIC IDENTITY ---
-    first_name: { type: String, required: true, trim: true },
-    last_name: { type: String, required: true, trim: true },
-    profile_photo: { type: String, default: null },
+    firstName: { type: String, required: true, trim: true },
+    lastName: { type: String, required: true, trim: true },
+    profilePhoto: { type: String, default: null },
 
     // --- SECURITY FLAGS ---
     isVerified: { type: Boolean, default: false },
@@ -61,4 +57,4 @@ const userSchema = new Schema<UserDocument>(
 
 userSchema.index({ firstName: 1, lastName: 1 });
 
-export const User = model<UserDocument>('User', userSchema);
+export const UserModel = model<IUser>('UserModel', userSchema);

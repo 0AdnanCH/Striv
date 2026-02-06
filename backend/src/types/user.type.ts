@@ -2,21 +2,22 @@ import { ObjectId } from "mongoose";
 import { AuthProvider, Gender, UserRole } from "../constants/enums.constant";
 
 export interface IUser {
-  first_name?: string;
-  last_name?: string;
   email: string;
   password?: string;
-  gender?: Gender;
-  age?: number;
-  height?: number;
-  weight?: number;
-  phone?: string;
-  profile_photo?: string;
   role: UserRole;
+
+  first_name?: string;
+  last_name?: string;
+  profile_photo?: string;
+
   isVerified?: boolean;
   isBlocked?: boolean;
+
   authProvider: AuthProvider;
   googleId?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export interface IUserProfile {
